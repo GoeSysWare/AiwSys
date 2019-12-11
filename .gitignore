@@ -1,3 +1,66 @@
+#########################################################################################
+#目录类过滤
+#########################################################################################
+
+# Bazel
+bazel-bin
+bazel-genfiles
+bazel-out
+bazel-testlogs
+bazel-AiwSys
+/Debug/
+
+# Logs
+cyber/log/*
+log/*
+records
+
+# python proto
+py_proto
+cyber/python/cyber/proto/
+
+# Doxygen
+docs/doxygen
+cyber/doxy-docs/build/
+cyber/doxy-docs/xml/
+
+#########################################################################################
+#文件类型过滤
+#########################################################################################
+# Eclipse IDE files
+.project
+.cproject
+.settings
+.classpath
+
+# IntelliJ files
+.idea
+
+# Vscode files
+#.vscode
+
+# atom.io files
+*.gch
+
+# Logs.
+*.stdout
+*.stderr
+nohup.out
+*.bak
+*.csv.result
+
+#模型文件
+*.pt
+# temporary files
+*.swp
+*.swo
+*.pyc
+*genrule.log
+
+
+# Bash Environment
+.dev_bash_hist
+
 # Prerequisites
 *.d
 
@@ -30,3 +93,7 @@
 *.exe
 *.out
 *.app
+
+
+
+
