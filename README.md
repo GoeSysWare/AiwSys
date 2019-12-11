@@ -2,7 +2,40 @@
 some X things about control system 
 
 
-# 构建 Cyber
+
+# 系统组成
+- cyber          通信中间件
+- controller   控制器的内核
+  + core
+  + bsp
+  + logic
+  + os
+- db    数据库   
+  + rtdb
+  + hisd
+  + drivers
+- serivces    其他运行服务
+  + sound
+  + print
+  + alarm
+  + calc
+  + timer
+  + monitor
+- hmi   人机界面
+  + view
+  + web
+- manager   工程组态工具              
+  + 
+- gate   软件网关
+  + modbus
+  + opc
+- simulator    数据仿真系统    
+- app    
+- tools
+
+
+# 构建 
+## Cyber
 构建cyber是个非常麻烦的过程，需要时间和耐心....
 因为是bazel构建工具，最好需要在联网的情况下编译，这样可以自动下载构建需要的工具链
 构建源码时发生的错误，绝大多数是因为缺少 'functional' 这个头文件
