@@ -16,7 +16,7 @@
 *  @license																	 *
 *                                                                            *
 *----------------------------------------------------------------------------*
-*  Remark         : 必须在支持C++11环境下编译通过                            *
+*  Remark         :                            *
 *----------------------------------------------------------------------------*
 *  Change History :                                                          *
 *  <Date>     | <Version> | <Author>       | <Description>                   *
@@ -33,7 +33,7 @@
 
 
 #include "aiwVersion.h"
-#include "aiwNameSpace.h"
+#include "aiwNamespace.h"
 
 #define rtkm_node_key_length   16
 

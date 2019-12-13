@@ -18,6 +18,34 @@
            "group": "build"
        },
        {
+        "label": "Bazel Build App",
+        "type": "shell",
+        "command": "bazel",
+        "args": [
+            "build",
+            "//modules/app/...",
+            "--cpu=k8"
+        ],
+        "problemMatcher": [
+            "$gcc",
+        ],
+        "group": "build"
+       },
+       {
+        "label": "Bazel Build Tools",
+        "type": "shell",
+        "command": "bazel",
+        "args": [
+            "build",
+            "//modules/tools/...",
+            "--cpu=k8"
+        ],
+        "problemMatcher": [
+            "$gcc",
+        ],
+        "group": "build"
+       },
+       {
            "label": "Bazel Clear ",
            "type": "shell",
            "command": "bazel",
