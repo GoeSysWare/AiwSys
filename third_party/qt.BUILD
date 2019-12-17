@@ -21,7 +21,6 @@ cc_library(
     hdrs = glob(["*"]),
     copts = [
         "-Iinclude",
-        #        "-Iinclude/QtCore",
         "-Iinclude/QtWidgets",
     ],
     includes = ["include/QtWidgets"],
@@ -38,9 +37,7 @@ cc_library(
     hdrs = glob(["*"]),
     copts = [
         "-Iinclude",
-        # "-Iinclude/QtCore",
         "-Iinclude/QtGui",
-        # "-Iinclude/QtWidgets",
     ],
     includes = ["include/QtGui"],
     linkopts = [
@@ -76,3 +73,102 @@ cc_library(
         ":qt_widgets",
     ],
 )
+
+cc_library(
+    name = "qt_quick",
+    hdrs = glob(["*"]),
+    copts = [
+        "-Iinclude",
+        "-Iinclude/QtCore",
+        "-Iinclude/QtWidgets",
+        "-Iinclude/QtGui",
+        "-Iinclude/QtQuick",
+    ],
+    includes = ["include/QtQuick"],
+    linkopts = [
+        "-L/opt/Qt5.5.1/5.5/gcc_64/lib",
+        "-lQt5Quick",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":qt_core",
+        ":qt_gui",
+        ":qt_widgets",
+    ],
+)
+
+cc_library(
+    name = "qt_qml",
+    hdrs = glob(["*"]),
+    copts = [
+        "-Iinclude",
+        "-Iinclude/QtCore",
+        "-Iinclude/QtWidgets",
+        "-Iinclude/QtGui",
+        "-Iinclude/QtQml",
+    ],
+    includes = ["include/QtQml"],
+    linkopts = [
+        "-L/opt/Qt5.5.1/5.5/gcc_64/lib",
+        "-lQt5Qml",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":qt_core",
+        ":qt_gui",
+        ":qt_widgets",
+    ],
+)
+
+cc_library(
+    name = "qt_media",
+    hdrs = glob(["*"]),
+    copts = [
+        "-Iinclude",
+        "-Iinclude/QtCore",
+        "-Iinclude/QtWidgets",
+        "-Iinclude/QtGui",
+        "-Iinclude/QtMultimedia",
+        "-Iinclude/QtMultimediaWidgets",
+    ],
+    includes = [
+        "include/QtMultimedia",
+        "include/QtMultimediaWidgets",
+        ],
+    linkopts = [
+        "-L/opt/Qt5.5.1/5.5/gcc_64/lib",
+        "-lQt5Multimedia",
+        "-lQt5MultimediaWidgets",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":qt_core",
+        ":qt_gui",
+        ":qt_widgets",
+    ],
+)
+cc_library(
+    name = "qt_network",
+    hdrs = glob(["*"]),
+    copts = [
+        "-Iinclude",
+        "-Iinclude/QtCore",
+        "-Iinclude/QtWidgets",
+        "-Iinclude/QtGui",
+        "-Iinclude/QtNetwork",
+    ],
+    includes = [
+        "include/QtNetwork",
+        ],
+    linkopts = [
+        "-L/opt/Qt5.5.1/5.5/gcc_64/lib",
+        "-lQt5Network",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":qt_core",
+        ":qt_gui",
+        ":qt_widgets",
+    ],
+)
+

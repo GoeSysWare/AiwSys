@@ -18,7 +18,7 @@
             "name": "C++: Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bazel-bin/modules/tools/test_cuda_exe",
+            "program": "${workspaceFolder}/bazel-bin/modules/hmi/camera/test_qt_camera",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

@@ -69,6 +69,7 @@
         "random": "cpp",
         "set": "cpp",
         "string": "cpp",
-        "*.inc": "cpp"
+        "*.inc": "cpp",
+        "qcamera": "cpp"
     }
 }

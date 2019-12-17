@@ -1,6 +1,7 @@
 load("//tools:cpplint.bzl", "cpplint")
 load("//tools:cuda_library.bzl", "cuda_library","cuda_binary")
-# load("//tools:cuda_library.bzl", "cuda_library")
+load("//tools:qt.bzl", "qt_cc_library")
+
 package(default_visibility = ["//visibility:public"])
 
 cuda_library(
@@ -56,3 +57,6 @@ cc_library(
     deps = [
     ],
 )
+
+
+
