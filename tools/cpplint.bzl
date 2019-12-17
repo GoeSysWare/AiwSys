@@ -12,6 +12,7 @@ _SOURCE_EXTENSIONS = [source_ext for source_ext in """
 .hpp
 .hxx
 .inc
+.cu
 """.split("\n") if len(source_ext)]
 
 # The cpplint.py command-line argument so it doesn't skip our files!
@@ -38,6 +39,7 @@ def _add_linter_rules(source_labels, source_filenames, name, data=None):
   size = "small"
   tags = ["cpplint"]
 
+
   # Google cpplint.
   cpplint_cfg = ["//:CPPLINT.cfg"] + native.glob(['CPPLINT.cfg'])
   native.py_test(
@@ -49,6 +51,7 @@ def _add_linter_rules(source_labels, source_filenames, name, data=None):
     size = size,
     tags = tags,
   )
+
 
 def cpplint(data=None, extra_srcs=None):
   """For every rule in the BUILD file so far, adds a test rule that runs

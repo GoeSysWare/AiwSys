@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <iostream>
+
 __global__ void add(float * x, float *y, float * z, int n){
         int index = threadIdx.x + blockIdx.x * blockDim.x;
         int stride = blockDim.x * gridDim.x;
@@ -20,8 +21,6 @@ int main(){
         std::cout << "每个线程块的最大线程数：" << devProp.maxThreadsPerBlock << std::endl;
         std::cout << "每个EM的最大线程数：" << devProp.maxThreadsPerMultiProcessor << std::endl;
         std::cout << "每个EM的最大线程束数：" << devProp.maxThreadsPerMultiProcessor / 32 << std::endl;
-    
-
 
 
         int N = 1 << 20;

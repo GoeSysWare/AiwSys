@@ -5,7 +5,7 @@ load("//tools:qt.bzl", "qt_cc_library")
 package(default_visibility = ["//visibility:public"])
 
 cuda_library(
-    name = "test_cuda_lib",
+    name = "cuda_lib",
     srcs = [
         "test_CUDA.cu",
     ],
@@ -29,19 +29,19 @@ cuda_library(
 cc_binary(
     name = "test_cuda_exe",
     srcs = [
-         ":test_cuda_lib"
+         ":cuda_lib"
     ],
 )
 
 cc_binary(
     name = "test_opencv",
-    deps = [":main_lib"],
+    deps = [":opencv_lib"],
 )
 
 cc_library(
-    name = "main_lib",
+    name = "opencv_lib",
     srcs = [
-        "main.cpp",
+        "test_opencv.cpp",
     ],
     hdrs = [
     ],
@@ -60,3 +60,4 @@ cc_library(
 
 
 
+cpplint()

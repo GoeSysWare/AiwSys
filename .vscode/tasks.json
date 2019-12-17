@@ -32,12 +32,12 @@
         "group": "build"
        },
        {
-        "label": "Bazel Build Tools",
+        "label": "Bazel Build Test",
         "type": "shell",
         "command": "bazel",
         "args": [
             "build",
-            "//modules/tools/...",
+            "//modules/test/...",
             "--compilation_mode=dbg",
         ],
         "problemMatcher": [

@@ -10,7 +10,6 @@
             "request": "launch",
             "program": "${file}",
             "args": [
-                "/home/shuimujie/02.github/Algorithm_Code/modules/sort/code_004.cpp",
             ],
             "console": "integratedTerminal"
         },

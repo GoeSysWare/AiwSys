@@ -113,7 +113,7 @@ http_archive(
 new_local_repository(
     name = "google_styleguide",
     build_file = "third_party/google_styleguide.BUILD",
-    path = "/home/shuimujie/01.works/3rd/styleguide-gh-pages"
+    path = "./third_party/"
 )
 
 
