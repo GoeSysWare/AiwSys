@@ -5,10 +5,20 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: 当前文件",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": [
+                "/home/shuimujie/02.github/Algorithm_Code/modules/sort/code_004.cpp",
+            ],
+            "console": "integratedTerminal"
+        },
+        {
             "name": "C++: Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bazel-bin/modules/app/test_opencv",
+            "program": "${workspaceFolder}/bazel-bin/modules/tools/test_cuda_exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

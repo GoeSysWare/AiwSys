@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+#include <iostream>
 __global__ void add(float * x, float *y, float * z, int n){
         int index = threadIdx.x + blockIdx.x * blockDim.x;
         int stride = blockDim.x * gridDim.x;
@@ -10,6 +10,20 @@ __global__ void add(float * x, float *y, float * z, int n){
 }
 
 int main(){
+
+        int dev = 0;
+        cudaDeviceProp devProp;
+        cudaGetDeviceProperties(&devProp, dev);
+        std::cout << "使用GPU device " << dev << ": " << devProp.name << std::endl;
+        std::cout << "SM的数量：" << devProp.multiProcessorCount << std::endl;
+        std::cout << "每个线程块的共享内存大小：" << devProp.sharedMemPerBlock / 1024.0 << " KB" << std::endl;
+        std::cout << "每个线程块的最大线程数：" << devProp.maxThreadsPerBlock << std::endl;
+        std::cout << "每个EM的最大线程数：" << devProp.maxThreadsPerMultiProcessor << std::endl;
+        std::cout << "每个EM的最大线程束数：" << devProp.maxThreadsPerMultiProcessor / 32 << std::endl;
+    
+
+
+
         int N = 1 << 20;
         int nBytes = N * sizeof (float);
         float *x, *y, *z;
@@ -42,7 +56,7 @@ int main(){
         for (int i = 0; i < N; i++){
                 maxError = fmax(maxError, (float)(fabs(z[i] - 30.0)));
         }
-        printf ("max default: %.4f\n", maxError);
+        printf ("test max default: %.4f\n", maxError);
 
         cudaFree(d_x);
         cudaFree(d_y);

@@ -1,5 +1,3 @@
-TransitiveDataInfo = provider("cc")
-
 cuda_srcs = ([
     ".cu",
     ".cc",
@@ -24,17 +22,23 @@ cuda_arch = " ".join([
 def cuda_library_impl(ctx):
     flags = ' '.join(ctx.attr.flags)
     output = ctx.outputs.out
-    lib_flags = ["-std=c++11", "--shared", "--compiler-options -fPIC", "-lcudart", "-lcublas"]
-    args = [f.path for f in ctx.files.srcs] + [f.path for f in ctx.files.deps]
-
+     # .cu文件非调试模式
+    # lib_flags = ["-std=c++11", "--shared", "--compiler-options -fPIC"]
+    # .cu文件调试模式
+    lib_flags = ["-std=c++11", "--shared", "-g","--compiler-options -fPIC"]
+    args = [f.path for f in ctx.files.srcs]
     deps_flags=[]
-     FooFiles(transitive_sources = trans_srcs)
+
     for f in ctx.attr.deps:
-      deps_flags += f.cc.link_flags
-      deps_flags += ["-I" + d for d in f.cc.quote_include_directories]
+      deps_flags += f[CcInfo] .linking_context.user_link_flags
+      deps_flags += ["-I" + d for d in f[CcInfo] .compilation_context.includes.to_list()]
+      deps_flags += ["-I" + d for d in  f[CcInfo] .compilation_context.quote_includes.to_list()]
+      deps_flags += ["-I" + d for d in  f[CcInfo] .compilation_context.system_includes.to_list()]
+
+
 
     ctx.actions.run_shell(
-            inputs=ctx.files.srcs + ctx.files.hdrs,
+            inputs=ctx.files.srcs + ctx.files.hdrs + ctx.files.deps,
             outputs=[ctx.outputs.out],
             arguments=args,
             env={'PATH':'/usr/local/cuda/bin:/usr/local/bin:/usr/bin:/bin',},
@@ -43,15 +47,24 @@ def cuda_library_impl(ctx):
 
 def cuda_binary_impl(ctx):
     flags = ' '.join(ctx.attr.flags)
-    args = ctx.attr.flags + [f.path for f in ctx.files.srcs] + [f.path for f in ctx.files.hdrs] + [f.path for f in ctx.attr.deps]
+    args = ctx.attr.flags + [f.path for f in ctx.files.srcs] + [f.path for f in ctx.files.hdrs]
+    deps_flags=[]
+    
+
+    for f in ctx.attr.deps:
+      deps_flags += f[CcInfo] .linking_context.user_link_flags
+      deps_flags += ["-I" + d for d in f[CcInfo] .compilation_context.includes.to_list()]
+      deps_flags += ["-I" + d for d in  f[CcInfo] .compilation_context.quote_includes.to_list()]
+      deps_flags += ["-I" + d for d in  f[CcInfo] .compilation_context.system_includes.to_list()]
     output = ctx.outputs.out
     ctx.actions.run_shell(
-            inputs=ctx.files.srcs + ctx.files.hdrs,
+            inputs=ctx.files.srcs + ctx.files.hdrs + ctx.files.deps,
             outputs=[ctx.outputs.out],
             arguments=args,
             env={ 'PATH':'/usr/local/cuda/bin:/usr/local/bin:/usr/bin:/bin', },
-            command="/usr/local/cuda/bin/nvcc %s %s -o %s" % (' '.join(cuda_arch), " ".join(args), output.path),
+            command="nvcc %s %s %s -o %s" % (cuda_arch, " ".join(args), " ".join(deps_flags), output.path),
      )
+    return DefaultInfo( executable = output)
 
 cuda_library = rule(
     attrs = {
