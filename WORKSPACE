@@ -37,6 +37,7 @@ py_repositories()
 load("@rules_python//python:pip.bzl", "pip_repositories")
 pip_repositories()
 
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
 
 # python
 new_local_repository(
@@ -55,6 +56,8 @@ go_rules_dependencies()
 go_register_toolchains()
 load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_binary","go_test","go_source")
 load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
+
+
 
 #rules_java
 local_repository(
@@ -112,12 +115,12 @@ new_local_repository(
     path = "../3rd/styleguide-gh-pages"
 )
 
+
 # protobuf
 local_repository(
     name = "com_google_protobuf",
     path=  "../3rd/protobuf-3.9.1",
 )
-
 load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps",)
 protobuf_deps()
 
@@ -132,62 +135,62 @@ load("@com_google_protobuf//:protobuf.bzl", "cc_proto_library","py_proto_library
 new_local_repository(
     name = "fastrtps",
     build_file = "third_party/fastrtps.BUILD",
-    path = "/home/shuimujie/01.works/3rd/Fast-RTPS",
+    path = "../3rd/Fast-RTPS",
 )
 
 #  pocoproject / poco , 自己添加的
 new_local_repository(
     name = "poco",
     build_file = "third_party/poco.BUILD",
-    path = "/home/shuimujie/01.works/3rd/poco-poco-1.9.4-release"
+    path = "../3rd/poco-poco-1.9.4-release"
 )
-# # Curl-CPP
-# new_local_repository(
-#     name = "curlpp",
-#     build_file = "third_party/curlpp.BUILD",
-#     path = "/home/shuimujie/01.works/3rd/curlpp-0.8.1"
-# )
+# Curl-CPP
+new_local_repository(
+    name = "curlpp",
+    build_file = "third_party/curlpp.BUILD",
+    path = "../3rd/curlpp-0.8.1"
+)
 
-# # YAML-CPP
-# #  https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-0.5.3.zip
-# new_local_repository(
-#     name = "yaml_cpp",
-#     build_file = "third_party/yaml_cpp.BUILD",
-#     path = "/home/shuimujie/01.works/3rd/yaml-cpp-yaml-cpp-0.6.3",
-# )
+# YAML-CPP
+#  https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-0.5.3.zip
+new_local_repository(
+    name = "yaml_cpp",
+    build_file = "third_party/yaml_cpp.BUILD",
+    path = "../3rd/yaml-cpp-yaml-cpp-0.6.3",
+)
 #########################################################################################
 # 雷达点云功能库
 #########################################################################################
-# # PCL 1.9
-# # =======
-# # This requires libpcl-dev to be installed in your Ubuntu/Debian.
-# new_local_repository(
-#     name = "pcl",
-#     build_file = "third_party/pcl.BUILD",
-#     path = "/usr/local/include/pcl-1.9",
-# )
+# PCL 1.9
+# =======
+# This requires libpcl-dev to be installed in your Ubuntu/Debian.
+new_local_repository(
+    name = "pcl",
+    build_file = "third_party/pcl.BUILD",
+    path = "/usr/local/include/pcl-1.9",
+)
 #########################################################################################
 # 数学计算库
 #########################################################################################
-# # eigen https://github.com/eigenteam/eigen-git-mirror.git
-# new_local_repository(
-#     name = "eigen",
-#     build_file = "third_party/eigen.BUILD",
-#     path = "/home/shuimujie/01.works/3rd/eigen-git-mirror-3.2.10",
-# )
-# # OSQP 算子分解QP解算  https://github.com/oxfordcontrol/osqp.git
-# new_local_repository(
-#     name = "osqp",
-#     build_file = "third_party/osqp.BUILD",
-#     path = "/home/shuimujie/01.works/3rd/osqp-0.6.0/",
-# )
-# # qpOASES来源于  https://www.coin-or.org/download/source/qpOASES/qpOASES-3.2.1.zip ，一种控制策略算法
-# new_local_repository(
-#     name = "qpOASES",
-#     build_file = "third_party/qpOASES.BUILD",
-#     # strip_prefix = "qpOASES-3.2.1",
-#     path = "/home/shuimujie/01.works/3rd/qpOASES-3.2.1",
-# )
+# eigen https://github.com/eigenteam/eigen-git-mirror.git
+new_local_repository(
+    name = "eigen",
+    build_file = "third_party/eigen.BUILD",
+    path = "../3rd/eigen-git-mirror-3.2.10",
+)
+# OSQP 算子分解QP解算  https://github.com/oxfordcontrol/osqp.git
+new_local_repository(
+    name = "osqp",
+    build_file = "third_party/osqp.BUILD",
+    path = "../3rd/osqp-0.6.0/",
+)
+# qpOASES来源于  https://www.coin-or.org/download/source/qpOASES/qpOASES-3.2.1.zip ，一种控制策略算法
+new_local_repository(
+    name = "qpOASES",
+    build_file = "third_party/qpOASES.BUILD",
+    # strip_prefix = "qpOASES-3.2.1",
+    path = "../3rd/qpOASES-3.2.1",
+)
 
 
 #########################################################################################
@@ -199,25 +202,25 @@ new_local_repository(
     build_file = "third_party/cuda.BUILD",
     path = "/usr/local/cuda",
 )
-# # Caffe
-# new_local_repository(
-#     name = "caffe",
-#     build_file = "third_party/caffe.BUILD",
-#     path = "/home/shuimujie/01.works/3rd/caffe-1.0/build/install",
-# )
-# # PyTorch
-# new_local_repository(
-#     name = "pytorch",
-#     build_file = "third_party/pytorch.BUILD",
-#     path = "/usr/local/lib",
-# )
+# Caffe
+new_local_repository(
+    name = "caffe",
+    build_file = "third_party/caffe.BUILD",
+    path = "../3rd/caffe-1.0/build/install",
+)
+# PyTorch
+new_local_repository(
+    name = "pytorch",
+    build_file = "third_party/pytorch.BUILD",
+    path = "/usr/local/lib",
+)
 
-# # PyTorch GPU
-# new_local_repository(
-#     name = "pytorch_gpu",
-#     build_file = "third_party/pytorch_gpu.BUILD",
-#     path = "/usr/local/lib",
-# )
+# PyTorch GPU
+new_local_repository(
+    name = "pytorch_gpu",
+    build_file = "third_party/pytorch_gpu.BUILD",
+    path = "/usr/local/lib",
+)
 
 # # paddlepaddle
 # new_local_repository(
@@ -249,3 +252,4 @@ new_local_repository(
 #########################################################################################
 # 其他工具和框架
 #########################################################################################
+

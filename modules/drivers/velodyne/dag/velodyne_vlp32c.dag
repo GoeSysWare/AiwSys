@@ -1,0 +1,30 @@
+
+
+# Define all coms in DAG streaming.
+module_config {
+   module_library : "/home/shuimujie/01.works/AutoSys/bazel-bin/modules/drivers/velodyne/driver/libvelodyne_driver_component.so"
+
+    components {
+      class_name : "VelodyneDriverComponent"
+      config {
+        name : "velodyne_vlp32c_driver"
+        config_file_path : "/home/shuimujie/01.works/AutoSys/bazel-AutoSys/modules/drivers/velodyne/conf/velodyne_vlp32c_conf.pb.txt"
+      }
+    }
+}
+
+module_config {
+    module_library : "/home/shuimujie/01.works/AutoSys/bazel-bin/modules/drivers/velodyne/parser/libvelodyne_convert_component.so"
+
+    components {
+      class_name : "VelodyneConvertComponent"
+      config {
+        name : "velodyne_vlp32c_convert"
+        config_file_path : "/home/shuimujie/01.works/AutoSys/bazel-AutoSys/modules/drivers/velodyne/conf/velodyne_vlp32c_conf.pb.txt"
+        readers {channel: "/apollo/sensor/velodyne32/VelodyneScan"}
+      }
+    }
+}
+
+
+

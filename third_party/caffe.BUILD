@@ -6,7 +6,7 @@ cc_library(
     name = "caffe",
     includes = [
         ".",
-        "/usr/include",
+        "include",
     ],
     linkopts = [
         "-lboost_system",
@@ -24,6 +24,7 @@ cc_library(
         "-lopencv_highgui",
         "-lopencv_imgproc",
         "-lopencv_objdetect",
+        "-Llib",
         "-lcaffe",
     ],
 )
