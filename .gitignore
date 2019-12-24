@@ -11,8 +11,9 @@ bazel-Watrix_Train
 /Debug/
 
 # Logs
-cyber/log/*
-log/*
+cyber/Logs/*
+logs
+Logs
 records
 
 # python proto
