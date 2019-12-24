@@ -1,4 +1,0 @@
-Log file created at: 2019/12/24 17:04:32
-Running on machine: shuimujie-Linux
-Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
-I1224 17:04:32.887115 21270 class_loader_utility.h:78]  registerclass:Monitor,apollo::cyber::ComponentBase,/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-bin/modules/monitor/libmonitor.so
