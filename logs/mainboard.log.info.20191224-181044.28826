@@ -1,0 +1,171 @@
+Log file created at: 2019/12/24 18:10:44
+Running on machine: shuimujie-Linux
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+W1224 18:10:44.162632 28826 scheduler_factory.cc:63]  No sched conf found, use default conf.
+I1224 18:10:44.163662 28840 processor.cc:80]  processor_tid: 28840
+I1224 18:10:44.163945 28841 processor.cc:80]  processor_tid: 28841
+I1224 18:10:44.164405 28843 processor.cc:80]  processor_tid: 28843
+I1224 18:10:44.164510 28844 processor.cc:80]  processor_tid: 28844
+I1224 18:10:44.164728 28842 processor.cc:80]  processor_tid: 28842
+I1224 18:10:44.164777 28845 processor.cc:80]  processor_tid: 28845
+I1224 18:10:44.164846 28847 processor.cc:80]  processor_tid: 28847
+I1224 18:10:44.165436 28850 processor.cc:80]  processor_tid: 28850
+I1224 18:10:44.165551 28851 processor.cc:80]  processor_tid: 28851
+I1224 18:10:44.166877 28852 processor.cc:80]  processor_tid: 28852
+I1224 18:10:44.167403 28853 processor.cc:80]  processor_tid: 28853
+I1224 18:10:44.167585 28854 processor.cc:80]  processor_tid: 28854
+I1224 18:10:44.167732 28855 processor.cc:80]  processor_tid: 28855
+I1224 18:10:44.168022 28856 processor.cc:80]  processor_tid: 28856
+I1224 18:10:44.168123 28857 processor.cc:80]  processor_tid: 28857
+I1224 18:10:44.168267 28858 processor.cc:80]  processor_tid: 28858
+I1224 18:10:44.168273 28826 init.cc:104]  Register exit handle succ.
+I1224 18:10:44.168298 28826 module_controller.cc:57]  Start initialize dag: /media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-AiwSys/modules/monitor/dag/monitor.dag
+I1224 18:10:44.186491 28826 class_loader.cc:37]  Begin LoadLibrary: /media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-bin/modules/monitor/libmonitor.so
+I1224 18:11:16.742565 28826 monitor_conf.cc:83]  Loaded HMI config: modes {
+  key: "Rtk"
+  value: "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/modules/monitor/conf//rtk.pb.txt"
+}
+I1224 18:11:17.245880 28871 scheduler.cc:55]  create croutine: /internal/task0
+W1224 18:11:17.246074 28871 environment.h:33]  Environment variable [cyber_trans_perf] not set, fallback to 
+W1224 18:11:17.246106 28871 environment.h:33]  Environment variable [cyber_sched_perf] not set, fallback to 
+I1224 18:11:17.246182 28871 scheduler.cc:55]  create croutine: /internal/task1
+I1224 18:11:17.246559 28871 scheduler.cc:55]  create croutine: /internal/task2
+I1224 18:11:17.246676 28871 scheduler.cc:55]  create croutine: /internal/task3
+I1224 18:11:17.246752 28871 scheduler.cc:55]  create croutine: /internal/task4
+I1224 18:11:17.246819 28871 scheduler.cc:55]  create croutine: /internal/task5
+I1224 18:11:17.246904 28871 scheduler.cc:55]  create croutine: /internal/task6
+I1224 18:11:17.246973 28871 scheduler.cc:55]  create croutine: /internal/task7
+I1224 18:11:17.247030 28871 scheduler.cc:55]  create croutine: /internal/task8
+I1224 18:11:17.247093 28871 scheduler.cc:55]  create croutine: /internal/task9
+I1224 18:11:17.247155 28871 scheduler.cc:55]  create croutine: /internal/task10
+I1224 18:11:17.247232 28871 scheduler.cc:55]  create croutine: /internal/task11
+I1224 18:11:17.247308 28871 scheduler.cc:55]  create croutine: /internal/task12
+I1224 18:11:17.247375 28871 scheduler.cc:55]  create croutine: /internal/task13
+I1224 18:11:17.247442 28871 scheduler.cc:55]  create croutine: /internal/task14
+I1224 18:11:17.247506 28871 scheduler.cc:55]  create croutine: /internal/task15
+W1224 18:11:17.259985 28871 rate.cc:95]  Detect forward jumps in time
+I1224 18:11:17.278688 28845 monitor_conf.cc:124]  Loaded HMI mode: modules {
+  key: "Canbus"
+  value {
+    start_command: "nohup mainboard -d /apollo/modules/canbus/dag/canbus.dag &"
+    stop_command: "pkill -f \"/apollo/modules/canbus/dag/canbus.dag\""
+    process_monitor_config {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/canbus/dag/canbus.dag"
+    }
+    required_for_safety: true
+  }
+}
+modules {
+  key: "Control"
+  value {
+    start_command: "nohup mainboard -d /apollo/modules/control/dag/control.dag &"
+    stop_command: "pkill -f \"/apollo/modules/control/dag/control.dag\""
+    process_monitor_config {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/control/dag/control.dag"
+    }
+    required_for_safety: true
+  }
+}
+modules {
+  key: "Data Recorder"
+  value {
+    start_command: "/apollo/scripts/record_bag.py --start"
+    stop_command: "/apollo/scripts/record_bag.py --stop"
+    process_monitor_config {
+      command_keywords: "cyber_recorder"
+    }
+  }
+}
+modules {
+  key: "GPS"
+  value {
+    start_command: "nohup mainboard -d /apollo/modules/drivers/gnss/dag/gnss.dag &"
+    stop_command: "pkill -f \"/apollo/modules/drivers/gnss/dag/gnss.dag\""
+    process_monitor_config {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/drivers/gnss/dag/gnss.dag"
+    }
+    required_for_safety: true
+  }
+}
+modules {
+  key: "Guardian"
+  value {
+    start_command: "nohup mainboard -d /apollo/modules/guardian/dag/guardian.dag &"
+    stop_command: "pkill -f \"/apollo/modules/guardian/dag/guardian.dag\""
+    process_monitor_config {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/guardian/dag/guardian.dag"
+    }
+    required_for_safety: true
+  }
+}
+modules {
+  key: "Localization"
+  value {
+    start_command: "nohup mainboard -d /apollo/modules/localization/dag/dag_streaming_rtk_localization.dag &"
+    stop_command: "pkill -f \"/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag\""
+    process_monitor_config {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
+    }
+    required_for_safety: true
+  }
+}
+modules {
+  key: "RTK Player"
+  value {
+    start_command: "nohup /apollo/scripts/rtk_player.sh start &"
+    stop_command: "/apollo/scripts/rtk_player.sh stop"
+    process_monitor_config {
+      command_keywords: "record_play/rtk_player.py"
+    }
+  }
+}
+modules {
+  key: "RTK Recorder"
+  value {
+    start_command: "nohup /apollo/scripts/rtk_recorder.sh start &"
+    stop_command: "/apollo/scripts/rtk_recorder.sh stop"
+    process_monitor_config {
+      command_keywords: "record_play/rtk_recorder.py"
+    }
+    required_for_safety: false
+  }
+}
+monitored_components {
+  key: "Data Recorder"
+  value {
+    process {
+      command_keywords: "cyber_recorder"
+    }
+    resource {
+      disk_spaces {
+        path: "/apollo/data"
+        insufficient_space_warning: 8
+        insufficient_space_error: 2
+      }
+      disk_spaces {
+        path: "/media/apollo/internal_nvme"
+        insufficient_space_warning: 128
+        insufficient_space_error: 32
+      }
+    }
+  }
+}
+monitored_components {
+  key: "Localization"
+  value {
+  }
+}
+I1224 18:11:17.278903 28845 recurrent_runner.cc:30]  ProcessMonitor is running round #1
+W1224 18:11:29.268047 28871 rate.cc:95]  Detect forward jumps in time
+W1224 18:11:31.176816 28871 rate.cc:95]  Detect forward jumps in time
+W1224 18:11:35.911284 28871 rate.cc:95]  Detect forward jumps in time
+W1224 18:11:36.403791 28871 rate.cc:95]  Detect forward jumps in time
+W1224 18:11:36.797694 28871 rate.cc:95]  Detect forward jumps in time
+W1224 18:11:38.193270 28871 rate.cc:95]  Detect forward jumps in time
+W1224 18:11:39.569335 28871 rate.cc:95]  Detect forward jumps in time
+W1224 18:11:40.045080 28871 rate.cc:95]  Detect forward jumps in time

@@ -18,6 +18,20 @@
            "group": "build"
        },
        {
+        "label": "Bazel Build Monitor",
+        "type": "shell",
+        "command": "bazel",
+        "args": [
+            "build",
+            "//modules/monitor/...",
+            "--cpu=k8"
+        ],
+        "problemMatcher": [
+            "$gcc",
+        ],
+        "group": "build"
+    },
+       {
         "label": "Bazel Build App",
         "type": "shell",
         "command": "bazel",

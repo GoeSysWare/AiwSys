@@ -70,6 +70,13 @@
         "set": "cpp",
         "string": "cpp",
         "*.inc": "cpp",
-        "qcamera": "cpp"
+        "qcamera": "cpp",
+        "*.ipp": "cpp",
+        "csetjmp": "cpp",
+        "rope": "cpp",
+        "scoped_allocator": "cpp",
+        "shared_mutex": "cpp",
+        "valarray": "cpp",
+        "cuchar": "cpp"
     }
 }

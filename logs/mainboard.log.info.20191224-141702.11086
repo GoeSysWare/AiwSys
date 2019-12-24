@@ -1,0 +1,25 @@
+Log file created at: 2019/12/24 14:17:02
+Running on machine: shuimujie-Linux
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+W1224 14:17:02.335453 11086 scheduler_factory.cc:63]  No sched conf found, use default conf.
+I1224 14:17:02.335881 11098 processor.cc:80]  processor_tid: 11098
+I1224 14:17:02.336093 11099 processor.cc:80]  processor_tid: 11099
+I1224 14:17:02.336338 11100 processor.cc:80]  processor_tid: 11100
+I1224 14:17:02.336820 11101 processor.cc:80]  processor_tid: 11101
+I1224 14:17:02.336948 11102 processor.cc:80]  processor_tid: 11102
+I1224 14:17:02.337163 11103 processor.cc:80]  processor_tid: 11103
+I1224 14:17:02.337276 11104 processor.cc:80]  processor_tid: 11104
+I1224 14:17:02.337493 11105 processor.cc:80]  processor_tid: 11105
+I1224 14:17:02.337807 11107 processor.cc:80]  processor_tid: 11107
+I1224 14:17:02.337939 11108 processor.cc:80]  processor_tid: 11108
+I1224 14:17:02.338114 11109 processor.cc:80]  processor_tid: 11109
+I1224 14:17:02.338212 11110 processor.cc:80]  processor_tid: 11110
+I1224 14:17:02.338302 11111 processor.cc:80]  processor_tid: 11111
+I1224 14:17:02.338452 11112 processor.cc:80]  processor_tid: 11112
+I1224 14:17:02.338557 11113 processor.cc:80]  processor_tid: 11113
+I1224 14:17:02.338651 11114 processor.cc:80]  processor_tid: 11114
+I1224 14:17:02.338660 11086 init.cc:104]  Register exit handle succ.
+I1224 14:17:02.338681 11086 module_controller.cc:57]  Start initialize dag: /media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-AiwSys/modules/monitor/dag/monitor.dag
+E1224 14:17:02.340649 11086 module_controller.cc:79]  Path does not exist: /apollo/bazel-bin/modules/monitor/libmonitor.so
+E1224 14:17:02.340679 11086 module_controller.cc:59]  Failed to load module: /media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-AiwSys/modules/monitor/dag/monitor.dag
+E1224 14:17:02.340689 11086 mainboard.cc:43]  module start error.

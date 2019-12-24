@@ -1,0 +1,460 @@
+Log file created at: 2019/12/24 18:16:42
+Running on machine: shuimujie-Linux
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+W1224 18:16:42.392778 29099 scheduler_factory.cc:63]  No sched conf found, use default conf.
+I1224 18:16:42.393172 29112 processor.cc:80]  processor_tid: 29112
+I1224 18:16:42.393306 29113 processor.cc:80]  processor_tid: 29113
+I1224 18:16:42.393565 29114 processor.cc:80]  processor_tid: 29114
+I1224 18:16:42.394225 29117 processor.cc:80]  processor_tid: 29117
+I1224 18:16:42.397331 29118 processor.cc:80]  processor_tid: 29118
+I1224 18:16:42.398242 29119 processor.cc:80]  processor_tid: 29119
+I1224 18:16:42.398567 29120 processor.cc:80]  processor_tid: 29120
+I1224 18:16:42.398774 29121 processor.cc:80]  processor_tid: 29121
+I1224 18:16:42.399155 29122 processor.cc:80]  processor_tid: 29122
+I1224 18:16:42.399272 29123 processor.cc:80]  processor_tid: 29123
+I1224 18:16:42.399462 29124 processor.cc:80]  processor_tid: 29124
+I1224 18:16:42.399591 29125 processor.cc:80]  processor_tid: 29125
+I1224 18:16:42.399789 29126 processor.cc:80]  processor_tid: 29126
+I1224 18:16:42.400012 29127 processor.cc:80]  processor_tid: 29127
+I1224 18:16:42.400295 29128 processor.cc:80]  processor_tid: 29128
+I1224 18:16:42.400408 29099 init.cc:104]  Register exit handle succ.
+I1224 18:16:42.400409 29129 processor.cc:80]  processor_tid: 29129
+I1224 18:16:42.400426 29099 module_controller.cc:57]  Start initialize dag: /media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-AiwSys/modules/monitor/dag/monitor.dag
+I1224 18:16:42.413810 29099 class_loader.cc:37]  Begin LoadLibrary: /media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-bin/modules/monitor/libmonitor.so
+I1224 18:16:47.297232 29099 monitor_conf.cc:83]  Loaded HMI config: modes {
+  key: "Rtk"
+  value: "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/modules/monitor/conf//rtk.pb.txt"
+}
+I1224 18:16:47.801209 29163 scheduler.cc:55]  create croutine: /internal/task0
+W1224 18:16:47.801276 29163 environment.h:33]  Environment variable [cyber_trans_perf] not set, fallback to 
+W1224 18:16:47.801283 29163 environment.h:33]  Environment variable [cyber_sched_perf] not set, fallback to 
+I1224 18:16:47.801302 29163 scheduler.cc:55]  create croutine: /internal/task1
+I1224 18:16:47.801322 29163 scheduler.cc:55]  create croutine: /internal/task2
+I1224 18:16:47.801343 29163 scheduler.cc:55]  create croutine: /internal/task3
+I1224 18:16:47.801380 29163 scheduler.cc:55]  create croutine: /internal/task4
+I1224 18:16:47.801398 29163 scheduler.cc:55]  create croutine: /internal/task5
+I1224 18:16:47.801411 29163 scheduler.cc:55]  create croutine: /internal/task6
+I1224 18:16:47.801427 29163 scheduler.cc:55]  create croutine: /internal/task7
+I1224 18:16:47.801440 29163 scheduler.cc:55]  create croutine: /internal/task8
+I1224 18:16:47.801455 29163 scheduler.cc:55]  create croutine: /internal/task9
+I1224 18:16:47.801470 29163 scheduler.cc:55]  create croutine: /internal/task10
+I1224 18:16:47.801486 29163 scheduler.cc:55]  create croutine: /internal/task11
+I1224 18:16:47.801508 29163 scheduler.cc:55]  create croutine: /internal/task12
+I1224 18:16:47.801530 29163 scheduler.cc:55]  create croutine: /internal/task13
+I1224 18:16:47.801558 29163 scheduler.cc:55]  create croutine: /internal/task14
+I1224 18:16:47.801587 29163 scheduler.cc:55]  create croutine: /internal/task15
+I1224 18:16:47.802685 29114 monitor_conf.cc:124]  Loaded HMI mode: modules {
+  key: "Canbus"
+  value {
+    start_command: "nohup mainboard -d /apollo/modules/canbus/dag/canbus.dag &"
+    stop_command: "pkill -f \"/apollo/modules/canbus/dag/canbus.dag\""
+    process_monitor_config {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/canbus/dag/canbus.dag"
+    }
+    required_for_safety: true
+  }
+}
+modules {
+  key: "Control"
+  value {
+    start_command: "nohup mainboard -d /apollo/modules/control/dag/control.dag &"
+    stop_command: "pkill -f \"/apollo/modules/control/dag/control.dag\""
+    process_monitor_config {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/control/dag/control.dag"
+    }
+    required_for_safety: true
+  }
+}
+modules {
+  key: "Data Recorder"
+  value {
+    start_command: "/apollo/scripts/record_bag.py --start"
+    stop_command: "/apollo/scripts/record_bag.py --stop"
+    process_monitor_config {
+      command_keywords: "cyber_recorder"
+    }
+  }
+}
+modules {
+  key: "GPS"
+  value {
+    start_command: "nohup mainboard -d /apollo/modules/drivers/gnss/dag/gnss.dag &"
+    stop_command: "pkill -f \"/apollo/modules/drivers/gnss/dag/gnss.dag\""
+    process_monitor_config {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/drivers/gnss/dag/gnss.dag"
+    }
+    required_for_safety: true
+  }
+}
+modules {
+  key: "Guardian"
+  value {
+    start_command: "nohup mainboard -d /apollo/modules/guardian/dag/guardian.dag &"
+    stop_command: "pkill -f \"/apollo/modules/guardian/dag/guardian.dag\""
+    process_monitor_config {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/guardian/dag/guardian.dag"
+    }
+    required_for_safety: true
+  }
+}
+modules {
+  key: "Localization"
+  value {
+    start_command: "nohup mainboard -d /apollo/modules/localization/dag/dag_streaming_rtk_localization.dag &"
+    stop_command: "pkill -f \"/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag\""
+    process_monitor_config {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
+    }
+    required_for_safety: true
+  }
+}
+modules {
+  key: "RTK Player"
+  value {
+    start_command: "nohup /apollo/scripts/rtk_player.sh start &"
+    stop_command: "/apollo/scripts/rtk_player.sh stop"
+    process_monitor_config {
+      command_keywords: "record_play/rtk_player.py"
+    }
+  }
+}
+modules {
+  key: "RTK Recorder"
+  value {
+    start_command: "nohup /apollo/scripts/rtk_recorder.sh start &"
+    stop_command: "/apollo/scripts/rtk_recorder.sh stop"
+    process_monitor_config {
+      command_keywords: "record_play/rtk_recorder.py"
+    }
+    required_for_safety: false
+  }
+}
+monitored_components {
+  key: "Data Recorder"
+  value {
+    process {
+      command_keywords: "cyber_recorder"
+    }
+    resource {
+      disk_spaces {
+        path: "/home/shuimujie/"
+        insufficient_space_warning: 8
+        insufficient_space_error: 2
+      }
+      disk_spaces {
+        path: "/tmp/"
+        insufficient_space_warning: 128
+        insufficient_space_error: 32
+      }
+    }
+  }
+}
+monitored_components {
+  key: "Localization"
+  value {
+  }
+}
+I1224 18:16:47.802740 29114 recurrent_runner.cc:30]  ProcessMonitor is running round #1
+W1224 18:16:55.600816 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:16:59.173476 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:17:08.573940 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:17:12.685781 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:17:15.443471 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:17:15.452013 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:17:15.457543 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:17:15.461539 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:17:15.465543 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:17:15.465665 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:17:15.468446 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:17:15.468540 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:17:15.473541 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:17:20.799641 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:17:21.631223 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:17:22.197319 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:17:23.131875 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:17:23.676941 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:17:26.083947 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:17:27.819943 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:17:33.491711 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:18:31.973116 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:20:12.040498 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:20:12.043684 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:20:13.486454 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:20:15.600760 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:20:16.701611 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:20:19.728354 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:20:20.764766 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:20:21.366931 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:20:39.909792 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:20:42.437641 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:21:00.326218 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:21:01.946303 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:21:10.118448 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:21:10.597693 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:21:19.860604 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:21:22.781637 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:21:23.406270 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:21:25.330233 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:21:26.589844 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:21:27.309887 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:21:28.693238 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:21:29.759949 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:21:39.741328 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:21:52.884613 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:21:54.094135 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:21:55.500932 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:21:56.078063 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:21:56.628770 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:22:10.134799 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:22:12.261248 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:22:30.130198 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:22:30.971086 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:22:30.974874 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:22:38.003806 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:22:39.657238 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:22:40.961138 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:22:56.896746 29163 rate.cc:95]  Detect forward jumps in time
+I1224 18:22:56.916085 29117 monitor_conf.cc:124]  Loaded HMI mode: modules {
+  key: "Canbus"
+  value {
+    start_command: "nohup mainboard -d /apollo/modules/canbus/dag/canbus.dag &"
+    stop_command: "pkill -f \"/apollo/modules/canbus/dag/canbus.dag\""
+    process_monitor_config {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/canbus/dag/canbus.dag"
+    }
+    required_for_safety: true
+  }
+}
+modules {
+  key: "Control"
+  value {
+    start_command: "nohup mainboard -d /apollo/modules/control/dag/control.dag &"
+    stop_command: "pkill -f \"/apollo/modules/control/dag/control.dag\""
+    process_monitor_config {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/control/dag/control.dag"
+    }
+    required_for_safety: true
+  }
+}
+modules {
+  key: "Data Recorder"
+  value {
+    start_command: "/apollo/scripts/record_bag.py --start"
+    stop_command: "/apollo/scripts/record_bag.py --stop"
+    process_monitor_config {
+      command_keywords: "cyber_recorder"
+    }
+  }
+}
+modules {
+  key: "GPS"
+  value {
+    start_command: "nohup mainboard -d /apollo/modules/drivers/gnss/dag/gnss.dag &"
+    stop_command: "pkill -f \"/apollo/modules/drivers/gnss/dag/gnss.dag\""
+    process_monitor_config {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/drivers/gnss/dag/gnss.dag"
+    }
+    required_for_safety: true
+  }
+}
+modules {
+  key: "Guardian"
+  value {
+    start_command: "nohup mainboard -d /apollo/modules/guardian/dag/guardian.dag &"
+    stop_command: "pkill -f \"/apollo/modules/guardian/dag/guardian.dag\""
+    process_monitor_config {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/guardian/dag/guardian.dag"
+    }
+    required_for_safety: true
+  }
+}
+modules {
+  key: "Localization"
+  value {
+    start_command: "nohup mainboard -d /apollo/modules/localization/dag/dag_streaming_rtk_localization.dag &"
+    stop_command: "pkill -f \"/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag\""
+    process_monitor_config {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
+    }
+    required_for_safety: true
+  }
+}
+modules {
+  key: "RTK Player"
+  value {
+    start_command: "nohup /apollo/scripts/rtk_player.sh start &"
+    stop_command: "/apollo/scripts/rtk_player.sh stop"
+    process_monitor_config {
+      command_keywords: "record_play/rtk_player.py"
+    }
+  }
+}
+modules {
+  key: "RTK Recorder"
+  value {
+    start_command: "nohup /apollo/scripts/rtk_recorder.sh start &"
+    stop_command: "/apollo/scripts/rtk_recorder.sh stop"
+    process_monitor_config {
+      command_keywords: "record_play/rtk_recorder.py"
+    }
+    required_for_safety: false
+  }
+}
+monitored_components {
+  key: "Data Recorder"
+  value {
+    process {
+      command_keywords: "cyber_recorder"
+    }
+    resource {
+      disk_spaces {
+        path: "/home/shuimujie/"
+        insufficient_space_warning: 8
+        insufficient_space_error: 2
+      }
+      disk_spaces {
+        path: "/tmp/"
+        insufficient_space_warning: 128
+        insufficient_space_error: 32
+      }
+    }
+  }
+}
+monitored_components {
+  key: "Localization"
+  value {
+  }
+}
+W1224 18:22:58.502403 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:22:59.959663 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:23:01.443538 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:23:02.941067 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:23:07.567678 29163 rate.cc:95]  Detect forward jumps in time
+I1224 18:23:07.574681 29112 monitor_conf.cc:124]  Loaded HMI mode: modules {
+  key: "Canbus"
+  value {
+    start_command: "nohup mainboard -d /apollo/modules/canbus/dag/canbus.dag &"
+    stop_command: "pkill -f \"/apollo/modules/canbus/dag/canbus.dag\""
+    process_monitor_config {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/canbus/dag/canbus.dag"
+    }
+    required_for_safety: true
+  }
+}
+modules {
+  key: "Control"
+  value {
+    start_command: "nohup mainboard -d /apollo/modules/control/dag/control.dag &"
+    stop_command: "pkill -f \"/apollo/modules/control/dag/control.dag\""
+    process_monitor_config {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/control/dag/control.dag"
+    }
+    required_for_safety: true
+  }
+}
+modules {
+  key: "Data Recorder"
+  value {
+    start_command: "/apollo/scripts/record_bag.py --start"
+    stop_command: "/apollo/scripts/record_bag.py --stop"
+    process_monitor_config {
+      command_keywords: "cyber_recorder"
+    }
+  }
+}
+modules {
+  key: "GPS"
+  value {
+    start_command: "nohup mainboard -d /apollo/modules/drivers/gnss/dag/gnss.dag &"
+    stop_command: "pkill -f \"/apollo/modules/drivers/gnss/dag/gnss.dag\""
+    process_monitor_config {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/drivers/gnss/dag/gnss.dag"
+    }
+    required_for_safety: true
+  }
+}
+modules {
+  key: "Guardian"
+  value {
+    start_command: "nohup mainboard -d /apollo/modules/guardian/dag/guardian.dag &"
+    stop_command: "pkill -f \"/apollo/modules/guardian/dag/guardian.dag\""
+    process_monitor_config {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/guardian/dag/guardian.dag"
+    }
+    required_for_safety: true
+  }
+}
+modules {
+  key: "Localization"
+  value {
+    start_command: "nohup mainboard -d /apollo/modules/localization/dag/dag_streaming_rtk_localization.dag &"
+    stop_command: "pkill -f \"/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag\""
+    process_monitor_config {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
+    }
+    required_for_safety: true
+  }
+}
+modules {
+  key: "RTK Player"
+  value {
+    start_command: "nohup /apollo/scripts/rtk_player.sh start &"
+    stop_command: "/apollo/scripts/rtk_player.sh stop"
+    process_monitor_config {
+      command_keywords: "record_play/rtk_player.py"
+    }
+  }
+}
+modules {
+  key: "RTK Recorder"
+  value {
+    start_command: "nohup /apollo/scripts/rtk_recorder.sh start &"
+    stop_command: "/apollo/scripts/rtk_recorder.sh stop"
+    process_monitor_config {
+      command_keywords: "record_play/rtk_recorder.py"
+    }
+    required_for_safety: false
+  }
+}
+monitored_components {
+  key: "Data Recorder"
+  value {
+    process {
+      command_keywords: "cyber_recorder"
+    }
+    resource {
+      disk_spaces {
+        path: "/home/shuimujie/"
+        insufficient_space_warning: 8
+        insufficient_space_error: 2
+      }
+      disk_spaces {
+        path: "/tmp/"
+        insufficient_space_warning: 128
+        insufficient_space_error: 32
+      }
+    }
+  }
+}
+monitored_components {
+  key: "Localization"
+  value {
+  }
+}
+W1224 18:23:15.012749 29163 rate.cc:95]  Detect forward jumps in time
+W1224 18:23:17.228518 29163 rate.cc:95]  Detect forward jumps in time

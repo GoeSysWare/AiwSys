@@ -1,0 +1,53 @@
+Log file created at: 2019/12/24 14:30:03
+Running on machine: shuimujie-Linux
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+W1224 14:30:03.105129 18911 scheduler_factory.cc:63]  No sched conf found, use default conf.
+I1224 14:30:03.124063 18935 processor.cc:80]  processor_tid: 18935
+I1224 14:30:03.125715 18936 processor.cc:80]  processor_tid: 18936
+I1224 14:30:03.126552 18937 processor.cc:80]  processor_tid: 18937
+I1224 14:30:03.126770 18938 processor.cc:80]  processor_tid: 18938
+I1224 14:30:03.127357 18939 processor.cc:80]  processor_tid: 18939
+I1224 14:30:03.128384 18941 processor.cc:80]  processor_tid: 18941
+I1224 14:30:03.129624 18942 processor.cc:80]  processor_tid: 18942
+I1224 14:30:03.130897 18943 processor.cc:80]  processor_tid: 18943
+I1224 14:30:03.131130 18944 processor.cc:80]  processor_tid: 18944
+I1224 14:30:03.131453 18945 processor.cc:80]  processor_tid: 18945
+I1224 14:30:03.131603 18946 processor.cc:80]  processor_tid: 18946
+I1224 14:30:03.131696 18947 processor.cc:80]  processor_tid: 18947
+I1224 14:30:03.131850 18948 processor.cc:80]  processor_tid: 18948
+I1224 14:30:03.132026 18949 processor.cc:80]  processor_tid: 18949
+I1224 14:30:03.132170 18950 processor.cc:80]  processor_tid: 18950
+I1224 14:30:03.132364 18951 processor.cc:80]  processor_tid: 18951
+I1224 14:30:03.132376 18911 init.cc:104]  Register exit handle succ.
+I1224 14:30:03.132400 18911 module_controller.cc:57]  Start initialize dag: /media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-AiwSys/modules/monitor/dag/monitor.dag
+I1224 14:30:03.138844 18911 class_loader.cc:37]  Begin LoadLibrary: /media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-bin/modules/monitor/libmonitor.so
+I1224 14:30:16.033043 18972 scheduler.cc:55]  create croutine: /internal/task0
+W1224 14:30:16.033208 18972 environment.h:33]  Environment variable [cyber_trans_perf] not set, fallback to 
+W1224 14:30:16.033239 18972 environment.h:33]  Environment variable [cyber_sched_perf] not set, fallback to 
+I1224 14:30:16.033316 18972 scheduler.cc:55]  create croutine: /internal/task1
+I1224 14:30:16.033402 18972 scheduler.cc:55]  create croutine: /internal/task2
+I1224 14:30:16.033486 18972 scheduler.cc:55]  create croutine: /internal/task3
+I1224 14:30:16.033576 18972 scheduler.cc:55]  create croutine: /internal/task4
+I1224 14:30:16.033641 18972 scheduler.cc:55]  create croutine: /internal/task5
+I1224 14:30:16.033713 18972 scheduler.cc:55]  create croutine: /internal/task6
+I1224 14:30:16.033782 18972 scheduler.cc:55]  create croutine: /internal/task7
+I1224 14:30:16.033839 18972 scheduler.cc:55]  create croutine: /internal/task8
+I1224 14:30:16.033901 18972 scheduler.cc:55]  create croutine: /internal/task9
+I1224 14:30:16.033962 18972 scheduler.cc:55]  create croutine: /internal/task10
+I1224 14:30:16.034018 18972 scheduler.cc:55]  create croutine: /internal/task11
+I1224 14:30:16.034090 18972 scheduler.cc:55]  create croutine: /internal/task12
+I1224 14:30:16.034162 18972 scheduler.cc:55]  create croutine: /internal/task13
+I1224 14:30:16.034226 18972 scheduler.cc:55]  create croutine: /internal/task14
+I1224 14:30:16.034286 18972 scheduler.cc:55]  create croutine: /internal/task15
+W1224 14:30:16.044644 18972 rate.cc:95]  Detect forward jumps in time
+I1224 14:30:24.834169 18936 recurrent_runner.cc:30]  ProcessMonitor is running round #1
+W1224 14:30:24.834436 18972 rate.cc:95]  Detect forward jumps in time
+W1224 14:30:28.978272 18972 rate.cc:95]  Detect forward jumps in time
+W1224 14:30:35.588405 18972 rate.cc:95]  Detect forward jumps in time
+W1224 14:30:52.026619 18972 rate.cc:95]  Detect forward jumps in time
+W1224 14:30:52.501392 18972 rate.cc:95]  Detect forward jumps in time
+W1224 14:30:53.834273 18972 rate.cc:95]  Detect forward jumps in time
+W1224 14:30:59.558486 18972 rate.cc:95]  Detect forward jumps in time
+W1224 14:31:01.810497 18972 rate.cc:95]  Detect forward jumps in time
+W1224 14:31:10.691825 18972 rate.cc:95]  Detect forward jumps in time
+W1224 14:31:13.578531 18972 rate.cc:95]  Detect forward jumps in time

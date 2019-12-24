@@ -1,0 +1,82 @@
+Log file created at: 2019/12/24 17:27:14
+Running on machine: shuimujie-Linux
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+W1224 17:27:14.249258 23840 scheduler_factory.cc:63]  No sched conf found, use default conf.
+I1224 17:27:14.250674 23852 processor.cc:80]  processor_tid: 23852
+I1224 17:27:14.252148 23853 processor.cc:80]  processor_tid: 23853
+I1224 17:27:14.253448 23854 processor.cc:80]  processor_tid: 23854
+I1224 17:27:14.253957 23855 processor.cc:80]  processor_tid: 23855
+I1224 17:27:14.254477 23856 processor.cc:80]  processor_tid: 23856
+I1224 17:27:14.254863 23857 processor.cc:80]  processor_tid: 23857
+I1224 17:27:14.256225 23859 processor.cc:80]  processor_tid: 23859
+I1224 17:27:14.256836 23860 processor.cc:80]  processor_tid: 23860
+I1224 17:27:14.257205 23861 processor.cc:80]  processor_tid: 23861
+I1224 17:27:14.257642 23858 processor.cc:80]  processor_tid: 23858
+I1224 17:27:14.258062 23862 processor.cc:80]  processor_tid: 23862
+I1224 17:27:14.263356 23863 processor.cc:80]  processor_tid: 23863
+I1224 17:27:14.263690 23864 processor.cc:80]  processor_tid: 23864
+I1224 17:27:14.263871 23865 processor.cc:80]  processor_tid: 23865
+I1224 17:27:14.264268 23866 processor.cc:80]  processor_tid: 23866
+I1224 17:27:14.264693 23867 processor.cc:80]  processor_tid: 23867
+I1224 17:27:14.264725 23840 init.cc:104]  Register exit handle succ.
+I1224 17:27:14.264811 23840 module_controller.cc:57]  Start initialize dag: /media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-AiwSys/modules/monitor/dag/monitor.dag
+I1224 17:27:14.298524 23840 class_loader.cc:37]  Begin LoadLibrary: /media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-bin/modules/monitor/libmonitor.so
+I1224 17:27:23.199899 23840 monitor_conf.cc:83]  Loaded HMI config: modes {
+  key: "Rtk"
+  value: "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/modules/monitor/conf//rtk.pb.txt"
+}
+I1224 17:27:23.702877 23877 scheduler.cc:55]  create croutine: /internal/task0
+W1224 17:27:23.702934 23877 environment.h:33]  Environment variable [cyber_trans_perf] not set, fallback to 
+W1224 17:27:23.702942 23877 environment.h:33]  Environment variable [cyber_sched_perf] not set, fallback to 
+I1224 17:27:23.702961 23877 scheduler.cc:55]  create croutine: /internal/task1
+I1224 17:27:23.702982 23877 scheduler.cc:55]  create croutine: /internal/task2
+I1224 17:27:23.703001 23877 scheduler.cc:55]  create croutine: /internal/task3
+I1224 17:27:23.703016 23877 scheduler.cc:55]  create croutine: /internal/task4
+I1224 17:27:23.703034 23877 scheduler.cc:55]  create croutine: /internal/task5
+I1224 17:27:23.703048 23877 scheduler.cc:55]  create croutine: /internal/task6
+I1224 17:27:23.703063 23877 scheduler.cc:55]  create croutine: /internal/task7
+I1224 17:27:23.703074 23877 scheduler.cc:55]  create croutine: /internal/task8
+I1224 17:27:23.703089 23877 scheduler.cc:55]  create croutine: /internal/task9
+I1224 17:27:23.703105 23877 scheduler.cc:55]  create croutine: /internal/task10
+I1224 17:27:23.703119 23877 scheduler.cc:55]  create croutine: /internal/task11
+I1224 17:27:23.703132 23877 scheduler.cc:55]  create croutine: /internal/task12
+I1224 17:27:23.703146 23877 scheduler.cc:55]  create croutine: /internal/task13
+I1224 17:27:23.703183 23877 scheduler.cc:55]  create croutine: /internal/task14
+I1224 17:27:23.703210 23877 scheduler.cc:55]  create croutine: /internal/task15
+W1224 17:29:35.010025 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:29:47.712281 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:30:20.156738 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:30:25.424176 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:30:25.823850 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:30:26.424269 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:30:27.523905 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:30:27.523980 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:30:41.683744 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:30:56.208735 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:31:05.530397 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:31:08.249584 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:31:19.240000 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:31:23.209022 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:31:23.210083 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:31:26.750862 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:31:34.236948 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:32:13.428115 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:32:26.479827 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:32:26.485635 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:33:05.691323 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:33:12.167593 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:33:31.173485 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:33:36.236915 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:33:39.236932 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:34:33.985324 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:34:33.985611 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:34:54.385690 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:34:54.386636 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:35:17.361552 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:35:17.936743 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:35:18.080022 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:35:38.235821 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:35:41.683954 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:35:41.684022 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:35:41.992884 23877 rate.cc:95]  Detect forward jumps in time
+W1224 17:36:36.699482 23877 rate.cc:95]  Detect forward jumps in time

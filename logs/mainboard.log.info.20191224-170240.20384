@@ -1,0 +1,29 @@
+Log file created at: 2019/12/24 17:02:40
+Running on machine: shuimujie-Linux
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+W1224 17:02:40.199704 20384 scheduler_factory.cc:63]  No sched conf found, use default conf.
+I1224 17:02:40.225477 20393 processor.cc:80]  processor_tid: 20393
+I1224 17:02:40.226023 20394 processor.cc:80]  processor_tid: 20394
+I1224 17:02:40.226593 20395 processor.cc:80]  processor_tid: 20395
+I1224 17:02:40.227949 20396 processor.cc:80]  processor_tid: 20396
+I1224 17:02:40.228361 20397 processor.cc:80]  processor_tid: 20397
+I1224 17:02:40.228528 20398 processor.cc:80]  processor_tid: 20398
+I1224 17:02:40.228974 20399 processor.cc:80]  processor_tid: 20399
+I1224 17:02:40.230010 20400 processor.cc:80]  processor_tid: 20400
+I1224 17:02:40.230484 20401 processor.cc:80]  processor_tid: 20401
+I1224 17:02:40.231079 20402 processor.cc:80]  processor_tid: 20402
+I1224 17:02:40.231498 20403 processor.cc:80]  processor_tid: 20403
+I1224 17:02:40.232009 20404 processor.cc:80]  processor_tid: 20404
+I1224 17:02:40.232225 20405 processor.cc:80]  processor_tid: 20405
+I1224 17:02:40.232834 20406 processor.cc:80]  processor_tid: 20406
+I1224 17:02:40.233172 20407 processor.cc:80]  processor_tid: 20407
+I1224 17:02:40.234088 20384 init.cc:104]  Register exit handle succ.
+I1224 17:02:40.234154 20384 module_controller.cc:57]  Start initialize dag: /media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-AiwSys/modules/monitor/dag/monitor.dag
+I1224 17:02:40.234244 20408 processor.cc:80]  processor_tid: 20408
+I1224 17:02:40.240248 20384 class_loader.cc:37]  Begin LoadLibrary: /media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-bin/modules/monitor/libmonitor.so
+E1224 17:02:44.383689 20384 class_loader_utility.cc:220]  poco LibraryLoadException: /media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-bin/modules/monitor/../../_solib_k8/libmodules_Smonitor_Scommon_Slibmonitor_Umanager.so: undefined symbol: _ZN6apollo7monitor10LoadConfigEv
+E1224 17:02:44.383728 20384 class_loader_utility.cc:236]  poco shared library failed: /media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-bin/modules/monitor/libmonitor.so
+E1224 17:02:44.383747 20384 class_loader_manager.h:70]  Invalid class name: Monitor
+E1224 17:02:44.383764 20384 module_controller.cc:59]  Failed to load module: /media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-AiwSys/modules/monitor/dag/monitor.dag
+E1224 17:02:44.383772 20384 class_loader_utility.cc:258]  Attempt to UnloadLibrary lib, but can't find lib: /media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-bin/modules/monitor/libmonitor.so
+E1224 17:02:44.383777 20384 mainboard.cc:43]  module start error.

@@ -9,9 +9,6 @@ cc_library(
         "include",
     ],
     linkopts = [
-        "-lboost_system",
-        "-lboost_thread",
-        "-lboost_filesystem",
         "-lpthread",
         "-lblas",
         "-lcblas",
@@ -20,11 +17,11 @@ cc_library(
         "-lz",
         "-ldl",
         "-lm",
-        "-lopencv_core",
-        "-lopencv_highgui",
-        "-lopencv_imgproc",
-        "-lopencv_objdetect",
         "-Llib",
         "-lcaffe",
     ],
+    deps = [
+        "@opencv",
+        "@boost"
+    ]
 )

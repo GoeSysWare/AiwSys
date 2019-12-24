@@ -8,6 +8,7 @@
   + driver 驱动结点，包括照相机、雷达、激光雷达等各类外部设备的驱动
   + percetion 感知结点，人工智能框架接口与人工智能相关的感知处理基本方法、过程和结果
   + transform  坐标变换
+  + monitor 系统软硬件监测
 - projects 工程项目包，利用平台其他基础库定制开发形成实际产品与项目
   + conductor_rail 三轨检测
   + adas 智能感知系统
@@ -108,6 +109,17 @@ bazel clean --expunge
 ## 构建Drivers
 
 
+## 构建Opencv 3.4 
+  - 提示 ："cudacodec/src/precomp.hpp:60:37: fatal error: dynlink_nvcuvid.h: 没有那个文件或目录#include <dynlink_nvcuvid.h>"  
+    错误原因:  
+    CUDA 10.0 中 Decode 模块已经被废弃：https://docs.nvidia.com/cuda/video-decoder/index.html   
+    该模块和 Encode 模块将作为 NVIDIA VIDEO CODEC SDK 模块独立发行：https://developer.nvidia.com/nvidia-video-codec-sdk  
+    解决方法：
+    1. 根据上述链接下载安装 NVIDIA VIDEO CODEC SDK 并安装   
+    或  
+    2. 关闭 CMake 配置中的 BUILD_opencv_cudacodec 标签。  
+
+
 ## 构建AI框架
 ### 构建Caffe
   - 默认protobuf版本，caffe依赖protobuf，默认去系统路径下寻找，需要与平台使用的一致否则会报:
@@ -143,6 +155,8 @@ bazel clean --expunge
       export CMAKE_PREFIX_PATH=${CONDA_PREFIX:-"$(dirname $(which conda))/../"}  
       python setup.py install  
 ```
+
+
 # 运行
 ## 运行Cyber
   一种运行是常规方式，把生成的可执行文件和so，拷贝到一处，配置好环境LD_LIBRARY_PATH等环境再执行  

@@ -131,6 +131,13 @@ load("@com_google_protobuf//:protobuf.bzl", "cc_proto_library","py_proto_library
 #########################################################################################
 # 开发应用的功能基础库、框架、中间件
 #########################################################################################
+
+#BOOST
+new_local_repository(
+    name = "boost",
+    build_file = "third_party/boost.BUILD",
+    path = "../3rd/boost_1_70_0",
+)
 #FastRTPS
 new_local_repository(
     name = "fastrtps",
@@ -159,7 +166,7 @@ new_local_repository(
     path = "../3rd/yaml-cpp-yaml-cpp-0.6.3",
 )
 #########################################################################################
-# 雷达点云功能库
+# 图像处理、点云功能库
 #########################################################################################
 # PCL 1.9
 # =======
@@ -167,8 +174,17 @@ new_local_repository(
 new_local_repository(
     name = "pcl",
     build_file = "third_party/pcl.BUILD",
-    path = "/usr/local/include/pcl-1.9",
+    path = "../3rd/libpcap-1.9.1/build/install",
 )
+# opencv  3.2
+# =======
+# This requires libpcl-dev to be installed in your Ubuntu/Debian.
+new_local_repository(
+    name = "opencv",
+    build_file = "third_party/opencv.BUILD",
+    path = "/usr/include/opencv2",
+)
+
 #########################################################################################
 # 数学计算库
 #########################################################################################
@@ -208,19 +224,19 @@ new_local_repository(
     build_file = "third_party/caffe.BUILD",
     path = "../3rd/caffe-1.0/build/install",
 )
-# PyTorch
-new_local_repository(
-    name = "pytorch",
-    build_file = "third_party/pytorch.BUILD",
-    path = "/usr/local/lib",
-)
+# # PyTorch
+# new_local_repository(
+#     name = "pytorch",
+#     build_file = "third_party/pytorch.BUILD",
+#     path = "/usr/local/lib",
+# )
 
-# PyTorch GPU
-new_local_repository(
-    name = "pytorch_gpu",
-    build_file = "third_party/pytorch_gpu.BUILD",
-    path = "/usr/local/lib",
-)
+# # PyTorch GPU
+# new_local_repository(
+#     name = "pytorch_gpu",
+#     build_file = "third_party/pytorch_gpu.BUILD",
+#     path = "/usr/local/lib",
+# )
 
 # # paddlepaddle
 # new_local_repository(
