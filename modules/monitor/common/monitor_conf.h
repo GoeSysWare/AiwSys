@@ -9,8 +9,6 @@ namespace apollo
 namespace monitor
 {
 
-apollo::dreamview::HMIConfig LoadConfig();
-
 apollo::dreamview::HMIMode LoadMode(const std::string &mode_config_path);
 
 } // namespace monitor

@@ -27,7 +27,9 @@ namespace apollo {
 namespace monitor {
 
 bool Monitor::Init() {
-  MonitorManager::Instance()->Init(node_);
+
+
+  MonitorManager::Instance()->Init(config_file_path_,node_);
 
 
 

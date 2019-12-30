@@ -7,15 +7,12 @@ cc_library(
     srcs = ["caffe_net.cc"],
     hdrs = ["caffe_net.h"],
     linkopts = [
-        "-lopencv_core",
-        "-lboost_system",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
     ],
     deps = [
         "//modules/perception/inference:inference_lib",
         "@caffe",
         "@com_google_protobuf//:protobuf",
+        "@opencv"
     ],
 )
 

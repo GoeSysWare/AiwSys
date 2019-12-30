@@ -1,0 +1,13 @@
+
+<cyber>
+    <module>
+        <name>wear</name>
+        <dag_conf>projects/conductor_rail/production/dag/wear.dag</dag_conf>
+        <process_name>aiwsys_wear</process_name>
+    </module>
+    <module>
+        <name>spot</name>
+        <dag_conf>projects/conductor_rail/production/dag/spot.dag</dag_conf>
+        <process_name>aiwsys_spot</process_name>
+    </module>
+</cyber>

@@ -1,0 +1,25 @@
+syntax = "proto2";
+
+package aiwsys.production.onboard;
+
+message RailCameraDetection {
+    optional string camera_names = 1 [default = "camera_wear"];
+    optional string input_camera_channel_names = 2 [default = "/aiwsys/inner/camera_wear"];
+    optional double timestamp_offset = 3 [default = 0.0];
+    optional string camera_detection_conf_dir = 4 [default = "production/conf/detection/camera"];
+    optional string camera_detection_conf_file = 5 [default = "wear.pt"];
+    optional int32 frame_capacity = 6 [default = 20];
+    optional int32 image_channel_num = 7 [default = 3];
+    optional string output_obstacles_channel_name = 8 [default = "/aiwsys/extra/camera_wear"];
+    optional double default_camera_pitch = 9 [default = 0.0];
+    optional double default_camera_height = 10 [default = 1.5];
+    optional string detect_method = 11 [default = "LaneLineCalibrator"];
+    optional bool output_camera_debug_msg = 12 [default = false];
+    optional string camera_debug_channel_name =13 [default = "/perception/camera_debug/wear"];
+    optional double ts_diff =14 [default = 0.1];
+    optional string visual_debug_folder = 15 [default = "records/debug_output"];
+    optional string visual_camera = 16 [default = "camera_wear"];
+    optional bool write_visual_img = 17 [default = false];
+    optional double average_frame_rate =18 [default = 0.05];
+    optional int32 debug_level = 19[default = 0];
+}

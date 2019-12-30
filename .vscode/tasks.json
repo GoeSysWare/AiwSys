@@ -51,7 +51,7 @@
         "command": "bazel",
         "args": [
             "build",
-            "//modules/test/...",
+            "//modules/test/test_pytorch/...",
             "--compilation_mode=dbg",
         ],
         "problemMatcher": [

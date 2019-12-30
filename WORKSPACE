@@ -46,6 +46,8 @@ new_local_repository(
     path = "/usr",
 )
 
+
+
 #Go
 local_repository(
     name = "io_bazel_rules_go",
@@ -176,13 +178,13 @@ new_local_repository(
     build_file = "third_party/pcl.BUILD",
     path = "../3rd/libpcap-1.9.1/build/install",
 )
-# opencv  3.2
+# opencv  3.4
 # =======
 # This requires libpcl-dev to be installed in your Ubuntu/Debian.
 new_local_repository(
     name = "opencv",
     build_file = "third_party/opencv.BUILD",
-    path = "/usr/include/opencv2",
+    path = "../3rd/opencv-3.4.0/build/install",
 )
 
 #########################################################################################
@@ -224,12 +226,12 @@ new_local_repository(
     build_file = "third_party/caffe.BUILD",
     path = "../3rd/caffe-1.0/build/install",
 )
-# # PyTorch
-# new_local_repository(
-#     name = "pytorch",
-#     build_file = "third_party/pytorch.BUILD",
-#     path = "/usr/local/lib",
-# )
+# PyTorch
+new_local_repository(
+    name = "pytorch",
+    build_file = "third_party/pytorch.BUILD",
+    path = "../3rd/libtorch/",
+)
 
 # # PyTorch GPU
 # new_local_repository(
@@ -264,6 +266,21 @@ new_local_repository(
 #     build_file = "third_party/tensorrt.BUILD",
 #     path = "/usr/include/tensorrt",
 # )
+
+# #xxhash
+# new_local_repository(
+#     name = "xxhash",
+#     build_file = "third_party/xxhash.BUILD",
+#     path = "/usr/local/apollo/paddlepaddle_dep/xxhash",
+# )
+
+# #snappystream
+# new_local_repository(
+#     name = "snappystream",
+#     build_file = "third_party/snappystream.BUILD",
+#     path = "/usr/local/apollo/paddlepaddle_dep/snappystream",
+# )
+
 
 #########################################################################################
 # 其他工具和框架

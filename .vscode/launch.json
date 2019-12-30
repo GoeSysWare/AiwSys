@@ -17,7 +17,7 @@
             "name": "C++: Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bazel-bin/modules/hmi/camera/test_qt_camera",
+            "program": "${workspaceFolder}/bazel-bin/modules/test/test_pytorch/test_torch",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

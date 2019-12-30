@@ -36,6 +36,7 @@ ProcessMonitor::ProcessMonitor()
     : RecurrentRunner(FLAGS_process_monitor_name,
                       FLAGS_process_monitor_interval) {}
 
+
 void ProcessMonitor::RunOnce(const double current_time) {
   // Get running processes.
   std::vector<std::string> running_processes;

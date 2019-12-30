@@ -1,0 +1,15 @@
+
+module_config {
+    module_library : "bazel-bin/modules/monitor/librail_wear.so"
+    components {
+    class_name : "WearDetectionComponent"
+    config {
+        name : "WearComponent"
+        config_file_path : "projects/conductor_rail/production/conf/wear.pb.txt"
+        flag_file_path: "projects/conductor_rail/production/conf/rail_common.flag"
+        readers {
+          channel: "/aiwsys/inner/camera_wear"
+        }
+    }
+  }
+}

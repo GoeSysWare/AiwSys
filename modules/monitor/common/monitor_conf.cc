@@ -22,11 +22,10 @@ using google::protobuf::Map;
 using  namespace apollo::dreamview;
 
 
-DEFINE_string(hmi_modes_config_path, "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/modules/monitor/conf/",
+DEFINE_string(hmi_modes_config_path, "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/modules/monitor/conf",
               "HMI modes config path.");
 
 
-constexpr char kNavigationModeName[] = "Navigation";
 // Convert a string to be title-like. E.g.: "hello_world" -> "Hello World".
 static std::string TitleCase(const std::string& origin) {
   static const std::string kDelimiter = "_";
@@ -53,21 +52,6 @@ static std::string TitleCase(const std::string& origin) {
     result.insert({file_title, file_path});
   }
   return result;
-}
-
-
-HMIConfig  LoadConfig() {
-  HMIConfig config;
-  // Get available modes, maps and vehicles by listing data directory.
-  *config.mutable_modes() =
-      ListFilesAsDict(FLAGS_hmi_modes_config_path, ".pb.txt");
-  CHECK(!config.modes().empty())
-      << "No modes config loaded from " << FLAGS_hmi_modes_config_path;
-
-//   *config.mutable_maps() = ListDirAsDict(FLAGS_maps_data_path);
-//   *config.mutable_vehicles() = ListDirAsDict(FLAGS_vehicles_config_path);
-  AINFO << "Loaded HMI config: " << config.DebugString();
-  return config;
 }
 
 

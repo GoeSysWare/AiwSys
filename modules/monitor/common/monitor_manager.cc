@@ -33,53 +33,31 @@ namespace monitor {
 
 
 MonitorManager::MonitorManager()
-    : hmi_config_(LoadConfig()),
-      log_buffer_(apollo::common::monitor::MonitorMessageItem::MONITOR) {}
+    : log_buffer_(apollo::common::monitor::MonitorMessageItem::MONITOR) {}
 
 
-void MonitorManager::Init(const std::shared_ptr<apollo::cyber::Node>& node) {
+void MonitorManager::Init(const std::string config_file, const std::shared_ptr<apollo::cyber::Node>& node) {
   node_ = node;
+  config_file_path_ = config_file;
   if (FLAGS_use_sim_time) {
     status_.set_is_realtime_in_simulation(true);
   }
 }
 
-bool MonitorManager::StartFrame(const double current_time) {
-  // Get latest HMIStatus.
-  static auto hmi_status_reader =
-      CreateReader<apollo::dreamview::HMIStatus>(FLAGS_hmi_status_topic);
-  hmi_status_reader->Observe();
-  const auto hmi_status = hmi_status_reader->GetLatestObserved();
-  if (hmi_status == nullptr) {
-    AERROR << "No HMIStatus was received.";
-    return false;
-  }
-
-  if (current_mode_ != hmi_status->current_mode()) {
-    // Mode changed, update configs and monitored.
-    current_mode_ = hmi_status->current_mode();
-    mode_config_ = LoadMode(hmi_config_.modes().at(current_mode_));
-    status_.clear_hmi_modules();
-    for (const auto& iter : mode_config_.modules()) {
-      status_.mutable_hmi_modules()->insert({iter.first, {}});
-    }
-    status_.clear_components();
-    for (const auto& iter : mode_config_.monitored_components()) {
-      status_.mutable_components()->insert({iter.first, {}});
-    }
-  } else {
-    // Mode not changed, clear component summary from the last frame.
-    for (auto& iter : *status_.mutable_components()) {
-      iter.second.clear_summary();
-    }
-  }
-
-  return true;
-}
-
 // bool MonitorManager::StartFrame(const double current_time) {
+//   // Get latest HMIStatus.
+//   static auto hmi_status_reader =
+//       CreateReader<apollo::dreamview::HMIStatus>(FLAGS_hmi_status_topic);
+//   hmi_status_reader->Observe();
+//   const auto hmi_status = hmi_status_reader->GetLatestObserved();
+//   if (hmi_status == nullptr) {
+//     AERROR << "No HMIStatus was received.";
+//     return false;
+//   }
 
-//     current_mode_ = "Rtk";
+//   if (current_mode_ != hmi_status->current_mode()) {
+//     // Mode changed, update configs and monitored.
+//     current_mode_ = hmi_status->current_mode();
 //     mode_config_ = LoadMode(hmi_config_.modes().at(current_mode_));
 //     status_.clear_hmi_modules();
 //     for (const auto& iter : mode_config_.modules()) {
@@ -89,8 +67,30 @@ bool MonitorManager::StartFrame(const double current_time) {
 //     for (const auto& iter : mode_config_.monitored_components()) {
 //       status_.mutable_components()->insert({iter.first, {}});
 //     }
+//   } else {
+//     // Mode not changed, clear component summary from the last frame.
+//     for (auto& iter : *status_.mutable_components()) {
+//       iter.second.clear_summary();
+//     }
+//   }
+
 //   return true;
 // }
+
+bool MonitorManager::StartFrame(const double current_time) {
+
+
+      mode_config_ = LoadMode(config_file_path_);
+      status_.clear_hmi_modules();
+      for (const auto& iter : mode_config_.modules()) {
+        status_.mutable_hmi_modules()->insert({iter.first, {}});
+      }
+      status_.clear_components();
+      for (const auto& iter : mode_config_.monitored_components()) {
+        status_.mutable_components()->insert({iter.first, {}});
+      }
+  return true;
+}
 
 void MonitorManager::EndFrame() {
   // Print and publish all monitor logs.

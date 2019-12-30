@@ -5,6 +5,7 @@ module_config {
         config {
             name: "monitor"
             interval: 500
+            config_file_path : "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/modules/monitor/conf/rtk.pb.txt"
         }
     }
 }

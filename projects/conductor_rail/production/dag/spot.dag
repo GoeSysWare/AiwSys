@@ -1,0 +1,15 @@
+
+module_config {
+    module_library : "bazel-bin/modules/monitor/librail_spot.so"
+    components {
+    class_name : "SpotDetectionComponent"
+    config {
+        name : "SpotComponent"
+        config_file_path : "projects/conductor_rail/production/conf/spot.pb.txt"
+        flag_file_path: "projects/conductor_rail/production/conf/rail_common.flag"
+        readers {
+          channel: "/watrix/inner/camera_spot"
+        }
+    }
+  }
+}

@@ -37,7 +37,7 @@ namespace monitor {
 // Centralized monitor config and status manager.
 class MonitorManager {
  public:
-  void Init(const std::shared_ptr<apollo::cyber::Node>& node);
+  void Init(const std::string config_file,const std::shared_ptr<apollo::cyber::Node>& node);
 
   // Start and end a monitoring frame.
   bool StartFrame(const double current_time);
@@ -68,12 +68,12 @@ class MonitorManager {
 
   // Input statuses.
   std::string current_mode_;
-  const apollo::dreamview::HMIConfig hmi_config_;
   apollo::dreamview::HMIMode mode_config_;
   bool in_autonomous_driving_ = false;
 
   apollo::common::monitor::MonitorLogBuffer log_buffer_;
   std::shared_ptr<apollo::cyber::Node> node_;
+  std::string config_file_path_;
   std::unordered_map<std::string, std::shared_ptr<cyber::ReaderBase>> readers_;
 
   DECLARE_SINGLETON(MonitorManager)
