@@ -8,20 +8,14 @@ cc_library(
         ".",
         "include",
     ],
-    linkopts = [
-        "-lpthread",
-        "-lblas",
-        "-lcblas",
-        "-lhdf5_hl",
-        "-lhdf5",
-        "-lz",
-        "-ldl",
-        "-lm",
-        "-Llib",
-        "-lcaffe",
-    ],
+    srcs = glob([
+        "lib/*.so.*",
+        "lib/*.so",
+    ]),
     deps = [
         "@opencv",
-        "@boost"
+        "@boost",
+        "@cuda",
+        "@com_google_protobuf//:protobuf",
     ]
 )

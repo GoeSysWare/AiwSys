@@ -7,11 +7,11 @@ cc_library(
     includes = [
         ".",
     ],
-    
-    linkopts = [
-        "-Lstage/lib",
-        "-lboost_system",
-        "-lboost_thread",
-        "-lboost_filesystem",
-    ],
+    srcs = glob([
+        "stage/lib/*.so.*",
+        "stage/lib/*.so",
+    ]),
+    deps = [
+        "@python36",
+    ]
 )

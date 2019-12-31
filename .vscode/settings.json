@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "README": "markdown",
         "vector": "cpp",
         "iostream": "cpp",
         "array": "cpp",
@@ -77,6 +78,8 @@
         "scoped_allocator": "cpp",
         "shared_mutex": "cpp",
         "valarray": "cpp",
-        "cuchar": "cpp"
+        "cuchar": "cpp",
+        "alignedvector3": "cpp",
+        "fft": "cpp"
     }
 }

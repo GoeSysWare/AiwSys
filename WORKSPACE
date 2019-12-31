@@ -230,7 +230,7 @@ new_local_repository(
 new_local_repository(
     name = "pytorch",
     build_file = "third_party/pytorch.BUILD",
-    path = "../3rd/libtorch/",
+    path = "../3rd/pytorch/build/install",
 )
 
 # # PyTorch GPU

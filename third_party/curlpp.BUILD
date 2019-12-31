@@ -1,5 +1,7 @@
 licenses(["notice"])
 
+package(default_visibility = ["//visibility:public"])
+
 cc_library(
     name = "curlpp",
     srcs = [
@@ -27,5 +29,4 @@ cc_library(
     linkopts = [
         "-lcurl",
     ],
-    visibility = ["//visibility:public"],
 )

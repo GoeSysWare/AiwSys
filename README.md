@@ -148,12 +148,12 @@ bazel clean --expunge
 -  指定protobuf版本，默认为3.0.0 修改cmakelist.txt 中的内容为 3.9.1
 
 
-### 构建PyTorch  
+### 构建PyTorch(1.2.0)  
 - [官网下载](https://download.pytorch.org/libtorch/cu101/libtorch-cxx11-abi-shared-with-deps-1.3.1.zip)编译好的库  
   要选择cuda、python等版本(推荐)
 
 - git后再源码编译  
-  pytorch源码编译需要下载很多的依赖项，最好用git模式下载后再编译  
+  pytorch源码编译需要下载很多的依赖项，最好用git独立下载各个依赖库后再编译  
   git clone --recursive https://github.com/pytorch/pytorch  
   cd pytorch  
   git checkout tags/v1.2.0
@@ -215,6 +215,19 @@ asmjit 版本不对，asmjit::X86Emitter 在新版中已经换名字了
 peachpy 版本不对，peachpy 在新版中缺少x86_64/avx.py文件
 解决办法:  
 官网下载 PeachPy-pre-generated 的分支
+8. 错误8:  
+"/third_party/cub/cub/device/dispatch/dispatch_reduce.cuh(362): error: use the "typename" keyword to treat nontype "std::iterator_traits<_Iterator>::value_type [with _Iterator=InputIteratorT]" as a type in a dependent context  "
+原因:  
+C++ 调用/声明模板类限定的模板函数时 必须使用关键字template/typename 进行说明  
+解决办法:  
+cub/cub/device/dispatch/dispatch_reduce.cuh(362和684行) ，修改源码增加typename 关键字作为模板类的声明  
+9. 错误9:  
+pytorch/aten/src/ATen/native/quantized/cpu/fbgemm_utils.h:24:19:   
+error: ‘PackWeightsForConv’ is not a member of ‘fbgemm’  
+原因:    
+fbgemm 版本和aTen 不对，  
+解决办法:  
+官网下载 fbgemm的分支(没有找到合适版本)  
 
 ### 构建PadlePadle
 

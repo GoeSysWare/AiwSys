@@ -6,6 +6,19 @@ cc_library(
     name = "pcl",
     defines = ["PCL_NO_PRECOMPILE"],
     includes = ["include"],
+    srcs = glob([
+        "build/src/cpp/*.so.*",
+        "build/src/cpp/*.so",
+        "build/external/install/lib/*.so.*",
+        "build/external/install/lib/*.so",
+    ]),
+    hdrs = glob([
+        "Eigen/*",
+        "Eigen/**/*.h",
+        "unsupported/Eigen/*",
+        "unsupported/Eigen/**/*.h",
+    ]),
+
     linkopts = [
         "-Linstall/lib",
         "-lboost_system",
