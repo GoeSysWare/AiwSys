@@ -8,14 +8,8 @@ cc_library(
     includes = [
         "include",
     ],
-    # linkopts = [
-    #     "-Lbuild/out",
-    #     "-Wl,-rpath,/usr/lib/x86_64-linux-gnu/",
-    #     "-losqp",
-    # ],
-    linkopts = [
-        "-Lbuild/out",
-        "-Wl,-rpath,",
-        "-losqp,-lqdldla",
+    srcs = [
+        "lib/libosqp.so",
+        "lib/libqdldl.so",
     ],
 )

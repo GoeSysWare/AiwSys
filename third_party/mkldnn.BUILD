@@ -5,7 +5,7 @@ licenses(["notice"])
 cc_library(
     name = "mkldnn",
     srcs = [
-        "lib/libmkldnn.so.0",
+        "lib/libmkldnn.so",
     ],
     hdrs = glob([
         "include/*.h",

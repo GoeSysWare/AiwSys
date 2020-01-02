@@ -57,7 +57,7 @@ load("@io_bazel_rules_go//go:deps.bzl", "go_rules_dependencies", "go_register_to
 go_rules_dependencies()
 go_register_toolchains()
 load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_binary","go_test","go_source")
-load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
+
 
 
 
@@ -140,7 +140,7 @@ new_local_repository(
     build_file = "third_party/boost.BUILD",
     path = "../3rd/boost_1_70_0",
 )
-#FastRTPS
+#FastRTPS 1.5
 new_local_repository(
     name = "fastrtps",
     build_file = "third_party/fastrtps.BUILD",
@@ -165,7 +165,7 @@ new_local_repository(
 new_local_repository(
     name = "yaml_cpp",
     build_file = "third_party/yaml_cpp.BUILD",
-    path = "../3rd/yaml-cpp-yaml-cpp-0.6.3",
+    path = "../3rd/yaml-cpp-0.6.3/build/install",
 )
 #########################################################################################
 # 图像处理、点云功能库
@@ -178,6 +178,7 @@ new_local_repository(
     build_file = "third_party/pcl.BUILD",
     path = "../3rd/libpcap-1.9.1/build/install",
 )
+
 # opencv  3.4
 # =======
 # This requires libpcl-dev to be installed in your Ubuntu/Debian.
@@ -247,12 +248,12 @@ new_local_repository(
 #     path = "/usr/local/apollo/paddlepaddle",
 # )
 
-# # mkldnn
-# new_local_repository(
-#     name = "mkldnn",
-#     build_file = "third_party/mkldnn.BUILD",
-#     path = "/usr/local/apollo/local_third_party/mkldnn",
-# )
+# mkldnn
+new_local_repository(
+    name = "mkldnn",
+    build_file = "third_party/mkldnn.BUILD",
+    path = "../3rd/mkl-dnn-0.14/build/install",
+)
 
 # # mklml
 # new_local_repository(
@@ -260,19 +261,13 @@ new_local_repository(
 #     build_file = "third_party/mklml.BUILD",
 #     path = "/usr/local/apollo/local_third_party/mklml",
 # )
-## tensorrt
+# tensorrt
 # new_local_repository(
 #     name = "tensorrt",
 #     build_file = "third_party/tensorrt.BUILD",
-#     path = "/usr/include/tensorrt",
+#     path = "../3rd/TensorRT-6.0.1/build/install",
 # )
 
-# #xxhash
-# new_local_repository(
-#     name = "xxhash",
-#     build_file = "third_party/xxhash.BUILD",
-#     path = "/usr/local/apollo/paddlepaddle_dep/xxhash",
-# )
 
 # #snappystream
 # new_local_repository(

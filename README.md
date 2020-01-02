@@ -9,6 +9,7 @@
   + percetion 感知结点，人工智能框架接口与人工智能相关的感知处理基本方法、过程和结果
   + transform  坐标变换
   + monitor 系统软硬件监测
+  + test 测试代码
 - projects 工程项目包，利用平台其他基础库定制开发形成实际产品与项目
   + conductor_rail 三轨检测
   + adas 智能感知系统
@@ -145,7 +146,8 @@ bazel clean --expunge
  - 构建TensortRT 依赖项:
     +  ONNX (1.5.0)
     +  cub (1.7.5)
--  指定protobuf版本，默认为3.0.0 修改cmakelist.txt 中的内容为 3.9.1
+-  指定protobuf版本，默认为3.0.0 修改cmakelist.txt 中的内容为 3.9.1,可以修改下载路径    
+
 
 
 ### 构建PyTorch(1.2.0)  
@@ -165,7 +167,7 @@ bazel clean --expunge
   python setup.py install  
 **注意:**  github太慢,所有第三方库都改为gitee  
 
-- 本地源码编译 (非常难编译)  
+- 本地源码编译 (  
   'BLAS' 选项可以选择'mkl'  
 1.  错误1:  
   "nvcc fatal : redefinition of argument 'std'"  

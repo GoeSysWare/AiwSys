@@ -27,3 +27,9 @@ class HelloWorld(object):
 
   def Stop(self):
     self._threadpool.shutdown(wait = True)
+
+    if __name__ == '__main__':
+     h = HelloWorld()
+     h.SayHello()
+     
+    

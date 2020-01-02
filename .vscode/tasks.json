@@ -51,8 +51,9 @@
         "command": "bazel",
         "args": [
             "build",
-            "//modules/test/test_caffe/...",
+            "//modules/test/...",
             "--compilation_mode=dbg",
+            // "--sandbox_debug",
         ],
         "problemMatcher": [
             "$gcc",

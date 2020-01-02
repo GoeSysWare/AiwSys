@@ -15,7 +15,6 @@ cc_library(
         "@glog",
         "@opencv",
         "@com_google_protobuf//:protobuf",
-        "@osqp",
     ],
 )
 

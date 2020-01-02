@@ -7,11 +7,25 @@ cc_library(
     includes = [
         ".",
     ],
-    srcs = glob([
-        "stage/lib/*.so.*",
-        "stage/lib/*.so",
-    ]),
-    deps = [
-        "@python36",
-    ]
+    # 链接全部的库
+    # srcs = glob([
+    #     "stage/lib/*.so.*",
+    #     "stage/lib/*.so",
+    # ]),
+    # deps = [
+    #     "@python36",
+    # ],
+
+    # 利用bazel规则链接指定的库
+    srcs = [
+        "stage/lib/libboost_filesystem.so",
+        "stage/lib/libboost_atomic.so",
+    ],
+
+    # 利用gcc规则链接指定的库
+    # linkopts = [
+    #     "-Wl,-rpath,/usr/lib/x86_64-linux-gnu/",
+    #     "-lboost_filesystem",
+    #     "-lboost_atomic",
+    # ],
 )

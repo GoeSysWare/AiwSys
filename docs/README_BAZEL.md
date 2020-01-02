@@ -4,9 +4,29 @@
     bazel clean 
     bazel clean --expunge
     bazel run 
-    bazel build
-
-
+    bazel build  
+    
+## 官方全命令
+**analyze-profile**	Analyzes build profile data.  
+**aquery**	Analyzes the given targets and queries the action graph.  
+**build**	Builds the specified targets.  
+**canonicalize-flags**	Canonicalizes a list of bazel options.  
+**clean**	Removes output files and optionally stops the server.  
+**coverage**	Generates code coverage report for specified test targets.  
+**cquery**	Loads, analyzes, and queries the specified targets w/ configurations.  
+**dump**	Dumps the internal state of the bazel server process.  
+**fetch**	Fetches external repositories that are prerequisites to the targets.  
+**help**	Prints help for commands, or the index.  
+**info**	Displays runtime info about the bazel server.  
+**license**	Prints the license of this software.  
+**mobile-install**	Installs targets to mobile devices.  
+**print_action**	Prints the command line args for compiling a file.  
+**query**	Executes a dependency graph query.  
+**run**	 Runs the specified target.  
+**shutdown**	Stops the bazel server.  
+**sync**	Syncs all repositories specified in the workspace file  
+**test**	Builds and runs the specified test targets.  
+**version**	Prints version information for bazel.  
 
 ## 参数解释
     --output_filter   这个是对编译的警告进行过滤，regex过滤

@@ -23,6 +23,15 @@ cc_library(
     ],
 )
 
+cc_binary(
+    name = "test_video",
+    srcs = [
+        "test_video.cpp",
+    ],
+    deps = [
+        "@opencv",
+    ],
+)
 
 
 cpplint()
