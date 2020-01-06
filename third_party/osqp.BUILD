@@ -8,8 +8,8 @@ cc_library(
     includes = [
         "include",
     ],
-    srcs = [
-        "lib/libosqp.so",
-        "lib/libqdldl.so",
-    ],
+    srcs = glob([
+        "lib/*.so.*",
+        "lib/*.so",
+    ]),
 )

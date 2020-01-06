@@ -12,15 +12,16 @@ cc_library(
     #     "stage/lib/*.so.*",
     #     "stage/lib/*.so",
     # ]),
-    # deps = [
-    #     "@python36",
-    # ],
+    deps = [
+        "@python36",
+    ],
 
     # 利用bazel规则链接指定的库
-    srcs = [
-        "stage/lib/libboost_filesystem.so",
-        "stage/lib/libboost_atomic.so",
-    ],
+    srcs = glob([
+        "stage/lib/libboost_filesystem.so*",
+        "stage/lib/libboost_atomic.so*",
+        "stage/lib/libboost_system.so*",
+    ]),
 
     # 利用gcc规则链接指定的库
     # linkopts = [

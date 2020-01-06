@@ -13,6 +13,13 @@ load('@bazel_tools//tools/build_defs/repo:git.bzl', 'git_repository',"new_git_re
 #########################################################################################
 #bazel 编译的语言支持
 #########################################################################################
+local_repository(
+    name = "bazel_skylib",
+    path=  "../3rd/bazel-skylib-1.0.2",
+)
+load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
+bazel_skylib_workspace()
+
 
 #rules_cc
 local_repository(
@@ -119,6 +126,9 @@ new_local_repository(
 
 
 # protobuf
+
+# This com_google_protobuf repository is required for proto_library rule.
+# It provides the protocol compiler binary (i.e., protoc).
 local_repository(
     name = "com_google_protobuf",
     path=  "../3rd/protobuf-3.9.1",
@@ -128,6 +138,29 @@ protobuf_deps()
 
 load("@com_google_protobuf//:protobuf.bzl", "cc_proto_library","py_proto_library")
 
+# This com_google_protobuf_cc repository is required for cc_proto_library
+# rule. It provides protobuf C++ runtime. Note that it actually is the same
+# repo as com_google_protobuf but has to be given a different name as
+# required by bazel.
+# local_repository(
+#     name = "com_google_protobuf_cc",
+#     path=  "../3rd/protobuf-3.9.1",
+# )
+
+# # Similar to com_google_protobuf_cc but for Java (i.e., java_proto_library).
+# local_repository(
+#     name = "com_google_protobuf_java",
+#     path=  "../3rd/protobuf-3.9.1",
+# )
+
+# Similar to com_google_protobuf_cc but for Java lite. If you are building
+# for Android, the lite version should be prefered because it has a much
+# smaller code size.
+# "https://github.com/protocolbuffers/protobuf/archive/javalite.zip"
+local_repository(
+    name = "com_google_protobuf_javalite",
+    path=  "../3rd/protobuf-javalite",
+)
 
 
 #########################################################################################
@@ -151,7 +184,7 @@ new_local_repository(
 new_local_repository(
     name = "poco",
     build_file = "third_party/poco.BUILD",
-    path = "../3rd/poco-poco-1.9.4-release"
+    path = "../3rd/poco-1.9.4"
 )
 # Curl-CPP
 new_local_repository(
@@ -176,7 +209,7 @@ new_local_repository(
 new_local_repository(
     name = "pcl",
     build_file = "third_party/pcl.BUILD",
-    path = "../3rd/libpcap-1.9.1/build/install",
+    path = "../3rd/pcl-1.9.0/build/install",
 )
 
 # opencv  3.4
