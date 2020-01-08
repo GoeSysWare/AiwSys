@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/perception/camera/common/data_provider.h"
 #include "cyber/common/log.h"
 

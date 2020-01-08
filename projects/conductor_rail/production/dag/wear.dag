@@ -1,8 +1,8 @@
 
 module_config {
-    module_library : "bazel-bin/modules/monitor/librail_wear.so"
+    module_library : "bazel-bin/modules/monitor/librail_wearcomponent.so"
     components {
-    class_name : "WearDetectionComponent"
+    class_name : "WearComponent"
     config {
         name : "WearComponent"
         config_file_path : "projects/conductor_rail/production/conf/wear.pb.txt"

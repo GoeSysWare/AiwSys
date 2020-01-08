@@ -33,7 +33,7 @@ cc_library(
         "-lnppitc",
         "-lnpps",
         "-lnvToolsExt",
-        # "-lnvblas",
+        "-lnvblas",
         "-lnvgraph",
         "-lnvrtc-builtins",
         "-lnvrtc",

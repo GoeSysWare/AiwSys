@@ -198,7 +198,7 @@ new_local_repository(
 new_local_repository(
     name = "yaml_cpp",
     build_file = "third_party/yaml_cpp.BUILD",
-    path = "../3rd/yaml-cpp-0.6.3/build/install",
+    path = "../3rd/yaml-cpp-0.6.3/",
 )
 #########################################################################################
 # 图像处理、点云功能库

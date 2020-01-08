@@ -61,6 +61,21 @@
         "group": "build"
        },
        {
+        "label": "Bazel Build Projects",
+        "type": "shell",
+        "command": "bazel",
+        "args": [
+            "build",
+            "//projects/conductor_rail/...",
+            "--compilation_mode=dbg",
+            // "--sandbox_debug",
+        ],
+        "problemMatcher": [
+            "$gcc",
+        ],
+        "group": "build"
+       },
+       {
            "label": "Bazel Clear ",
            "type": "shell",
            "command": "bazel",

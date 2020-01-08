@@ -231,6 +231,13 @@ fbgemm 版本和aTen 不对，
 解决办法:  
 官网下载 fbgemm的分支(没有找到合适版本)  
 
+
+### CUDA  
+ 使用时遇到问题：  
+  cuda_runtime.h:379:1: error: template with C linkage  
+  解决方案
+  添加 #include<cuda_runtime.h>   
+  
 ### 构建PadlePadle
 
 - 将PaddlePaddle的源码clone在当下目录下的Paddle的文件夹中，并进入Padde目录下：

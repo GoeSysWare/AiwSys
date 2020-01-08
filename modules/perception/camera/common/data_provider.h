@@ -15,7 +15,8 @@
  *****************************************************************************/
 #pragma once
 
-#include <nppi.h>
+  #include <cuda_runtime.h>
+  #include <nppi.h>
 
 #include <memory>
 #include <string>
