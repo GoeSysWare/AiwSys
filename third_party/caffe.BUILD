@@ -13,14 +13,12 @@ cc_library(
     #     "lib/*.so",
     # ]),
     # 利用bazel规则链接指定的库
-    srcs = glob([
-        "lib/libcaffe.so*",
-    ]),
+    srcs = glob(["lib/*.so"]),
     # #链接指定的库
-    # linkopts = [
-    #     "-L/usr/local",
-    #     "-lcaffe",
-    # ],
+    linkopts = [
+        "-Llib",
+        "-lcaffe",
+    ],
     deps = [
         "@opencv",
         "@boost",

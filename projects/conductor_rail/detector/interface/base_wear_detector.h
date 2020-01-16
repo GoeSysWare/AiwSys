@@ -7,9 +7,9 @@
 
 #include "modules/perception/base/camera.h"
 #include "modules/perception/camera/common/camera_frame.h"
-#include "modules/perception/camera/lib/interface/base_init_options.h"
-#include "projects/common/registerer/registerer.h"
 
+#include "projects/common/registerer/registerer.h"
+#include "base_init_options.h"
 
 namespace aiwsys {
 namespace projects {
@@ -17,8 +17,7 @@ namespace conductor_rail {
 
 
 
-struct WearDetectorInitOptions : public apollo::perception::camera::BaseInitOptions {
-  std::shared_ptr<apollo::perception::base::BaseCameraModel> base_camera_model = nullptr;
+struct WearDetectorInitOptions : public BaseInitOptions {
 };
 
 struct WearDetectorOptions {};

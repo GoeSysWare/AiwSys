@@ -408,6 +408,7 @@ cc_library(
     deps = [
         ":common",
         "//cyber",
+        "@cuda",
     ],
 )
 
@@ -416,6 +417,7 @@ cc_test(
     size = "small",
     srcs = [
         "syncedmem_test.cc",
+
     ],
     deps = [
         ":syncedmem",

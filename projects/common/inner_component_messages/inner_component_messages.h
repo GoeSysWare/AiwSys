@@ -43,12 +43,12 @@ class Descriptor {
   std::string full_name() { return "name"; }
 };
 
-class SensorFrameMessage {
+class ProjectsSensorFrameMessage {
  public:
-  SensorFrameMessage() { type_name_ = "SensorFrameMessage"; }
-  ~SensorFrameMessage() = default;
+  ProjectsSensorFrameMessage() { type_name_ = "ProjectsSensorFrameMessage"; }
+  ~ProjectsSensorFrameMessage() = default;
   std::string GetTypeName() { return type_name_; }
-  SensorFrameMessage* New() const { return new SensorFrameMessage; }
+  ProjectsSensorFrameMessage* New() const { return new ProjectsSensorFrameMessage; }
 
  public:
   apollo::common::ErrorCode error_code_ = apollo::common::ErrorCode::OK;

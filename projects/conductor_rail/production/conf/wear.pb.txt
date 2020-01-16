@@ -1,25 +1,19 @@
 camera_names: "front_6mm"
 input_camera_channel_names : "/apollo/sensor/camera/front_6mm/image"
 timestamp_offset : 0.0
-camera_obstacle_perception_conf_dir : "/apollo/modules/perception/production/conf/perception/camera"
-camera_obstacle_perception_conf_file : "obstacle.pt"
+camera_detection_conf_dir : "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/modules/perception/production/conf/perception/camera"
+camera_detection_conf_file : "obstacle.pt"
 frame_capacity : 20
 image_channel_num : 3
-enable_undistortion : false
 enable_visualization : false
-output_final_obstacles : true
-output_obstacles_channel_name : "/perception/obstacles"
-camera_perception_viz_message_channel_name : "/perception/inner/camera_viz_msg"
-prefused_channel_name : "/perception/inner/PrefusedObjects"
+output_camera_channel_name : "/aiwsys/extra/camera_wear"
 default_camera_pitch : 0.0
 default_camera_height : 1.5
-lane_calibration_working_sensor_name : "front_6mm"
-calibrator_method : "LaneLineCalibrator"
-calib_service_name : "OnlineCalibrationService"
-run_calib_service : true
+detect_method : "LaneLineCalibrator"
 output_camera_debug_msg : false
-camera_debug_channel_name : "/perception/camera_debug"
+camera_debug_channel_name : "/perception/camera_debug/wear"
 ts_diff : 0.1
-visual_debug_folder : "/apollo/debug_output"
-visual_camera : "front_6mm"
+visual_debug_folder : "records/debug_output"
+visual_camera : "camera_wear"
 write_visual_img : false
+debug_level: 0

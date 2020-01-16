@@ -21,6 +21,11 @@ namespace projects
 namespace conductor_rail
 {
 
+using apollo::cyber::Component;
+using apollo::cyber::Reader;
+using apollo::cyber::Writer;
+using apollo::drivers::Image;
+
 class WearComponent : public apollo::cyber::Component<>
 {
 public:
@@ -101,7 +106,7 @@ private:
     double last_timestamp_ = 0.0;
     double ts_diff_ = 1.0;
 
-    std::shared_ptr<apollo::cyber::Writer<aiwsys::projects::common::SensorFrameMessage>  sensorframe_writer_;
+    std::shared_ptr<apollo::cyber::Writer<aiwsys::projects::common::ProjectsSensorFrameMessage>>  sensorframe_writer_;
 
     std::shared_ptr<
         apollo::cyber::Writer<detection::DetectionWearResult>>

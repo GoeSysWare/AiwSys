@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "projects/conductor_rail/component/config_gflags.h"
+#include "projects/conductor_rail/configs/config_gflags.h"
 
-DEFINE_string(wear_camera_size,1,"磨损支持的相机数");
-DEFINE_string(spot_camera_size,1,"焊点支持的相机数");
+DEFINE_int32(wear_camera_size,1,"磨损支持的相机数");
+DEFINE_int32(spot_camera_size,1,"焊点支持的相机数");
 

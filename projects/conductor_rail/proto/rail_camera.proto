@@ -22,5 +22,5 @@ message RailCameraDetection {
     optional string visual_debug_folder = 16 [default = "records/debug_output"];
     optional string visual_camera = 17 [default = "camera_wear"];
     optional bool write_visual_img = 18 [default = false];
-    optional int32 debug_level = 19[default = 0];
+    optional int32 debug_level = 19 [default = 0];
 }
