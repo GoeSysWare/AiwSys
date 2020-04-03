@@ -154,6 +154,11 @@ bazel clean --expunge
 - [官网下载](https://download.pytorch.org/libtorch/cu101/libtorch-cxx11-abi-shared-with-deps-1.3.1.zip)编译好的库  
   要选择cuda、python等版本(推荐)
 
+- python 版本  
+  pytorch 分C++和python版本  
+  python环境下调用pytoch需要下载:  
+ " pip3 install torch==1.2.0 --user "       
+
 - git后再源码编译  
   pytorch源码编译需要下载很多的依赖项，最好用git独立下载各个依赖库后再编译  
   git clone --recursive https://github.com/pytorch/pytorch  

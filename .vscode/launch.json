@@ -23,7 +23,7 @@
             "name": "Debug Test",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bazel-bin/modules/test/test_pattern/test_pattern",
+            "program": "${workspaceFolder}/bazel-bin/modules/test/test_torch/test_torch",
             "args": ["addressbook.data",],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

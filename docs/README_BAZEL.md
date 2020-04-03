@@ -66,5 +66,6 @@
     + [new_local_repository](https://docs.bazel.build/versions/master/be/workspace.html#new_local_repository)
     + [new_git_repository](https://docs.bazel.build/versions/0.28.0/repo/git.html#new_git_repository)
 -  deps规则  
-    + @boost 为@boost//:boost的默认名，当空间与内容名一致，可以缩写
-    + bind() 重命名后必须用 //externel: 来引用
+    + @boost 为@boost//:boost的默认名，当空间与内容名一致，可以缩写  
+    + bind() 重命名后必须用 //externel: 来引用  
+    + protobuf 引用时，如果需要独立的库则需要用  "@com_google_protobuf//:protobuf_headers",而不是        "@com_google_protobuf//:protobuf",

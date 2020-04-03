@@ -51,8 +51,7 @@
         "command": "bazel",
         "args": [
             "build",
-            "//modules/test/...",
-            "--compilation_mode=dbg",
+            "//modules/test/test_torch/...",
             // "--sandbox_debug",
         ],
         "problemMatcher": [
