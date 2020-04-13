@@ -24,7 +24,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bazel-bin/modules/test/test_torch/test_torch",
-            "args": ["addressbook.data",],
+            "args": ["",],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
@@ -76,13 +76,125 @@
             ]
         },
         {
+            "name": "Debug ADAS",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bazel-bin/projects/adas/test_perception/test_perception",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [
+                {
+                    "name": "CYBER_PATH",
+                    "value": "${workspaceFolder}/cyber",
+                },
+                {
+                    "name": "GLOG_log_dir",
+                    "value": "${workspaceFolder}/logs"
+                },
+                {
+                    "name": "CYBER_DOMAIN_ID",
+                    "value": "80"
+                },
+                {
+                    "name": "CYBER_IP",
+                    //"value":"192.168.0.227"
+                    "value": "127.0.0.1"
+                },
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Record",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bazel-bin/projects/adas/test_record/test_record",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [
+                {
+                    "name": "CYBER_PATH",
+                    "value": "${workspaceFolder}/cyber",
+                },
+                {
+                    "name": "GLOG_log_dir",
+                    "value": "${workspaceFolder}/logs"
+                },
+                {
+                    "name": "CYBER_DOMAIN_ID",
+                    "value": "80"
+                },
+                {
+                    "name": "CYBER_IP",
+                    //"value":"192.168.0.227"
+                    "value": "127.0.0.1"
+                },
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug  HMI",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bazel-bin/projects/adas/hmi/perception_hmi",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [
+                {
+                    "name": "CYBER_PATH",
+                    "value": "${workspaceFolder}/cyber",
+                },
+                {
+                    "name": "GLOG_log_dir",
+                    "value": "${workspaceFolder}/logs"
+                },
+                {
+                    "name": "CYBER_DOMAIN_ID",
+                    "value": "80"
+                },
+                {
+                    "name": "CYBER_IP",
+                    //"value":"192.168.0.227"
+                    "value": "127.0.0.1"
+                },
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
             "name": "Debug Monitor",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bazel-bin/cyber/mainboard",
             "args": [
                 "-d",
-                "${workspaceFolder}/bazel-AiwSys/modules/monitor/dag/monitor.dag",
+                // "${workspaceFolder}/bazel-AiwSys/projects/adas/production/dag/adas.dag",
+                "${workspaceFolder}/bazel-AiwSys/modules/drivers/camera/dag/camera.dag",
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

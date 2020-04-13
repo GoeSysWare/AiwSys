@@ -74,7 +74,6 @@ cc_library(
         "cyber.h",
     ],
     linkopts = [
-        ## George Kuo  修改去掉这种直接链接方式
         # "-lglog",
         # "-lgflags",
         # "-lprotobuf",
@@ -120,8 +119,7 @@ cc_library(
         "//cyber/transport:participant",
         "//cyber/transport:sub_listener",
         "//third_party/tf2",
-        "@fastrtps",
-
+        "@fastrtps",   
     ],
 )
 

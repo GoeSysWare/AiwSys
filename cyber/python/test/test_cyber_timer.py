@@ -16,13 +16,6 @@
 # -*- coding: utf-8 -*-
 """Module for test node."""
 
-import os
-import sys
-CYBER_DIR = os.environ['CYBER_PATH']
-sys.path.append(CYBER_DIR + "/python/cyber_py")
-sys.path.append(CYBER_DIR + "/python/")
-sys.path.append("/mnt/c/20.LinuxDisk/works/AiSys_Auto/bazel-bin/cyber/py_wrapper")
-
 import unittest
 import time
 

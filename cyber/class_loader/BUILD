@@ -15,13 +15,13 @@ cc_library(
         "utility/class_factory.h",
         "utility/class_loader_utility.h",
     ],
-    # linkopts = [
-    #     "-lPocoFoundation",
-    # ],
+    linkopts = [
+        # "-lPocoFoundation",
+    ],
     deps = [
         "//cyber:init",
         "//cyber/common:log",
-        "@poco"
+         "@poco",   
     ],
 )
 

@@ -75,9 +75,12 @@ build --copt="-Werror=return-type"
 build --copt="-Werror=unused-but-set-variable"
 build --copt="-Werror=switch"
 
+build --copt="-Wfloat-conversion"
+build --copt="-Wunknown-pragmas"
 #以下警告不为错误
 build --copt="-Wno-sign-compare"
 build --copt="-Wno-unused-variable"
+build --copt="-Wno-unused-but-set-variable"
 
 
 # Strict check on type conversion.

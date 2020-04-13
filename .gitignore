@@ -58,6 +58,8 @@ nohup.out
 *.pyc
 *genrule.log
 
+*.caffemodel
+
 
 # Bash Environment
 .dev_bash_hist

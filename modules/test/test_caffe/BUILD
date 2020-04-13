@@ -14,6 +14,8 @@ cc_library(
         "@caffe",
         "@glog",
         "@opencv",
+        "@cuda",
+        "@boost",
     ],
 )
 

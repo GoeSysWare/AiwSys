@@ -73,7 +73,7 @@ cc_test(
     ],
     deps = [
         ":basic",
-        "@gtest//:main",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -85,7 +85,7 @@ cc_test(
     ],
     deps = [
         ":camera_homography",
-        "@gtest//:main",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -97,7 +97,7 @@ cc_test(
     ],
     deps = [
         ":roi_filter",
-        "@gtest//:main",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -110,7 +110,7 @@ cc_test(
     deps = [
         ":convex_hull_2d",
         "//modules/perception/base:point_cloud",
-        "@gtest//:main",
+        "@gtest//:gtest_main",
     ],
 )
 

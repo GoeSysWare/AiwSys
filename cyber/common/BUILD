@@ -26,7 +26,6 @@ cc_library(
     ],
     deps = [
         "//cyber/common:log",
-        "@com_google_protobuf//:protobuf"
     ],
 )
 
@@ -48,15 +47,12 @@ cc_library(
     hdrs = [
         "log.h",
     ],
-     # george kuo glog 0.4.0 支持bazel编译，就无须动态链接",
-    # linkopts = [
-    #     "-lglog",
-    # ],
+    linkopts = [
+        # "-lglog",
+    ],
     deps = [
         "//cyber:binary",
-        # george kuo glog 0.4.0 支持bazel编译，可以直接添加进来",
-        "@glog",
-        "//external:gflags",
+         "@glog",      
     ],
 )
 

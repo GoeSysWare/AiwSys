@@ -21,6 +21,6 @@ cc_library(
     ],
     linkstatic = False,
     deps = [
-        "@python27",
+        "@python36",
     ],
 )

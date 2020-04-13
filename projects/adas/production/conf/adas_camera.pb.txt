@@ -1,0 +1,20 @@
+
+camera_names: "front_6mm,front_12mm"
+input_camera_channel_names : "/apollo/sensor/camera/front_6mm/image,/apollo/sensor/camera/front_12mm/image"
+timestamp_offset : 0.0
+camera_detection_conf_dir : "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/modules/perception/production/conf/perception/camera"
+camera_detection_conf_file : "obstacle.pt"
+frame_capacity : 20
+image_channel_num : 3
+enable_visualization : false
+output_camera_channel_name : "/aiwsys/extra/camera_adas"
+default_camera_pitch : 0.0
+default_camera_height : 1.5
+detect_method : "LaneLineCalibrator"
+output_camera_debug_msg : false
+camera_debug_channel_name : "/perception/camera_debug/adas"
+ts_diff : 0.1
+visual_debug_folder : "records/debug_output"
+visual_camera : "camera_adas"
+write_visual_img : false
+debug_level: 0

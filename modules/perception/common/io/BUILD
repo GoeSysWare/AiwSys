@@ -36,7 +36,7 @@ cc_test(
     ],
     deps = [
         ":io_util",
-        "@gtest//:main",
+        "@gtest//:gtest_main",
     ],
 )
 

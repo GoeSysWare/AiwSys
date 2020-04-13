@@ -10,6 +10,7 @@
            "args": [
                "build",
                "//cyber/...",
+               "--compilation_mode=dbg",
                "--cpu=k8"
            ],
            "problemMatcher": [
@@ -52,7 +53,6 @@
         "args": [
             "build",
             "//modules/test/test_torch/...",
-            // "--sandbox_debug",
         ],
         "problemMatcher": [
             "$gcc",
@@ -65,8 +65,7 @@
         "command": "bazel",
         "args": [
             "build",
-            "//projects/conductor_rail/component/...",
-            "--compilation_mode=dbg",
+            "//projects/adas/component/...",
             // "--sandbox_debug",
         ],
         "problemMatcher": [

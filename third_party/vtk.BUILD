@@ -1,0 +1,55 @@
+licenses(["notice"])
+
+package(default_visibility = ["//visibility:public"])
+
+# This assumes you have vtk pre-installed in your system.
+cc_library(
+    name = "vtk",
+    copts = [
+        "-Wno-deprecated",
+    ],
+    includes = ["include/vtk-8.2"],
+    srcs = glob([
+        "lib/*.so*",
+        # "lib/libvtkChartsCore.so*",
+        # "lib/libvtkCommonCore.so*",
+        # "lib/libvtkCommonMath.so*",
+        # "lib/libvtkCommonDataModel.so*",
+        # "lib/libvtkCommonMisc.so*",
+        # "lib/libvtkCommonSystem.so*",
+        # "lib/vtkCommonTransforms.so*",
+        # "lib/vtkDICOMParser.so*",
+        # "lib/vtkDomainsChemistry.so*",
+        # "lib/vtkDomainsChemistryOpenGL2.so*",
+        # "lib/vtkFiltersCore.so*",
+        # "lib/vtkFiltersExtraction.so*",
+        # "lib/vtkFiltersFlowPaths.so*",
+        #  "lib/vtkFiltersGeneral.so*",
+        #  "lib/vtkFiltersGeometry.so*",
+        # "lib/vtkFiltersHybrid.so*",
+        # "lib/vtkFiltersHyperTree.so*",
+        # "lib/vtkFiltersImaging.so*",
+        # "lib/vtkFiltersModeling.so*",
+
+        # "lib/vtkFiltering.so*",
+        # "lib/vtkGenericFiltering.so*",
+        # "lib/vtkGeovis.so*",
+        # "lib/vtkGraphics.so*",
+        # "lib/vtkHybrid.so*",
+        # "lib/vtkIO.so*",
+        # "lib/vtkImaging.so*",
+        # "lib/vtkInfovis.so*",
+        # "lib/vtkParallel.so*",
+        # "lib/vtkQtChart.so*",
+        # "lib/vtkRendering.so*",
+        # "lib/vtkViews.so*",
+        # "lib/vtkVolumeRendering.so*",
+        # "lib/vtkWidgets.so*",
+        # "lib/vtkalglib.so*",
+        # "lib/vtkexoIIc.so*",
+        # "lib/vtkftgl.so*",
+        # "lib/vtkmetaio.so*",
+        # "lib/vtkproj4.so*",
+        # "lib/vtksys.so*",
+    ]),
+)

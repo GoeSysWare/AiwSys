@@ -36,7 +36,7 @@ cc_test(
     ],
     deps = [
         ":thread",
-        "@gtest//:main",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -49,7 +49,7 @@ cc_test(
     deps = [
         ":thread",
         "@com_google_protobuf//:protobuf",
-        "@gtest//:main",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -61,7 +61,7 @@ cc_test(
     ],
     deps = [
         ":thread",
-        "@gtest//:main",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -73,7 +73,7 @@ cc_test(
     ],
     deps = [
         ":thread",
-        "@gtest//:main",
+        "@gtest//:gtest_main",
     ],
 )
 

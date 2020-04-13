@@ -1,37 +1,36 @@
 # Define all coms in DAG streaming.
 module_config {
-    #module_library : "/apollo/bazel-bin/modules/drivers/camera/libcamera_component.so"
-    module_library : "/home/shuimujie/01.works/AutoSys/bazel-bin/modules/drivers/camera/libcamera_component.so"
+    module_library : "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-bin/modules/drivers/camera/libcamera_component.so"
     components {
-      class_name : "CameraComponent"
+     class_name : "CameraComponent"
       config {
        name : "camera_front_6mm"
-        config_file_path : "/home/shuimujie/01.works/AutoSys/bazel-AutoSys/modules/drivers/camera/conf/camera_front_6mm.pb.txt"
+       config_file_path : "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-AiwSys/modules/drivers/camera/conf/camera_front_6mm.pb.txt"
      }
     }
     components {
       class_name : "CompressComponent"
       config {
         name : "camera_front_6mm_compress"
-        config_file_path : "/home/shuimujie/01.works/AutoSys/bazel-AutoSys/modules/drivers/camera/conf/camera_front_6mm.pb.txt"
+       config_file_path : "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-AiwSys/modules/drivers/camera/conf/camera_front_6mm.pb.txt"
         readers {
           channel: "/apollo/sensor/camera/front_6mm/image"
           pending_queue_size: 10
-        }
-      }
+       }
+     }
     }
       components {
       class_name : "CameraComponent"
       config {
         name : "camera_front_12mm"
-        config_file_path : "/home/shuimujie/01.works/AutoSys/bazel-AutoSys/modules/drivers/camera/conf/camera_front_12mm.pb.txt"
+        config_file_path : "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-AiwSys/modules/drivers/camera/conf/camera_front_12mm.pb.txt"
       }
     }
     components {
       class_name : "CompressComponent"
       config {
         name : "camera_front_12mm_compress"
-        config_file_path : "/home/shuimujie/01.works/AutoSys/bazel-AutoSys/modules/drivers/camera/conf/camera_front_12mm.pb.txt"
+        config_file_path : "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-AiwSys/modules/drivers/camera/conf/camera_front_12mm.pb.txt"
         readers {
           channel: "/apollo/sensor/camera/front_12mm/image"
           pending_queue_size: 10

@@ -20,7 +20,6 @@
 #include <mutex>
 #include <thread>
 #include <utility>
-#include <functional>
 
 namespace apollo {
 namespace cyber {

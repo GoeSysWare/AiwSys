@@ -29,8 +29,8 @@ cc_library(
         ":record_file_base",
         ":section",
         "//cyber/common:file",
-        "//cyber/time",   
-       "@com_google_protobuf//:protobuf",
+        "//cyber/time",
+        "@com_google_protobuf//:protobuf",
     ],
 )
 

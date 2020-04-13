@@ -1,8 +1,6 @@
-load("//tools:cpplint.bzl", "cpplint")
+#load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
-
-
 
 cc_proto_library(
     name = "cyber_conf_cc_proto",
@@ -250,4 +248,4 @@ proto_library(
     ],
 )
 
-cpplint()
+#cpplint()

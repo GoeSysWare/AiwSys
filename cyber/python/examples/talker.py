@@ -14,23 +14,12 @@
 # limitations under the License.
 # ****************************************************************************
 # -*- coding: utf-8 -*-
-
+from cyber_py import cyber
+from cyber.proto.unit_test_pb2 import ChatterBenchmark
+"""Module for example of talker."""
 
 import time
 import sys
-import os
-CYBER_DIR = os.environ['CYBER_PATH']
-sys.path.append(CYBER_DIR + "/python/cyber_py")
-sys.path.append(CYBER_DIR + "/python/")
-sys.path.append(CYBER_DIR + "/proto/")
-sys.path.append(CYBER_DIR)
-sys.path.append("/mnt/c/20.LinuxDisk/works/AiSys_Auto/bazel-bin/cyber/py_wrapper")
-
-from cyber_py import cyber
-from unit_test_pb2 import ChatterBenchmark
-"""Module for example of talker."""
-
-
 
 sys.path.append("../")
 

@@ -32,8 +32,6 @@ cc_library(
         "//cyber/service_discovery:role",
         "//cyber/task",
         "@fastrtps",
-        # george kuo glog 0.4.0 支持bazel编译，可以直接添加进来",
-        "@glog"
     ],
 )
 
@@ -44,7 +42,7 @@ cc_test(
     deps = [
         "//cyber:cyber_core",
         "//cyber/proto:unit_test_cc_proto",
-        "@gtest//:gtest_main",
+        "@gtest",
     ],
 )
 
@@ -318,6 +316,7 @@ cc_library(
         ":message_info",
         ":underlay_message",
         ":underlay_message_type",
+     "@com_google_protobuf//:protobuf",
     ],
 )
 

@@ -16,7 +16,7 @@ cc_test(
     ],
     deps = [
         ":hough_transfer",
-        "@gtest//:main",
+        "@gtest//:gtest_main",
     ],
 )
 

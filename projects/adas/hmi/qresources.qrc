@@ -1,0 +1,42 @@
+<RCC>
+    <qresource prefix="/image">
+        <file>Icons/logo.png</file>
+        <file>Icons/alarm_system@2x.png</file>
+        <file>Icons/alarm_system@3x.png</file>
+        <file>Icons/alarm_system.png</file>
+        <file>Icons/alarm_system_w@2x.png</file>
+        <file>Icons/alarm_system_w@3x.png</file>
+        <file>Icons/alarm_system_w.png</file>        
+        <file>Icons/app_logo.png</file>
+        <file>Icons/boundary_box@2x.png</file>
+        <file>Icons/boundary_box@3x.png</file>
+        <file>Icons/boundary_box.png</file>
+        <file>Icons/camera@2x.png</file>
+        <file>Icons/camera@3x.png</file>
+        <file>Icons/camera.png</file>
+        <file>Icons/logo@2x.png</file>
+        <file>Icons/logo@3x.png</file>
+        <file>Icons/point_cloud@2x.png</file>
+        <file>Icons/point_cloud@3x.png</file>
+        <file>Icons/point_cloud.png</file>
+        <file>Icons/speed_limit@2x.png</file>
+        <file>Icons/speed_limit@3x.png</file>
+        <file>Icons/speed_limit.png</file>
+    </qresource>   
+</RCC>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

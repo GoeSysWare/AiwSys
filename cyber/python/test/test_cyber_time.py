@@ -20,8 +20,6 @@ import sys
 import unittest
 import time
 
-
-
 from cyber_py import cyber
 from cyber_py import cyber_time
 

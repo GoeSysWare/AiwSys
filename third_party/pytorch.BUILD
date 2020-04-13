@@ -28,12 +28,22 @@ licenses(["notice"])
 cc_library(
     name = "pytorch",
     srcs =glob( [
-        "lib/libtorch.so*",
-        "lib/libc10.so*",
+        "lib/*.so",
     ]),
-
+    hdrs = glob(["*"]),
+    copts = [
+        "-Iinclude",
+        "-Iinclude/torch",
+      "-Iinclude/ATen",
+      "-Iinclude/c10",
+          "-Iinclude/Caffe2",
+        "-Iinclude/torch/csrc/api/include/torch",
+    ],
     includes = [
         "include",
+        "include/ATen",
+      "include/c10",
+          "include/Caffe2",
         "include/torch/csrc/api/include",
         "include/torch/csrc/api/include/torch",
     ],

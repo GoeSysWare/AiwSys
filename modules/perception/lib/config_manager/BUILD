@@ -31,7 +31,7 @@ cc_test(
     ],
     deps = [
         ":config_manager",
-        "@gtest//:main",
+        "@gtest//:gtest_main",
     ],
 )
 

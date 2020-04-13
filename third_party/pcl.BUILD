@@ -6,11 +6,16 @@ cc_library(
     name = "pcl",
     defines = ["PCL_NO_PRECOMPILE"],
     includes = ["include/pcl-1.9"],
+    hdrs = glob([
+        "*",
+        "**/*.h",
+    ]),
     srcs = glob([
         "lib/libpcl_common.so*",
         "lib/libpcl_features.so*",
         "lib/libpcl_filters.so*",
         "lib/libpcl_io_ply.so*",
+         "lib/libpcl_ml.so*",
         "lib/libpcl_io.so*",
         "lib/libpcl_kdtree.so*",
         "lib/libpcl_keypoints.so*",
@@ -26,7 +31,8 @@ cc_library(
         "lib/libpcl_visualization.so*",                                                                                                           
     ]),
     deps = [
-        "@boost",
+        # pcl依赖boost库，boost有版本限制，默认链接系统下的boost库
+        # "@boost",
     ],
 
 

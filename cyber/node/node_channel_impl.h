@@ -244,7 +244,6 @@ void NodeChannelImpl::FillInAttr(proto::RoleAttributes* attr) {
   }
   if (!attr->has_proto_desc()) {
     std::string proto_desc("");
-
     message::GetDescriptorString<MessageT>(attr->message_type(), &proto_desc);
     attr->set_proto_desc(proto_desc);
   }

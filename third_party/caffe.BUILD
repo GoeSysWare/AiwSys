@@ -7,22 +7,29 @@ cc_library(
     includes = [
         "include",
     ],
-    # 利用bazel规则链接全部的库
+    hdrs = glob([
+        "caffe/*",
+        "caffe/**/*.h",
+    ]),
+    # 利用bazel规则链接全部vtk的库
     # srcs = glob([
     #     "lib/*.so.*",
     #     "lib/*.so",
     # ]),
     # 利用bazel规则链接指定的库
-    srcs = glob(["lib/*.so"]),
+    srcs = glob([
+          "lib/*.so",
+        "lib/*.so*",
+        ]),
     # #链接指定的库
-    linkopts = [
-        "-Llib",
-        "-lcaffe",
-    ],
+    # linkopts = [
+    #     "-Llib",
+    #     "-lcaffe",
+    # ],
     deps = [
-        "@opencv",
-        "@boost",
-        "@cuda",
-        "@com_google_protobuf//:protobuf_headers",
+        # "@opencv",
+        # "@boost",
+        # "@cuda",
+        # "@com_google_protobuf//:protobuf_headers",
     ]
 )

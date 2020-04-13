@@ -22,6 +22,7 @@ cc_library(
         "lib/libopencv_imgproc.so*",
         "lib/libopencv_video.so*",
         "lib/libopencv_videoio.so*",
+        "lib/libopencv_calib3d.so*",       
     ]),
     includes = [
         "include",

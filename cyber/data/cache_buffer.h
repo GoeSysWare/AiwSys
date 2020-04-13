@@ -20,7 +20,6 @@
 #include <memory>
 #include <mutex>
 #include <vector>
-#include <functional>
 
 namespace apollo {
 namespace cyber {

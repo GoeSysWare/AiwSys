@@ -103,6 +103,7 @@
         "xtr1common": "cpp",
         "xtree": "cpp",
         "xutility": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "*.cuh": "cpp"
     }
 }

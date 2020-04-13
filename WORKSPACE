@@ -90,6 +90,12 @@ new_local_repository(
 #########################################################################################
 # 开发应用的通用基础库如glog gflag  gtest protobuf
 #########################################################################################
+new_local_repository(
+    name = "zlib",
+    build_file = "third_party/zlib.BUILD",
+    path=  "../3rd/zlib-1.2.11",
+)
+
 # googletest (GTest and GMock)
 
 local_repository(
@@ -211,6 +217,18 @@ new_local_repository(
     build_file = "third_party/pcl.BUILD",
     path = "../3rd/pcl-1.9.0/build/install",
 )
+# VTK 8.2.0 
+new_local_repository(
+    name = "vtk",
+    build_file = "third_party/vtk.BUILD",
+    path = "../3rd/VTK-8.2.0/build/install",
+)
+#CGAL 4.14.1
+new_local_repository(
+    name = "cgal",
+    build_file = "third_party/cgal.BUILD",
+    path = "../3rd/CGAL-4.14.1/build/install",
+)
 
 # opencv  3.4
 # =======
@@ -244,7 +262,6 @@ new_local_repository(
     path = "../3rd/qpOASES-3.2.1",
 )
 
-
 #########################################################################################
 # 人工智能框架和工具
 #########################################################################################
@@ -258,7 +275,7 @@ new_local_repository(
 new_local_repository(
     name = "caffe",
     build_file = "third_party/caffe.BUILD",
-    path = "../3rd/caffe-1.0/build/install",
+    path = "../3rd/caffe-watrix/build/install",
 )
 # PyTorch
 new_local_repository(

@@ -14,6 +14,7 @@ proto_library(
     srcs = [
         "pointcloud.proto",
         "sensor_image.proto",
+         "radar.proto",
     ],
     deps = [
         "//modules/common/proto:error_code_proto_lib",

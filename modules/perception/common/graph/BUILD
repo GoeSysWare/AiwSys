@@ -33,7 +33,7 @@ cc_test(
     ],
     deps = [
         ":disjoint_set",
-        "@gtest//:main",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -59,7 +59,7 @@ cc_test(
     ],
     deps = [
         ":graph_segmentor",
-        "@gtest//:main",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -82,7 +82,7 @@ cc_test(
     deps = [
         ":secure_matrix",
         "@eigen",
-        "@gtest//:main",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -105,7 +105,7 @@ cc_test(
     deps = [
         ":hungarian_optimizer",
         ":secure_matrix",
-        "@gtest//:main",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -131,7 +131,7 @@ cc_test(
     deps = [
         ":connected_component_analysis",
         "@eigen",
-        "@gtest//:main",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -155,7 +155,7 @@ cc_test(
     ],
     deps = [
         ":conditional_clustering",
-        "@gtest//:main",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -180,7 +180,7 @@ cc_test(
     ],
     deps = [
         ":gated_hungarian_bigraph_matcher",
-        "@gtest//:main",
+        "@gtest//:gtest_main",
     ],
 )
 

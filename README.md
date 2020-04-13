@@ -34,18 +34,19 @@
   + apt install unixodbc-dev (2.3.4)
   + apt install gdb (8.1)
   + apt install libc6-dbg
-  + apt install protobuf-compiler
+  + apt install protobuf-compiler  可自编译版本
   + apt install libsqlite3-dev
   + apt install libcurl4-openssl-dev
-  + apt install libopencv-core-dev (3.2.0)
+  + apt install libopencv-core-dev (3.2.0) 可自编译版本
   + apt install libavcodec-dev (7.3.4)
   + apt install libswscale-dev (7.3.4)
-  + apt install libopencv-highgui-dev(3.2.0)
+  + apt install libopencv-highgui-dev(3.2.0)可自编译版本
   + apt install mesa-common-dev （opengl）
   + apt install libgl1-mesa-dev libglu1-mesa-dev
-  + apt install libpcl-dev (1.8.1)
+  + apt install libpcl-dev (1.8.1)  可自编译版本
   + apt install libpcap0.8-dev
-
+  + apt install libcgal-dev (3.14) 可自编译版本
+  + apt install libflann-dev (1.9)
 ### python 环境
   + Python 版本为3.6
   + protobuf (pip install protobuf)
@@ -82,7 +83,7 @@ bazel clean --expunge
 - glog 
 
 - gtest  == 1.8.1
-  + 需要修改BUILD文件中的的 @gtest//:main 为 @gtest//:gtest_main
+  + 需要修改BUILD文件中的的 @gtest//:gtest_main 为 @gtest//:gtest_main
 
 - Bazel     >= 0.28.0 
   + Bazel 版本 与各个rules要匹配，否则会报错
@@ -96,7 +97,9 @@ bazel clean --expunge
   + 类似与boost的C++框架
 - protobuf == 3.9.1
   + 由于 @rule_proto限制，版本大于3.8.0
-  + 官方"If you're using Bazel 0.21.0 or later, the minimum Protocol Buffer version required is 3.6.1.2. See this pull request for more information."
+  + 官方"If you're using Bazel 0.21.0 or later, the minimum Protocol Buffer version required is 3.6.1.2. See this pull request for more information." 
+  + protbuf在 opencv caffe pytorch 等多个库中，最好用静态链接库 
+   + 静态库的编译方法:  ./configure --disable-shared --with-pic 
 - gflags
 - python 3.6
 
