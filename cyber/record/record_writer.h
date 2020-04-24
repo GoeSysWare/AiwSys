@@ -124,6 +124,10 @@ class RecordWriter : public RecordBase {
    */
   bool SetIntervalOfFileSegmentation(uint64_t time_sec);
 
+
+  bool SetCountOfFileSegmentation(uint64_t max_nums);
+
+
   /**
    * @brief Get message number by channel name.
    *
@@ -178,6 +182,7 @@ class RecordWriter : public RecordBase {
   std::string path_;
   uint64_t segment_raw_size_ = 0;
   uint64_t segment_begin_time_ = 0;
+    uint64_t segment_files_max_nums_ = 0;
   uint32_t file_index_ = 0;
   MessageNumberMap channel_message_number_map_;
   MessageTypeMap channel_message_type_map_;

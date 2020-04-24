@@ -16,14 +16,17 @@
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "args": [],
+            "args": [
+                "start",
+                "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/projects/adas/production/launch/app.launch"
+            ],
             "console": "integratedTerminal"
         },
         {
             "name": "Debug Test",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bazel-bin/modules/test/test_torch/test_torch",
+            "program": "${workspaceFolder}/bazel-bin/modules/test/test_cc/test_move",
             "args": ["",],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -42,7 +45,7 @@
             "name": "Debug Cyber",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bazel-bin/cyber/examples/listener",
+            "program": "${workspaceFolder}/bazel-bin/cyber/examples/service",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -236,7 +239,7 @@
             "program": "${workspaceFolder}/bazel-bin/cyber/mainboard",
             "args": [
                 "-d",
-                "${workspaceFolder}/projects/conductor_rail/production/dag/wear.dag",
+                "${workspaceFolder}/projects/adas/production/dag/recorder.dag",
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

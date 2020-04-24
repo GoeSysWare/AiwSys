@@ -31,6 +31,23 @@ cc_proto_library(
 )
 
 proto_library(
+    name = "adas_record_proto_lib",
+    srcs = [
+        "adas_record.proto",
+    ],
+    deps = [
+
+    ],
+)
+
+cc_proto_library(
+    name = "adas_record_proto",
+    deps = [
+        ":adas_record_proto_lib",
+    ],
+)
+
+proto_library(
     name = "adas_detection_proto_lib",
     srcs = [
         "adas_detection.proto",
@@ -43,7 +60,21 @@ proto_library(
 
     ],
 )
+cc_proto_library(
+    name = "adas_config_proto",
+    deps = [
+        ":adas_config_proto_lib",
+    ],
+)
 
+proto_library(
+    name = "adas_config_proto_lib",
+    srcs = [
+        "adas_config.proto",
+    ],
+    deps = [
+    ],
+)
 
 
 
@@ -162,4 +193,5 @@ proto_library(
     deps = [
     ],
 )
+
 cpplint()

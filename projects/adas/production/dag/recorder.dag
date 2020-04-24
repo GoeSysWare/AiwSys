@@ -1,0 +1,20 @@
+
+module_config {
+    module_library : "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-bin/projects/adas/component/recorder/libadas_recorder_component.so"
+    components {
+    class_name : "AdasRecRecorderComponent"
+    config {
+        name : "AdasRecRecorderComponent"
+        config_file_path : "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/projects/adas/production/conf/adas_recorder_config.pb.txt"
+        flag_file_path: "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/projects/adas/production/conf/common.flag"
+    }
+  }
+    components {
+    class_name : "AdasRecPlayerComponent"
+    config {
+        name : "AdasRecPlayerComponent"
+        config_file_path : "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/projects/adas/production/conf/adas_player_config.pb.txt"
+        flag_file_path: "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/projects/adas/production/conf/common.flag"
+    }
+  }
+}

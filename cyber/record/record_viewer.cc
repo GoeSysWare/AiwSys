@@ -81,6 +81,7 @@ void RecordViewer::Init() {
   // Init the channel list
   for (auto& reader : readers_) {
     auto all_channel = reader->GetChannelList();
+    //把该文件中存在的channel放入全channel_list_，不重复
     std::set_intersection(all_channel.begin(), all_channel.end(),
                           channels_.begin(), channels_.end(),
                           std::inserter(channel_list_, channel_list_.end()));
@@ -88,6 +89,7 @@ void RecordViewer::Init() {
   readers_finished_.resize(readers_.size(), false);
 
   // Sort the readers
+  //根据各个文件的时间排序
   std::sort(readers_.begin(), readers_.end(),
             [](const RecordReaderPtr& lhs, const RecordReaderPtr& rhs) {
               const auto& lhs_header = lhs->GetHeader();
@@ -108,6 +110,7 @@ void RecordViewer::Reset() {
   msg_buffer_.clear();
 }
 
+//取得这些reader的最早起始时间和最晚结束时间
 void RecordViewer::UpdateTime() {
   uint64_t min_begin_time = UINT64_MAX;
   uint64_t max_end_time = 0;

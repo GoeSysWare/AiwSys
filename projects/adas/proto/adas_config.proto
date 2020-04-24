@@ -1,0 +1,52 @@
+syntax = "proto2";
+
+package watrix.projects.adas.proto;
+
+
+//接口服务名称
+message InterfaceServiceConfig
+{
+  optional string  records_file_servicename = 1[default = "record_service_file"];
+  optional string  records_record_servicename = 2[default = "record_service_record"];
+}
+
+// 1 间断回放模式
+// 2. 持续长久模式
+enum RecorderModel
+{
+  RECORD_INTERVAL = 1;
+  RECORD_CONTINUOUS= 2;
+  RECORD_OTHER= 3;
+}
+
+//录像存档模块的配置
+message RecRecorderConfig
+{
+    //此目录不自带默认值，是为了手动设定
+  required string  records_save_dir = 1;
+  //设置文件前缀是为了可以区分不同项目
+  optional string  records_filename_suffix = 2[default = "adas_record"];
+
+  
+  ////////////////////////////////////////////////////////
+  //以下用户可以不在pb.txt中配置，属于高级用法
+  ////////////////////////////////////////////////////////
+  optional string  records_channels = 3[default = "adas/camera/front_6mm/image,adas/camera/front_12mm/image"];
+  optional string records_parameter_servicename = 4[default = "adas_perception"];
+  //设置存档模式:1. 回放模式，2  一直，3 其他 
+  optional RecorderModel   records_save_model =5[default =RECORD_INTERVAL ];
+  //单个文档最大容量为(M)，超过则生成新文件
+  optional int64   records_file_max_size = 6[default =512];
+  //单个文档最长间隔为(s)  ，超过则生成新文件
+  optional int64   records_file_interval = 7[default =5]; 
+  //最多多少个存档文件
+  optional int64   records_file_num = 8[default =99]; 
+}
+//录像播放模块的配置
+message RecPlayerConfig
+{
+  optional string  records_save_dir = 1;
+  optional InterfaceServiceConfig interface_service = 2;
+
+
+}

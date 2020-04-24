@@ -28,9 +28,15 @@ namespace record {
 using proto::Channel;
 using proto::SingleMessage;
 
-RecordWriter::RecordWriter() { header_ = HeaderBuilder::GetHeader(); }
+RecordWriter::RecordWriter() { 
+  segment_files_max_nums_ = 99999;
+  header_ = HeaderBuilder::GetHeader(); 
+  }
 
-RecordWriter::RecordWriter(const proto::Header& header) { header_ = header; }
+RecordWriter::RecordWriter(const proto::Header& header) {
+    segment_files_max_nums_ = 99999;
+   header_ = header; 
+  }
 
 RecordWriter::~RecordWriter() { Close(); }
 
@@ -68,7 +74,7 @@ void RecordWriter::Close() {
 
 bool RecordWriter::SplitOutfile() {
   file_writer_.reset(new RecordFileWriter());
-  if (file_index_ > 99999) {
+  if (file_index_ > segment_files_max_nums_) {
     AWARN << "More than 99999 record files had been recored, will restart "
           << "counting from 0.";
     file_index_ = 0;
@@ -168,6 +174,13 @@ bool RecordWriter::SetIntervalOfFileSegmentation(uint64_t time_sec) {
   header_.set_segment_interval(time_sec * 1000000000UL);
   return true;
 }
+
+  bool RecordWriter::SetCountOfFileSegmentation(uint64_t max_nums)
+  {
+      segment_files_max_nums_ = max_nums;
+    return true;
+  }
+
 
 bool RecordWriter::IsNewChannel(const std::string& channel_name) const {
   return channel_message_number_map_.find(channel_name) ==

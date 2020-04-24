@@ -4,6 +4,8 @@
 sdk_version:"sdk-1.2.10"
 lidar_version: "lidar-v2"
 
+
+
 test_file_dir:"/media/remote_pc/"
 test_config_filename:"/media/remote_pc/cam1_cam0_pcd.txt"
 test_save_dir:"/media/remote_pc/test_for_online/"

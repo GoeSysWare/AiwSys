@@ -289,7 +289,7 @@ void Test_Perception::SendCyberImg()
  		pb_img_short->set_width(1920);
     	pb_img_short->set_height(1080);
 	   pb_img_short->mutable_data()->reserve(1920*1080*	imgShort_.img.channels());
-       pb_img_short->set_encoding("rgb8");
+       pb_img_short->set_encoding("bgr8");
 	    pb_img_short->set_step(3* imgShort_.img.cols);
        pb_img_short->mutable_header()->set_timestamp_sec(apollo::cyber::Time::Now().ToSecond());
        pb_img_short->set_measurement_time(apollo::cyber::Time::Now().ToSecond());
@@ -300,7 +300,7 @@ void Test_Perception::SendCyberImg()
  		pb_img_long->set_width(1920);
     	pb_img_long->set_height(1080);
 	   pb_img_long->mutable_data()->reserve(1920*1080*	imgLong_.img.channels());
-       pb_img_long->set_encoding("rgb8");
+       pb_img_long->set_encoding("bgr8");
 	   	pb_img_long->set_step(3 * imgLong_.img.cols);
        pb_img_long->mutable_header()->set_timestamp_sec(apollo::cyber::Time::Now().ToSecond());
        pb_img_long->set_measurement_time(apollo::cyber::Time::Now().ToSecond());

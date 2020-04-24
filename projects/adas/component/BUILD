@@ -40,8 +40,7 @@ cc_library(
         "//projects/adas/detector/interface:base_adas_detector",
         "//projects/adas/algorithm:algorithm_sdk",
         "@yaml_cpp//:yaml",
-        # "@cuda",
-    ],
+      ],
 )
 
 

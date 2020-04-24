@@ -23,6 +23,10 @@
         <file>Icons/speed_limit@3x.png</file>
         <file>Icons/speed_limit.png</file>
     </qresource>   
+    <qresource prefix="/qss">
+        <file>qss/ui.qss</file>
+        <file>qss/dark.qss</file>
+    </qresource>
 </RCC>
 
 

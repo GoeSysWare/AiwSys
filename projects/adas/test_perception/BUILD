@@ -3,37 +3,6 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 
-cc_binary(
-    name = "test_algorithm",
-    srcs = [
-        "main.cpp",
-    ],
-    deps = [
-                ":test_perception_lib",  
-         "//cyber",
-        "//cyber/parameter",
-            "//projects/adas/algorithm:algorithm_sdk",
-            "@mkldnn",
-        "@vtk",
-        "@glog",  
-            "@opencv",
-               "@caffe",         
-        ],
-    linkopts = [
-         "-L/usr/lib/x86_64-linux-gnu", 
-       "-lboost_filesystem",
-        "-lboost_atomic",
-        "-lboost_system",
-        "-lboost_date_time",
-        # "-lgmpxx",
-        "-lgmp",
-         "-L /usr/local/lib", 
-         "-ldl", 
-    ],
-    
-)
-
-
 
 cc_binary(
     name = "test_perception",

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Widget</string>
+   <string>ADAS</string>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(0, 0, 0);</string>
@@ -21,7 +21,7 @@
     <rect>
      <x>-10</x>
      <y>0</y>
-     <width>1281</width>
+     <width>1241</width>
      <height>51</height>
     </rect>
    </property>
@@ -46,7 +46,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QLabel" name="label_2">
+     <widget class="QLabel" name="label_log">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -68,7 +68,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QLabel" name="label_3">
+     <widget class="QLabel" name="label_title">
       <property name="font">
        <font>
         <pointsize>-1</pointsize>
@@ -86,9 +86,9 @@
      </widget>
     </item>
     <item>
-     <widget class="QLabel" name="label_4">
+     <widget class="QLabel" name="label_sys_alarm">
       <property name="text">
-       <string>TextLabel</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; color:#1a2ff0;&quot;&gt;System OK&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </item>
@@ -115,7 +115,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QLabel" name="label_7">
+     <widget class="QLabel" name="label_record">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -136,96 +136,6 @@
       </property>
       <property name="pixmap">
        <pixmap resource="qresources.qrc">:/image/Icons/camera.png</pixmap>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLabel" name="label_8">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>76</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">font-size:20px;color:white</string>
-      </property>
-      <property name="text">
-       <string>摄像头01</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="horizontalLayoutWidget_2">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>740</y>
-     <width>1281</width>
-     <height>61</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
-    <item>
-     <widget class="QLabel" name="label_status">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>443</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>TextLabel</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLabel" name="label_11">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>-1</pointsize>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">font-size:20px;color:white</string>
-      </property>
-      <property name="text">
-       <string>Copyright © 2016-2019 银河水滴 版权所有 </string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLabel" name="label_13">
-      <property name="text">
-       <string>TextLabel</string>
       </property>
      </widget>
     </item>
@@ -342,7 +252,7 @@ background-color: rgba(200, 200, 200,20%);</string>
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-   <widget class="QLabel" name="label_sub">
+  <widget class="QLabel" name="label_sub">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -361,7 +271,6 @@ background-color: rgb(156, 159, 207);</string>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
-
  <resources>
   <include location="qresources.qrc"/>
  </resources>

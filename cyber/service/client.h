@@ -260,7 +260,7 @@ Client<Request, Response>::AsyncSendRequest(const Request& request) {
 template <typename Request, typename Response>
 typename Client<Request, Response>::SharedFuture
 Client<Request, Response>::AsyncSendRequest(SharedRequest request) {
-  return AsyncSendRequest(request, [](SharedFuture) {});
+  return AsyncSendRequest(request, [](SharedFuture) {  });
 }
 
 template <typename Request, typename Response>
@@ -293,6 +293,7 @@ void Client<Request, Response>::HandleResponse(
     const transport::MessageInfo& request_header) {
   ADEBUG << "client recv response.";
   std::lock_guard<std::mutex> lock(pending_requests_mutex_);
+
   if (request_header.spare_id() != writer_id_) {
     return;
   }

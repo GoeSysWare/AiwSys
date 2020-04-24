@@ -224,7 +224,6 @@ void Service<Request, Response>::HandleRequest(
     // LOG_DEBUG << "not inited error.";
     return;
   }
-  ADEBUG << "handling request:" << request_channel_;
   std::lock_guard<std::mutex> lk(service_handle_request_mutex_);
   auto response = std::make_shared<Response>();
   service_callback_(request, response);
@@ -242,7 +241,8 @@ void Service<Request, Response>::SendResponse(
     return;
   }
   // publish return value ?
-  // LOG_DEBUG << "send response id:" << message_id.sequence_number;
+  //  ADEBUG<< "send spare_id:" << message_info.spare_id().ToString()
+  //  << "response: " << response->ShortDebugString();
   response_transmitter_->Transmit(response, message_info);
 }
 

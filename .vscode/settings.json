@@ -104,6 +104,9 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "variant": "cpp",
-        "*.cuh": "cpp"
+        "*.cuh": "cpp",
+        "qlabel": "cpp",
+        "qpushbutton": "cpp",
+        "qatomicint": "cpp"
     }
 }

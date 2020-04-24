@@ -1,0 +1,49 @@
+syntax = "proto2";
+
+package watrix.projects.adas.proto;
+
+enum RecordCmdType {
+  CMD_RECORD_PLAY = 1;
+  CMD_RECORD_STOP = 2;
+  CMD_FILE_QUERY = 3;
+}
+
+
+// 当从界面查询纪录时的传递 的输入参数
+message RecordQueryParam {
+    optional RecordCmdType cmd_type = 1;
+    optional string file_name = 2;
+    optional string begin_time = 3;
+    optional double  play_rate = 4[default = 1.0];  
+    optional bool  is_loop_playback = 5[default = false];  
+    optional string other = 6;
+  }
+
+  // 当从界面查询纪录时的传递 的返回参数
+  message RecordAnswerParam {
+    optional bool status = 1;
+  }
+
+  // 当从界面查询纪录的文件情况时的传递 的输入参数
+message FilesQueryParam {
+  optional RecordCmdType cmd_type = 1;
+    optional string client_name = 2[default="anonymous"];
+  }
+
+  // 当从界面查询纪录的文件情况时的单个文件信息
+  message FileParam {
+    optional string file_name = 1;
+    repeated string channel_name = 2;
+    optional string start_time = 3;
+    optional double duration= 4;
+    optional bool is_completed= 5;   
+    optional uint64 file_size= 6;   
+    optional uint64 channel_number= 7;   
+    optional uint64 msg_number= 8;   
+}
+//从查询接口中返回参数
+message FilesAnswerParam {
+    optional bool status = 1;
+    repeated FileParam files = 2;
+}
+

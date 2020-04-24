@@ -34,6 +34,8 @@
 #include "cyber/tools/cyber_recorder/player/play_param.h"
 #include "cyber/tools/cyber_recorder/player/play_task_buffer.h"
 
+#define     record_channel_prefix_   "records/"
+
 namespace apollo {
 namespace cyber {
 namespace record {

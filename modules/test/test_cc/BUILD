@@ -25,6 +25,19 @@ cc_binary(
         "-lpthread",
     ],
 )
+cc_binary(
+    name = "test_move",
+    srcs = [
+        "test_move.cpp",
+    ],
+    deps = [
+
+    ],
+    linkopts = [
+        "-lpthread",
+    ],
+)
+
 
 
 

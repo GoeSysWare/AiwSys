@@ -15,7 +15,7 @@ cc_binary(
         "-lboost_atomic",
         "-lboost_system",
         "-lboost_date_time",
-        "-lasound",
+
         
     ],
     deps = [
@@ -54,11 +54,15 @@ qt_cc_library(
     ]),
     deps = [
         "//cyber",
+        "//cyber/common:log",
         "//modules/drivers/proto:sensor_proto",
         "@qt//:qt_gui",
         "@qt//:qt_media",
         "//projects/adas/proto:point_cloud_proto",
        "//projects/adas/proto:camera_image_proto",
+        "//projects/adas/proto:adas_record_proto",
+
+
        
 
     ],
