@@ -3,50 +3,41 @@ syntax = "proto2";
 package watrix.projects.adas.proto;
 
 
-//接口服务名称
+
+// 接口服务名称,多个模块内部共用此设定
+// 客户端和服务端共享的参数命名，系统默认采用缺省值
+// 不对一般用户开放,高级设置可以自定义
 message InterfaceServiceConfig
 {
+  //记录文件查询服务名称
   optional string  records_file_servicename = 1[default = "record_service_file"];
+  //记录回放启动服务名称
   optional string  records_record_servicename = 2[default = "record_service_record"];
+  //参数服务名称：用于ADAS发现有物体时的全局通知设定
+  optional string records_parameter_servicename = 3[default = "adas_perception"];
+  //从drivers里发出的通道名称，注意
+  //!!!!注意: 一定要与modules/drivers/camera里设定要保持一致
+  optional string  camera_channels = 4 [default = "adas/camera/front_6mm/image,adas/camera/front_12mm/image"];
+  //相机名称
+  optional string   camera_names = 5 [default = "front_6mm,front_12mm"];
+  //lidar名称  
+  optional string   lidar_names = 6 [default = "front_lidar"];
+  //从drivers里发出的通道名称，注意要与modules/drivers/velodyne里设定要保持一致
+  optional string   lidar_channels= 7 [default = "/adas/sensor/pointcloud2"];
+  //这是perception之后图像结果通道名称
+  optional string   camera_output_channels= 8 [default = "adas/camera/front_6mm/result,adas/camera/front_12mm/result"];
+  //这是debug的图像通道名称
+  optional string   camera_debug_channels= 9 [default = "adas/camera/front_6mm/debug,adas/camera/front_12mm/debug"];
+  // perception的默认线程池的size
+  optional sint32   perception_tasks_num = 10 [default = 4];
+
 }
 
-// 1 间断回放模式
-// 2. 持续长久模式
-enum RecorderModel
+// 算法SDK的配置信息
+message AlgorithmConfig
 {
-  RECORD_INTERVAL = 1;
-  RECORD_CONTINUOUS= 2;
-  RECORD_OTHER= 3;
-}
-
-//录像存档模块的配置
-message RecRecorderConfig
-{
-    //此目录不自带默认值，是为了手动设定
-  required string  records_save_dir = 1;
-  //设置文件前缀是为了可以区分不同项目
-  optional string  records_filename_suffix = 2[default = "adas_record"];
-
-  
-  ////////////////////////////////////////////////////////
-  //以下用户可以不在pb.txt中配置，属于高级用法
-  ////////////////////////////////////////////////////////
-  optional string  records_channels = 3[default = "adas/camera/front_6mm/image,adas/camera/front_12mm/image"];
-  optional string records_parameter_servicename = 4[default = "adas_perception"];
-  //设置存档模式:1. 回放模式，2  一直，3 其他 
-  optional RecorderModel   records_save_model =5[default =RECORD_INTERVAL ];
-  //单个文档最大容量为(M)，超过则生成新文件
-  optional int64   records_file_max_size = 6[default =512];
-  //单个文档最长间隔为(s)  ，超过则生成新文件
-  optional int64   records_file_interval = 7[default =5]; 
-  //最多多少个存档文件
-  optional int64   records_file_num = 8[default =99]; 
-}
-//录像播放模块的配置
-message RecPlayerConfig
-{
-  optional string  records_save_dir = 1;
-  optional InterfaceServiceConfig interface_service = 2;
-
-
+    //仿真测试时的sdk版本
+    optional string sdk_version = 1;
+    //仿真测试时的Lidar版本
+    optional string lidar_version = 2;
 }

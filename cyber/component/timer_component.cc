@@ -36,6 +36,7 @@ bool TimerComponent::Initialize(const TimerComponentConfig& config) {
     AERROR << "Missing required field in config file.";
     return false;
   }
+  interval_ = config.interval();
   node_.reset(new Node(config.name()));
   LoadConfigFiles(config);
   if (!Init()) {
@@ -56,6 +57,9 @@ bool TimerComponent::Initialize(const TimerComponentConfig& config) {
 }
 
 uint64_t TimerComponent::GetInterval() const { return interval_; }
+//shuimujie Modify 20-04-30
+void TimerComponent::SetInterval(uint64_t interval) 
+ {  interval_ =interval ; }
 
 }  // namespace cyber
 }  // namespace apollo

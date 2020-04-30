@@ -1,0 +1,166 @@
+    #ADAS 感知模块参数的配置
+  if_use_simulator:true
+  if_use_detect_model: true
+  if_use_train_seg_model: false
+  if_use_lane_seg_model: true
+  save_image_result: false
+
+  # yolo config 
+  yolo: {
+    net: {
+      net_count: 2
+      proto_filepath: "conf/autotrain_models/det/tong/v4/deploy.prototxt"
+      weight_filepath: "conf/autotrain_models/det/tong/v4/VOC0712Plus_refinedet_vgg16_512x512_ft_iter_160000.caffemodel"
+    }
+    mean: {
+      b: 104
+      g: 117
+      r: 123
+    }
+    label_filepath: "conf/autotrain_models/det/tong/v4/labelmap.names"
+    normalize_value: 1.0 #0.0039215
+    confidence_threshold: 0.50
+    resize_keep_flag: false
+  }
+
+  # trainseg config 
+  trainseg {
+     net: {
+      net_count: 1
+      proto_filepath: "conf/autotrain_models/det/tong/v4/deploy.prototxt"
+      weight_filepath: "conf/autotrain_models/det/tong/v4/VOC0712Plus_refinedet_vgg16_512x512_ft_iter_160000.caffemodel"
+    }
+    mean: {
+      b: 104.00698793
+      g: 116.66876762
+      r: 122.67891434
+    }
+  }
+
+  # laneseg config 
+  laneseg {
+     net: {
+      net_count: 1
+      proto_filepath: "conf/autotrain_models/lanenet/v5/model.prototxt"
+      weight_filepath: "conf/autotrain_models/pt/v7_sequence/20191209_seg_pics.pt"
+
+    }
+    mean: {
+      b: 103.939
+      g: 116.779
+      r: 123.68
+    }    
+    feature_dim : 8
+  }
+#feature_dim  for v1,v2,v3, use 8 for v4, use 16
+  laneinvasion:{
+    tr33 : {
+      dpoints_1 : 0.000454941989844663
+      dpoints_2 : 1.84395450492748e-05	
+      dpoints_3 : -0.446669926140494
+      dpoints_4 : 7.05709220832447e-06	
+      dpoints_5 : -0.000167377794898800	
+      dpoints_6 : 1.09624848239701
+      dpoints_7 : 5.19714743486694e-07	
+      dpoints_8 : 0.000224887814694170	
+      dpoints_9 : -0.138644209831810
+      dpoints_10 :  0
+      dpoints_11 :  0
+      dpoints_12 :  0       
+    }
+    tr34_short_b : {
+      dpoints_1 :  2122.02989774275
+      dpoints_2 :  -4.45967954912910
+      dpoints_3 : 956.768344759744	
+      dpoints_4 : -112.379804743330
+      dpoints_5 :  -4.72262358581564
+      dpoints_6 :  2130.86627431614
+      dpoints_7 :  585.666379309876
+      dpoints_8 :  4319.39283955568
+      dpoints_9 :  -0.0120433495000550
+      dpoints_10 : -0.00228454145517117
+      dpoints_11 : 0.999924866479057
+      dpoints_12 : 0.0275389000000000
+    } 
+
+     tr34_long_b: {
+      dpoints_1 :  9119.46415171167
+      dpoints_2 :  -170.663746026216
+      dpoints_3 :  988.815262453997
+      dpoints_4 :  -140.938141666000
+      dpoints_5 :  147.115918643172
+      dpoints_6 :  9125.31966104888
+      dpoints_7 :  553.968253925716	
+      dpoints_8 :  17669.7125138030
+      dpoints_9 :  -0.0158225168965055
+      dpoints_10 : -0.0174884208557346
+      dpoints_11 : 0.999721862867384
+      dpoints_12 : 0.416497000000000  
+    }     
+    output_dir : "conf/train/sdk_seg/"
+    b_save_temp_images : true # save temp image results
+
+    b_draw_lane_surface : false  # draw lane surface
+    b_draw_boxs : false  # draw detection boxs    
+    b_draw_left_right_lane : true  # draw left right lane
+    b_draw_other_lane : true  # draw other lane    
+    b_draw_left_right_fitted_lane : true  # draw left/right fitted lane
+    b_draw_other_fitted_lane : true  # draw other fitted lane
+
+    b_draw_expand_left_right_lane : true  # draw expand left right lane
+    b_draw_lane_keypoint : false  # draw left/right lane top/bottom keypoints   
+    b_draw_safe_area : true  # draw safe area
+    b_draw_safe_area_corner : false  # draw 4 corner
+
+    b_draw_train_cvpoints : true  # draw train-class cvpoints
+    b_draw_stats : true  # draw stats 
+
+		safe_area_y_step : 1  # y step for drawing safe area  >:1
+		safe_area_alpha : 0.5  # overlay aplpa
+
+		use_tr34 :  true
+
+		z_height : 1 
+
+		# cluster grid related params
+		grid_size : 8  # default 8
+		min_grid_count_in_cluster : 10  # if grid_count <:10 then filter out this cluster
+
+		# cluster algorithm params
+		# config.cluster_type : MLPACK_MEANSHIFT  #   # (1 USER_MEANSHIFT,2 MLPACK_MEANSHIFT, 3 MLPACK_DBSCAN)
+		cluster_type : 2
+		user_meanshift_kernel_bandwidth : 0.52 
+		user_meanshift_cluster_epsilon : 1.5
+				
+		mlpack_meanshift_radius : 1.5
+		mlpack_meanshift_max_iterations  : 1000  # max iterations
+		mlpack_meanshift_bandwidth : 0.52   #  0.50, 0.51, 0.52, ...0.6
+
+		mlpack_dbscan_cluster_epsilon : 0.7  # not same
+		mlpack_dbscan_min_pts  : 3  # cluster at least >:3 pts
+
+		 # filter out lane noise params
+		filter_out_lane_noise : true  # filter out lane noise
+		min_area_threshold : 500  # min area for filter lane noise
+		min_lane_pts : 10         # at least >:10 points for one lane
+
+		# polyfit lane 
+		polyfit_order : 5  # by default 4  value range : 1,2,...9
+		reverse_xy : true 
+		x_range_min : 0
+		x_range_max : 1920
+		y_range_min : 440  # 512,568   640,440
+		y_range_max : 1080 
+
+		# standard limit params (m)
+		railway_standard_width : 1.435
+		railway_half_width : 0.7175
+		railway_limit_width : 1.500
+		railway_delta_width : 0.7825 
+
+		case1_x_threshold : 1.500
+		case1_y_threshold :  15.0
+		use_lane_status : true
+		use_lidar_pointcloud_smallobj_invasion_detect : true
+        save_image_result: false 
+  }

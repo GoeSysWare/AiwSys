@@ -1,11 +1,14 @@
+    #ADAS存档录像的配置
 
-    #记录的保存绝对路径位置
+    #[必须]记录的保存绝对路径位置
     records_save_dir:"/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/records"
-    # 记录文件的前缀,可用于不同项目
+    #[可选]记录文件的前缀,可用于不同项目
     records_filename_suffix:"long_record"
+
+
     #####################################
     #后面的配置一般不用设定，高级模式采用
-    #录像模式
+    #[可选]录像模式
     #records_save_model:1
     #records_file_max_size:1024
     #records_file_interval:120

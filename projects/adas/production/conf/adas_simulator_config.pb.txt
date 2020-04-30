@@ -1,0 +1,5 @@
+    #ADAS 仿真模块的配置
+
+
+    simulator_files_dir:"/media/remote_pc"
+    config_file:"cam1_cam0_pcd_no.txt"

@@ -47,3 +47,43 @@ message FilesAnswerParam {
     repeated FileParam files = 2;
 }
 
+
+// 1 间断回放模式
+// 2. 持续长久模式
+enum RecorderModel
+{
+  RECORD_INTERVAL = 1;
+  RECORD_CONTINUOUS= 2;
+  RECORD_OTHER= 3;
+}
+
+//录像存档模块的配置
+message RecRecorderConfig
+{
+    //此目录不自带默认值，是为了手动设定
+  required string  records_save_dir = 1;
+  //设置文件前缀是为了可以区分不同项目
+  optional string  records_filename_suffix = 2[default = "adas_record"];
+
+  
+  ////////////////////////////////////////////////////////
+  //以下内容，用户可以不在pb.txt中配置，属于高级用法
+  ////////////////////////////////////////////////////////
+  //设置存档模式:1. 回放模式，2  一直，3 其他 
+  optional RecorderModel   records_save_model =3[default =RECORD_INTERVAL ];
+  //单个文档最大容量为(M)，超过则生成新文件
+  optional int64   records_file_max_size = 4[default =512];
+  //单个文档最长间隔为(s)  ，超过则生成新文件
+  optional int64   records_file_interval = 5[default =5]; 
+  //存档文件最大个数
+  optional int64   records_file_num = 6[default =99]; 
+  //是否清空旧的已经存在的记录文件
+  optional bool records_is_clear_earlier = 7[default = false];
+
+}
+//录像播放模块的配置
+message RecPlayerConfig
+{
+  //录像存放路径，一般与RecRecorderConfig设定的一致
+  required string  records_save_dir = 1;
+}

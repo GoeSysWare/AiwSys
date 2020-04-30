@@ -20,8 +20,8 @@ import sys
 import unittest
 import time
 
-from cyber_py import cyber
-from cyber_py import cyber_time
+from cyber.python.cyber_py import cyber
+from cyber.python.cyber_py import cyber_time
 
 
 class TestTime(unittest.TestCase):
@@ -41,12 +41,12 @@ class TestTime(unittest.TestCase):
         ct = cyber_time.Time(123)
         self.assertEqual(123, ct.to_nsec())
         ftime = ct.now().to_sec()
-        print ftime
+        print (ftime)
         time.sleep(1)
         ftime = cyber_time.Time.now().to_sec()
-        print ftime
+        print (ftime)
         ftime = cyber_time.Time.mono_time().to_sec()
-        print ftime
+        print (ftime)
 
         td1 = cyber_time.Duration(111)
         tm1 = ct - td1
@@ -65,13 +65,13 @@ class TestTime(unittest.TestCase):
         self.assertEqual(601000000000, td2.to_nsec())
         self.assertEqual(601000000000 - 111, td3.to_nsec())
 
-        print td2.to_sec()
+        print (td2.to_sec())
         self.assertEqual(601.0, td2.to_sec())
         self.assertFalse(td2.iszero())
-        print str(td2)
+        print (str(td2))
         td5 = cyber_time.Duration(1.8)
         td6 = td5
-        print type(td6)
+        print (type(td6))
         self.assertTrue(isinstance(td6, cyber_time.Duration))
 
     def test_rate(self):

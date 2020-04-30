@@ -87,7 +87,8 @@ void FindContours_v2::OnPointCloud(const watrix::proto::PointCloud& data, watrix
 	int image_width = 1920;
 	int * imagexy_check= (int *)malloc(1080*1920*sizeof(int));
 	memset(imagexy_check,0,1080*1920*sizeof(int));
-	//int imagexy_check[1080][1920];
+	
+
 	effect_point = 0;
 
 	watrix::proto::PointCloud lidar2image_check_;
@@ -99,7 +100,7 @@ void FindContours_v2::OnPointCloud(const watrix::proto::PointCloud& data, watrix
 
 	lidar_safe_area_.clear_points();
 	lidar_safe_area_.set_timestamp_msec(data.timestamp_msec());
-
+	lidar_cloud_buf.clear();
 	//lidar_cloud_buf[lidar_buf_index_];// = new pcl::PointCloud<pcl::PointXYZ>();
 	int p1_ep = 0;
 	int p2_ep = 0;
@@ -169,7 +170,6 @@ void FindContours_v2::OnPointCloud(const watrix::proto::PointCloud& data, watrix
 		if (cv_ori_point_i < 0 || cv_ori_point_i + 1 >= image_height || cv_ori_point_j < 0 || cv_ori_point_j + 1 >= image_width) {
 			continue;
 		}
-		//������Ӧ��ͼ������㣬�ظ��㣬ֱ�ӷ���
 		if (  *(imagexy_check + cv_ori_point_i * image_width +cv_ori_point_j) == 1) {
 			continue;
 		}
@@ -197,136 +197,16 @@ void FindContours_v2::OnPointCloud(const watrix::proto::PointCloud& data, watrix
 		effect_point++;   //return
 	}
 
-
-	//for(int i=0; i<data.points_size(); i++){
-		//�����״�ǰ����ȫ����
-		// double a1 ;
-		// double a2 ;
-		// double a3 ;	
-		// double pos_x ;
-		// double pos_y ;
-		// current_point.at<double>(0,0)= (double)(data.points(i).y());
-		// //�޽�ƥ�����ҿ���
-		// current_point.at<double>(1,0)= (double)-(data.points(i).x());//0.5;//(double)-(data.points(i).x());
-		// current_point.at<double>(2,0)= (double)(data.points(i).z());
-		// mat_rt_ = r_matrix_*current_point  +t_matrix_;
-		// a1 = mat_rt_.at<double>(0,0);
-		// a2 = mat_rt_.at<double>(1,0);
-		// a3 = mat_rt_.at<double>(2,0);
-		// pos_x = 	a1/(a3);
-		// pos_y =   a2/(a3);
-		// //std:cout<<pos_x<<"   y:"<<pos_y<<std::endl;
-		// pos_x = a_matrix_.at<double>(0,0) * pos_x + a_matrix_.at<double>(0,2) -18;   
-		// pos_y = (a_matrix_.at<double>(1,1) * pos_y + a_matrix_.at<double>(1,2)) + 131;//2019-0531-106;  
-		// //float posize_z = 1;//0.5;
-
-		// cv::Point2f input_pos(pos_x, pos_y);
-		// cv::Point2f point_pos = calibrator_lidar_point(input_pos, 1);
-		// pos_x = point_pos.x;
-		// pos_y = point_pos.y;			
-		// if (pos_y < 1 || pos_y +1 >= image_height || pos_x < 1 || pos_x+1 >= image_width) {			
-		// 	continue;
-		// }
-		// //������Ӧ��ͼ������㣬�ظ��㣬ֱ�ӷ���
-		// if(imagexy_check[(int)pos_y][(int)pos_x] == 1){
-		// 	continue;
-		// }
-		// imagexy_check[(int)pos_y][(int)pos_x] = 1;
-
-		// LidarPoint* lidar_point1 = lidar2image_check_[lidar_buf_index_].add_points();
-		// //std::cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
-		// //std::cout<<pos_x<<"  "<<pos_y<<std::endl;
-		// lidar_point1->set_x((int)pos_x);
-		// lidar_point1->set_y((int)pos_y);
-		// //std::cout<<(int)point_pos.x<<"  "<<(int)point_pos.y<<std::endl;
-		// p1_ep++;
-		// //////////////////////////////////////////////////////////////////////////////////////
-
-		// current_point.at<double>(0,0)= (double)(data.points(i).y());
-		// current_point.at<double>(1,0)= (double)-(data.points(i).x());
-		// current_point.at<double>(2,0)= (double)(data.points(i).z());
-		// mat_rt_ = r_matrix_*current_point  +t_matrix_;
-		// a1 = mat_rt_.at<double>(0,0);
-		// a2 = mat_rt_.at<double>(1,0);
-		// a3 = mat_rt_.at<double>(2,0);
-		// pos_x =   a1/(a3);
-		// pos_y =   a2/(a3);
-		// pos_x = a_matrix_.at<double>(0,0) * pos_x + a_matrix_.at<double>(0,2) -18;  
-		// pos_y = (a_matrix_.at<double>(1,1) * pos_y + a_matrix_.at<double>(1,2)) + 131;//2019-0531-106;   
-		// //float posize_z = 1;//0.5;
-		// input_pos.x = pos_x;
-		// input_pos.y = pos_y;
-		// point_pos = calibrator_lidar_point(input_pos, 1);
-		// pos_x = point_pos.x;
-		// pos_y = point_pos.y;
-		// LidarPoint* lpt1 = lidar2image_paint_[lidar_buf_index_].add_points();
-		// if (pos_y < 1 || pos_y +1 >= image_height || pos_x < 1 || pos_x+1 >= image_width) {
-		// 	lpt1->set_x(1);
-		// 	lpt1->set_y(1);
-		// }else{
-		// 	lpt1->set_x((int)pos_x);
-		// 	lpt1->set_y((int)pos_y);
-		// }
-		// p2_ep++;
-		// effect_point++;
-		// //safe area data 
-		// LidarPoint* lpt2 = lidar_safe_area_[lidar_buf_index_].add_points();
-		// lpt2->set_x(data.points(i).x());
-		// lpt2->set_y(data.points(i).y());
-		// lpt2->set_z(data.points(i).z());			
-
-	//}
-	// for(int i=0; i<data2.points_size(); i++){
-
-	// 	LidarPoint p2 = PointCloud2ImagePoint(imagexy_paint, (double)(data2.points(i).x()), (double)(data2.points(i).y()), (double)(data2.points(i).z()));
-	// 	if(p2.x() >0 ){
-	// 		LidarPoint* lidar_point2 = lidar2image_paint_[lidar_buf_index_].add_points();
-	// 		lidar_point2->set_x((int)p2.x());
-	// 		lidar_point2->set_y((int)p2.y());
-	// 		p2_ep++;
-	// 	}else{
-	// 		continue;
-	// 	}
-
-	// 	effect_point++;
-	// }
-	//�����״�ǰ����ȫ����
-	// lidar_objects_distance_[lidar_buf_index_].Clear();
-	// std::vector<int> objects_dis = lidar_object_distance(safe_area_pc);
-	// std::sort(objects_dis.begin(), objects_dis.end());
-	// std::vector<int>::iterator itr = objects_dis.begin();
-	// for(;itr!=objects_dis.end();++itr){
-	// 	ObjectsDistance * objects_dis = lidar_objects_distance_[lidar_buf_index_].add_lidar_distance();
-	// 	objects_dis->set_object_distance((*itr));
-	// 	//std::cout << (*itr)  << std::endl;
-
-	// for(int l = 0; l<LIDAR_QUEUE_SIZE; l++){
-	// 	WATRIX_ERROR<<"lidar queue index: "<<l<<"  time: "<<lidar2image_check_[l].timestamp_msec();
-	// }
 	free(lidar_buffer);
 	if (effect_point < 1) {
-
+		free(imagexy_check);
 		return;
 	}
 	free(imagexy_check);
 
 
 
-	//long time_ms =data.timestamp_msec();
-
-	// if (this->save_image_result_){
-	// 	std::string result_folder = "../data/autotrain/lidar_results/";
-	// 	FilesystemUtil::mkdir(result_folder);
-	// 	std::string lidar_mask_path = result_folder + std::to_string(time_ms)+ "_lidar_mask.jpg";
-	// 	cv::imwrite(lidar_mask_path, image_with_lidar);
-	// 	std::cout << " Saved to " << lidar_mask_path << std::endl;
-	// }
-	//�״��ת��ͼƬ�����ͳ�ȥ		
-	// watrix::proto::LidarImageResult lidar_image_result;
-	// lidar_image_result.set_timestamp_msec(time_ms);
-	// watrix::proto::CameraImage *lidar_binary_mask = lidar_image_result.mutable_lidar_image();
-	// GetCameraImage(image_with_lidar, CameraImage::MASK_RESULT, 0, lidar_binary_mask);
-	//AdapterManager::PublishLidarImageResult(lidar_image_result);
+//此处可以播放pointcloud
 }
 
 

@@ -15,11 +15,13 @@
 #include "cyber/proto/record.pb.h"
 #include "cyber/message/raw_message.h"
 #include "cyber/record/file/record_file_reader.h"
+
+
 #include "projects/adas/proto/adas_record.pb.h"
 #include "projects/adas/component/recorder/player/player.h"
 #include "projects/adas/proto/adas_config.pb.h"
 #include "projects/adas/proto/adas_record.pb.h"
-
+#include "projects/adas/configs/config_gflags.h"
 
 namespace watrix
 {
@@ -52,6 +54,7 @@ using apollo::cyber::record::PlayParam;
 using apollo::cyber::record::RecordFileReader;
 using apollo::cyber::record::Player;
 using apollo::cyber::record::Header;
+
 /**
  * @brief  回放播放模块
  * 

@@ -13,9 +13,11 @@
 #include "cyber/proto/record.pb.h"
 #include "cyber/message/raw_message.h"
 
-
+#include "projects/adas/proto/adas_record.pb.h"
 #include "projects/adas/proto/adas_config.pb.h"
 
+
+#include "projects/adas/configs/config_gflags.h"
 
 namespace watrix
 {

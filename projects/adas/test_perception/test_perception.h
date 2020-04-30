@@ -181,5 +181,6 @@ private:
 	void CreateNetwork(void);
 	void OnSendResult(const watrix::proto::SendResult& data);
 	void DoSendoutThread(char* buffer, int size);
+
 };
 } // namespace watrix

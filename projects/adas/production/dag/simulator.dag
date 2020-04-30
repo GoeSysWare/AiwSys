@@ -1,0 +1,13 @@
+module_config {
+    module_library : "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-bin/projects/adas/component/simulator/libadas_simulator_component.so"
+    timer_components {
+        class_name : "AdasSimulatorComponent"
+        config {
+            #创建的节点名称
+            name : "AdasSimulatorComponent"
+             config_file_path : "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/projects/adas/production/conf/adas_simulator_config.pb.txt"
+            flag_file_path: "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/projects/adas/production/conf/common.flag"
+            interval : 50
+        }
+    }
+}

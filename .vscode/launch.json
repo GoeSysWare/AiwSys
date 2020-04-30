@@ -45,7 +45,7 @@
             "name": "Debug Cyber",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bazel-bin/cyber/examples/service",
+            "program": "${workspaceFolder}/bazel-bin/cyber/python/examples/py_service",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -239,7 +239,7 @@
             "program": "${workspaceFolder}/bazel-bin/cyber/mainboard",
             "args": [
                 "-d",
-                "${workspaceFolder}/projects/adas/production/dag/recorder.dag",
+                "${workspaceFolder}/projects/adas/production/dag/perception.dag",
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -255,6 +255,10 @@
                 {
                     "name": "CYBER_DOMAIN_ID",
                     "value": "80"
+                },
+                {
+                    "name": "ADAS_PATH",
+                    "value": "${workspaceFolder}/projects/adas/production"
                 },
                 {
                     "name": "CYBER_IP",

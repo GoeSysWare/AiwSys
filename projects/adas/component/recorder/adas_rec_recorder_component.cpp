@@ -1,12 +1,16 @@
 
 #include "projects/adas/component/recorder/adas_rec_recorder_component.h"
 
+
 #include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
+
 
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/component/component.h"
 #include "cyber/common/time_conversion.h"
+
+
+#include "projects/adas/component/common/util.h"
 
 using namespace watrix::projects::adas::proto;
 
@@ -32,13 +36,30 @@ bool AdasRecRecorderComponent::InitConfig()
     {
         return false;
     }
+    //需要设置ADAS_PATH的环境变量，
+    // 如果没有设置环境变量，则以配置的地址必须为绝对地址
+    // 如果设置了环境变量，则可以设置相对地址= 环境变量+配置相对地址
+    std::string record_dir =  apollo::cyber::common::GetAbsolutePath(GetAdasWorkRoot(),config_.records_save_dir());
+
     //组成存档文件名 = 路径+ 前缀 + 当前时间+ .record+ 序号
-    output_ = config_.records_save_dir() + "/" + config_.records_filename_suffix() + "-" +
+    output_ = record_dir + "/" + config_.records_filename_suffix() + "-" +
               apollo::cyber::common::UnixSecondsToString(time(nullptr), "%Y%m%d%H%M%S") + ".record";
-    boost::algorithm::split(channel_vec_, config_.records_channels(), boost::algorithm::is_any_of(","));
-    //此作为参数服务的客户端，名字需要根服务端一致，不然不会存档文件
-    parameter_service_name_ = config_.records_parameter_servicename();
+
+
+    //每次启动时,是否清空原有的历史记录
+    if(config_.records_is_clear_earlier()) apollo::cyber::common::RemoveAllFiles(record_dir);
+
     record_model_ = config_.records_save_model();
+
+    //取得默认的内置参数
+    watrix::projects::adas::proto::InterfaceServiceConfig interface_config;
+    common::GetProtoFromFile(FLAGS_adas_cfg_interface_file, &interface_config);
+    //此作为参数服务的客户端，名字需要根服务端一致
+    parameter_service_name_ = interface_config.records_parameter_servicename();
+    // 记录的通道名
+    //没有成功，则用默认的通道名称
+    boost::algorithm::split(channel_vec_, interface_config.camera_channels(), boost::algorithm::is_any_of(","));
+
     return true;
 }
 

@@ -1,7 +1,4 @@
 
+#ADAS播放录像的配置
+
 records_save_dir:"/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/records"
-interface_service:
-{
-    records_file_servicename:"record_service_file"
-    records_record_servicename: "record_service_record"
-}

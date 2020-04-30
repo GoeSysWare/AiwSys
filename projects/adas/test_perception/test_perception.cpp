@@ -36,10 +36,7 @@ int gpu_id = 0;
 int number_camera_;
 int g_index = 0;
 FindContours_v2 findContours_v2;
-#define RED_POINT Vec3b(0, 0, 255)
-#define YELLOW_POINT Vec3b(0, 255, 255)
-#define GREEN_POINT Vec3b(0, 255, 0)
-#define BLUE_POINT Vec3b(255, 0, 0)
+
 
 //全绿的框
 static void here_draw_detection_boxs(
@@ -74,6 +71,7 @@ static void here_draw_detection_boxs(
 		cv::rectangle(image_with_boxs, box.tl(), box.br(), COLOR_GREEN, thickness, 8, 0);
 	}
 }
+
 //分色彩的框
 static void here_draw_detection_boxs_ex(
 	const cv::Mat &image,

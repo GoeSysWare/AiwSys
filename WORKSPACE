@@ -159,14 +159,15 @@ load("@com_google_protobuf//:protobuf.bzl", "cc_proto_library","py_proto_library
 #     path=  "../3rd/protobuf-3.9.1",
 # )
 
+
 # Similar to com_google_protobuf_cc but for Java lite. If you are building
 # for Android, the lite version should be prefered because it has a much
 # smaller code size.
 # "https://github.com/protocolbuffers/protobuf/archive/javalite.zip"
-local_repository(
-    name = "com_google_protobuf_javalite",
-    path=  "../3rd/protobuf-javalite",
-)
+# local_repository(
+#     name = "com_google_protobuf_javalite",
+#     path=  "../3rd/protobuf-javalite",
+# )
 
 
 #########################################################################################

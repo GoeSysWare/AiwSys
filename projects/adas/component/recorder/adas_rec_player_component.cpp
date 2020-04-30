@@ -1,14 +1,17 @@
 
 #include "projects/adas/component/recorder/adas_rec_player_component.h"
 
+#include "projects/adas/component/common/util.h"
 
-#include "boost/filesystem.hpp"
 namespace watrix
 {
 namespace projects
 {
 namespace adas
 {
+
+
+
 
 AdasRecPlayerComponent::AdasRecPlayerComponent()
 {
@@ -25,9 +28,18 @@ bool AdasRecPlayerComponent::InitConfig()
     {
         return false;
     }
-    record_save_dir_ = config_.records_save_dir();
-    file_q_servicename_ = config_.interface_service().records_file_servicename();
-    record_q_servicename_ = config_.interface_service().records_record_servicename();
+
+    //需要设置ADAS_PATH的环境变量，
+    // 如果没有设置环境变量，则以配置的地址必须为绝对地址
+    // 如果设置了环境变量，则可以设置相对地址= 环境变量+配置相对地址
+    record_save_dir_ =  apollo::cyber::common::GetAbsolutePath(GetAdasWorkRoot(),config_.records_save_dir());
+
+    // 根据配置获得内置的记录的通道名
+    watrix::projects::adas::proto::InterfaceServiceConfig interface_config;
+    common::GetProtoFromFile(FLAGS_adas_cfg_interface_file, &interface_config);
+
+    file_q_servicename_ = interface_config.records_file_servicename();
+    record_q_servicename_ = interface_config.records_record_servicename();
 
     return true; 
 }
@@ -123,14 +135,13 @@ void AdasRecPlayerComponent::EnumRecordFiles()
 {
     using namespace std;
 
-    namespace fs = boost::filesystem;
     //路径名不会太短
     if (record_save_dir_.size() < 2)
     {
         return;
     }
 
-    if (!fs::exists(record_save_dir_))
+    if (!apollo::cyber::common::DirectoryExists(record_save_dir_))
     {
         AERROR << "records  is not existed : " << record_save_dir_;
         return;
@@ -139,32 +150,9 @@ void AdasRecPlayerComponent::EnumRecordFiles()
     records_files_.clear();
 
     // 遍历配置文件所在的文件夹,得到所有的配置文件名.
-    if (fs::is_directory(record_save_dir_))
-    {
-        fs::directory_iterator end_iter;
-        for (fs::directory_iterator dir_itr(record_save_dir_); dir_itr != end_iter; ++dir_itr)
-        {
-            try
-            {
-                // 判断合法record文件
-                if (dir_itr->path().string().find(std::string(".record")) == std::string::npos)
-                    continue;
-                records_files_.emplace_back(dir_itr->path().string());
-            }
-            catch (const std::exception &ex)
-            {
-                string error_msg = dir_itr->path().string();
-                error_msg.append(",enum  error：");
-                error_msg.append(ex.what());
-                AERROR << error_msg;
-            }
-        }
-    }
-    else // must be a file
-    {
-        AERROR << record_save_dir_ << " is not dir ,may be is file";
-        return;
-    }
+
+    records_files_ = std::move( apollo::cyber::common::ListSubPaths(record_save_dir_,DT_REG));
+
 
     //这里需要加锁
     std::lock_guard<std::mutex> lock(enum_file_mutex_);

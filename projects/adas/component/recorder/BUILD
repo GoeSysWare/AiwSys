@@ -12,10 +12,10 @@ cc_binary(
         ],
     linkopts = [
         "-pthread",
-        "-L/usr/lib/x86_64-linux-gnu",
-        "-lboost_filesystem",
+         "-L/usr/lib/x86_64-linux-gnu",
+        # "-lboost_filesystem",
         # "-lboost_atomic",
-        # "-lboost_system",
+         "-lboost_system",
         # "-lboost_date_time",
     ],
 )
@@ -36,6 +36,8 @@ cc_library(
         "//cyber/parameter",
         "//cyber/proto:record_cc_proto",
         "//projects/adas/proto:adas_config_proto",
+        "//projects/adas/component/common",
+        "//projects/adas/configs:config_gflags",
     ],
 )
 
@@ -59,6 +61,8 @@ cc_library(
         "//cyber/proto:record_cc_proto",
         "//projects/adas/proto:adas_config_proto",
         "//projects/adas/proto:adas_record_proto",
+        "//projects/adas/component/common",
+        "//projects/adas/configs:config_gflags",
           ":player",
     ],
 )

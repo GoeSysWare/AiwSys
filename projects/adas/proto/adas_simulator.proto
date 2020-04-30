@@ -1,0 +1,28 @@
+syntax = "proto2";
+
+package watrix.projects.adas.proto;
+import "modules/drivers/proto/sensor_image.proto";
+import "modules/drivers/proto/pointcloud.proto";
+
+//仿真测试的时输出图像
+message SimulatorImage {
+    optional apollo.drivers.Image  image = 1; 
+    optional string sim_img_file = 2;
+  }
+//仿真测试的输出雷达
+  message SimulatorPointCloud {
+    optional apollo.drivers.PointCloud  piontclound = 1; 
+    optional string sim_lidar_file = 2;  
+  }
+
+
+  //仿真测试的输出雷达
+  message SimulatorConfig {
+    //仿真测试文件存放的目录
+    required string  simulator_files_dir = 1; 
+    //仿真配置文件名称
+    required string config_file = 2;  
+    //仿真播放的间隔时间ms
+    optional int32 sim_interval =3[default=400];
+    optional bool is_circle = 4[default= false];
+  }

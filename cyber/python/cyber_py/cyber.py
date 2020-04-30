@@ -41,6 +41,9 @@ sys.path.append(CYBER_PATH + "/lib/python/")
 sys.path.append(CYBER_DIR + "/python/")
 sys.path.append(CYBER_DIR + "/cyber/")
 
+sys.path.append(CYBER_DIR + "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-bin/cyber/py_wrapper/")
+
+
 _CYBER_INIT = importlib.import_module('_cyber_init')
 _CYBER_NODE = importlib.import_module('_cyber_node')
 

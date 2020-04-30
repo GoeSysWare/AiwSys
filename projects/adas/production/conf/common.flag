@@ -1,13 +1,5 @@
 ###########################################################################
-# Flags from sensor_manager
-
---adas_camera_size=2
-
---use_detect_model=false
-
---use_train_seg_model=false
-
---use_lane_seg_model=false
+# 一些FLAGS设置 
 
 
---adas_camera_cfg="/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/projects/adas/production/conf/adas_camera.pb.txt"
+--calibrator_cfg_distortTable= "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/projects/adas/cfg/nodes/config/distortTable.bin"

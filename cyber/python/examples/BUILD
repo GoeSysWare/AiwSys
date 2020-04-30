@@ -1,6 +1,7 @@
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+load("@com_google_protobuf//:protobuf.bzl", "cc_proto_library","py_proto_library")
 
 cc_binary(
     name = "py_talker",
@@ -41,5 +42,13 @@ cc_binary(
         "//cyber/py_wrapper:py_record",
     ],
 )
+
+py_proto_library(
+    name = "unit_test_py_proto",
+    deps = [
+        "//cyber/proto:unit_test_proto",
+    ],
+)
+
 
 cpplint()

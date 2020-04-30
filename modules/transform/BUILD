@@ -58,7 +58,7 @@ cc_test(
     srcs = ["static_transform_component_test.cc"],
     deps = [
         ":static_transform_component_lib",
-        "@gtest//:gtest_main",
+        "@gtest//:main",
     ],
 )
 

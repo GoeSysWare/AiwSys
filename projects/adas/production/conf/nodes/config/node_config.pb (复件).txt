@@ -1,0 +1,53 @@
+camera_1: {
+  if_use: 1
+  simulation: 2
+  camera_id: 1
+  camera_name: "left"
+  simulation_folder: "/home/wayne/data/"
+  simulate_file_extension: ".mp4"
+  interval_time: 400
+}
+#  simulation: 0  硬件连接  1 图片模拟  2 视频模拟   /home/wayne/project/data/dl_data/train_image1
+# interval_time 仿真模式下帧与帧的间隔 单位是毫秒，设置时跟据硬件性能进行设置 ../data/simulation/camera/
+#.mp4
+camera_2: {
+  if_use: 1
+  simulation: 2
+  camera_id: 2
+  camera_name: "right"
+  simulation_folder: "/home/wayne/data/"
+  simulate_file_extension: ".mp4"
+  interval_time: 400
+}
+sync: {
+  simulation: 0
+  interval_time: 500
+}
+# interval_time 硬件连接时帧与帧最短时间
+lidar: {
+  simulation: 1
+  save_config:{
+    save2disk:  0
+    save_folder: "./pcl/"
+  }
+  ipconfig:{
+    ip: "192.168.1.201"
+    port: 2368
+  }
+  pcd_folder: "../data/simulation/pcd/"
+}
+network: {
+  ipconfig:{
+    ip: "127.0.0.1"
+    port: 6666
+  }
+}
+perception: {
+  simulation: false
+  if_use_detect_model: true
+  if_use_train_seg_model: true
+  if_use_lane_seg_model: false
+  use_autotrain_model: false
+  save_image_result: false
+}
+# Put your config here

@@ -1,0 +1,7 @@
+    #ADAS 内置参数的配置[可以不设定]
+    # 与proto/adas_config:InterfaceServiceConfig 对应
+    #高级设置才用
+    #此配置文件可以不存在，也可以为空，
+    #不设置时系统会采用InterfaceServiceConfig对应的默认值
+    
+    # perception_tasks_num:4
