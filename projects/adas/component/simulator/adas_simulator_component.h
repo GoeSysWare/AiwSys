@@ -15,9 +15,15 @@
  *****************************************************************************/
 #include <memory>
 
+
+
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/component/component.h"
 #include "cyber/component/timer_component.h"
+
+#include "modules/drivers/proto/sensor_image.pb.h"
+#include "modules/drivers/proto/pointcloud.pb.h"
+
 #include "projects/adas/proto/adas_simulator.pb.h"
 #include "projects/adas/proto/adas_config.pb.h"
 
@@ -35,8 +41,7 @@ using apollo::drivers::Image;
 using apollo::drivers::PointCloud;
 using apollo::drivers::PointXYZIT;
 using watrix::projects::adas::proto::SimulatorConfig;
-using watrix::projects::adas::proto::SimulatorImage;
-using watrix::projects::adas::proto::SimulatorPointCloud;
+
 
 class AdasSimulatorComponent : public TimerComponent
 {
@@ -67,15 +72,15 @@ private:
   //仿真文件"照片--Lidar"对齐的配置文件
   std::string sim_config_file_;
   int sim_interval_;
-  std::shared_ptr<Writer<SimulatorImage>> front_6mm_writer_ = nullptr;
-  std::shared_ptr<Writer<SimulatorImage>> front_12mm_writer_ = nullptr;
-  std::shared_ptr<Writer<SimulatorPointCloud>> lidar_writer_ = nullptr;
+  std::shared_ptr<Writer<apollo::drivers::Image >> front_6mm_writer_ = nullptr;
+  std::shared_ptr<Writer<apollo::drivers::Image >> front_12mm_writer_ = nullptr;
+  std::shared_ptr<Writer<apollo::drivers::PointCloud>> lidar_writer_ = nullptr;
   std::vector<std::string> output_camera_channel_names_;
   std::vector<std::string> output_lidar_channel_names_;
 
-  SimulatorImage front_6mm_image_;
-  SimulatorImage front_12mm_image_;
-  SimulatorPointCloud lidar_pointcloud_;
+  std::shared_ptr<apollo::drivers::Image>  front_6mm_image_;
+  std::shared_ptr<apollo::drivers::Image>  front_12mm_image_;
+  std::shared_ptr<apollo::drivers::PointCloud> lidar_pointcloud_;
 };
 CYBER_REGISTER_COMPONENT(AdasSimulatorComponent)
 

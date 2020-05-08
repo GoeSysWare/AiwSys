@@ -17,38 +17,43 @@
 #include "projects/adas/configs/config_gflags.h"
 
 DEFINE_string(adas_cfg_interface_file,
-"conf/adas_interface.pb.txt",
+"production/conf/adas_interface.pb.txt",
 "ADAS系统内置参数配置文件，如果无此文件，系统自动采用默认值");
+
+DEFINE_string(adas_debug_output_dir,
+"data/debug/",
+"ADAS系统调试保存Images的输出目录");
+
 
 DEFINE_int32(adas_camera_size,2,"ADAS支持的相机数");
 DEFINE_int32(adas_lidar_size,1,"ADAS支持的激光雷达数");
 
 
 DEFINE_string(distance_cfg_long_a,
-"conf/distance_table/long_a.bin",
+"production/conf/autotrain_models/distance_table/long_a.bin",
 "配置文件");
 DEFINE_string(distance_cfg_long_b,
-"conf/distance_table/long_b.bin",
+"production/conf/autotrain_models/distance_table/long_b.bin",
 "配置文件");
 DEFINE_string(distance_cfg_short_a,
-"conf/distance_table/short_a.bin",
+"production/conf/autotrain_models/distance_table/short_a.bin",
 "配置文件");
 DEFINE_string(distance_cfg_short_b,
-"conf/distance_table/short_b.bin",
+"production/conf/autotrain_models/distance_table/short_b.bin",
 "配置文件");
 
 DEFINE_string(calibrator_cfg_short,
-"conf/nodes/config/camera_short.yaml",
+"production/conf/nodes/config/camera_short.yaml",
 "配置文件");
 DEFINE_string(calibrator_cfg_long,
-"conf/nodes/config/camera_long.yaml",
+"production/conf/nodes/config/camera_long.yaml",
 "配置文件");
 
 DEFINE_string(calibrator_cfg_distortTable,
-"conf/nodes/config/distortTable.bin",
+"production/conf/nodes/config/distortTable.bin",
 "配置文件");
 
 DEFINE_string(lidar_map_parameter,
-"conf/nodes/config/lidar_map_image.yaml",
+"production/conf/nodes/config/lidar_map_image.yaml",
 "配置文件");
 

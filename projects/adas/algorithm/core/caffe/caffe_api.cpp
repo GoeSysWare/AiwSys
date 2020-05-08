@@ -30,13 +30,14 @@ namespace watrix {
 		*/
 		void CaffeApi::set_mode(bool gpu_mode,int device_id, unsigned int seed)
 		{
+			Caffe::SetDevice(device_id);
 			if (gpu_mode) {
 				Caffe::set_mode(Caffe::GPU); // thread-local
 			}
 			else {
 				Caffe::set_mode(Caffe::CPU);
 			}
-			Caffe::SetDevice(device_id);
+
 			Caffe::set_random_seed(seed);
 		}
 

@@ -12,701 +12,683 @@
 
 namespace watrix
 {
-namespace projects
-{
-namespace adas
-{
-
-using apollo::cyber::common::GetAbsolutePath;
-
-using namespace std;
-using namespace cv;
-
-//初始化yolo参数
-void init_yolo_api(watrix::projects::adas::proto::YoloConfig perception_config)
-{
-  watrix::algorithm::YoloNetConfig cfg;
-
-  cfg.net_count = perception_config.net().net_count();
-  cfg.proto_filepath = apollo::cyber::common::GetAbsolutePath(
-      watrix::projects::adas::GetAdasWorkRoot(),
-      perception_config.net().proto_filepath());
-
-  cfg.weight_filepath = apollo::cyber::common::GetAbsolutePath(
-      watrix::projects::adas::GetAdasWorkRoot(),
-      perception_config.net().weight_filepath());
-
-  cfg.label_filepath = apollo::cyber::common::GetAbsolutePath(
-      watrix::projects::adas::GetAdasWorkRoot(),
-      perception_config.label_filepath());
-
-  cfg.input_size = cv::Size(512, 512);
-  cfg.bgr_means = {104, 117, 123}; // 104,117,123 ERROR
-  cfg.normalize_value = 1.0;       //perception_config.normalize_value();; // 1/255.0
-  cfg.confidence_threshold = 0.50; //perception_config.confidence_threshold(); // for filter out box
-  cfg.resize_keep_flag = false;    //perception_config.resize_keep_flag(); // true, use ResizeKP; false use cv::resize
-
-  watrix::algorithm::YoloApi::Init(cfg);
-}
-
-void init_trainseg_api(watrix::projects::adas::proto::TrainSegConfig perception_config)
-{
-
-  int net_count = perception_config.net().net_count();
-  std::string proto_filepath =
-      apollo::cyber::common::GetAbsolutePath(
-          watrix::projects::adas::GetAdasWorkRoot(), perception_config.net().proto_filepath());
-  std::string weight_filepath = apollo::cyber::common::GetAbsolutePath(
-      watrix::projects::adas::GetAdasWorkRoot(), perception_config.net().weight_filepath());
-
-  watrix::algorithm::caffe_net_file_t net_params = {proto_filepath, weight_filepath};
-  watrix::algorithm::TrainSegApi::init(net_params, net_count);
-
-  float b = perception_config.mean().b();
-  float g = perception_config.mean().g();
-  float r = perception_config.mean().r();
-
-  // set bgr mean
-  std::vector<float> bgr_mean{b, g, r};
-  watrix::algorithm::TrainSegApi::set_bgr_mean(bgr_mean);
-}
-
-void init_laneseg_api(watrix::projects::adas::proto::LaneSegConfig perception_config)
-{
-  int mode = 2;
-  watrix::algorithm::LaneSegApi::set_model_type(mode);
-  //if(perception_config.model_type()==LANE_MODEL_TYPE::LANE_MODEL_CAFFE){
-  if (mode == LANE_MODEL_TYPE::LANE_MODEL_CAFFE)
+  namespace projects
   {
-    int net_count = perception_config.net().net_count();
-    std::string proto_filepath = apollo::cyber::common::GetAbsolutePath(
-        watrix::projects::adas::GetAdasWorkRoot(), perception_config.net().proto_filepath());
-    std::string weight_filepath = apollo::cyber::common::GetAbsolutePath(
-        watrix::projects::adas::GetAdasWorkRoot(), perception_config.net().weight_filepath());
-
-    watrix::algorithm::caffe_net_file_t net_params = {proto_filepath, weight_filepath};
-    int feature_dim = perception_config.feature_dim(); // 8;//16; // for v1,v2,v3, use 8; for v4, use 16
-    watrix::algorithm::LaneSegApi::init(net_params, feature_dim, net_count);
-    float b = perception_config.mean().b();
-    float g = perception_config.mean().g();
-    float r = perception_config.mean().r();
-    // set bgr mean
-    std::vector<float> bgr_mean{b, g, r};
-    watrix::algorithm::LaneSegApi::set_bgr_mean(bgr_mean);
-  }
-  else if (mode == 2)
-  {
-    watrix::algorithm::PtSimpleLaneSegNetParams params;
-    params.model_path = apollo::cyber::common::GetAbsolutePath(
-        watrix::projects::adas::GetAdasWorkRoot(), perception_config.net().weight_filepath());
-    params.surface_id = 0;
-    params.left_id = 1;
-    params.right_id = 2;
-
-    int net_count = 2;
-    watrix::algorithm::LaneSegApi::init(params, net_count);
-  }
-  else if (mode == LANE_MODEL_TYPE::LANE_MODEL_PT_COMPLEX)
-  {
-    //} else if (perception_config.model_type() == LANE_MODEL_TYPE::LANE_MODEL_PT_COMPLEX) {
-    // pt complex model
-  }
-}
-
-void init_distance_api()
-{
-  table_param_t params;
-
-  params.long_a = apollo::cyber::common::GetAbsolutePath(
-      watrix::projects::adas::GetAdasWorkRoot(),
-      FLAGS_distance_cfg_long_a);
-  params.long_b = apollo::cyber::common::GetAbsolutePath(
-      watrix::projects::adas::GetAdasWorkRoot(),
-      FLAGS_distance_cfg_long_b);
-  params.short_a = apollo::cyber::common::GetAbsolutePath(
-      watrix::projects::adas::GetAdasWorkRoot(),
-      FLAGS_distance_cfg_short_a);
-  params.short_b = apollo::cyber::common::GetAbsolutePath(
-      watrix::projects::adas::GetAdasWorkRoot(),
-      FLAGS_distance_cfg_short_b);
-
-  MonocularDistanceApi::init(params);
-}
-
-//这个 unused
-void AdasPerceptionComponent::load_lidar_map_parameter(void)
-{
-  cv::FileStorage fs_lidar(
-      apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(),
-                                             FLAGS_lidar_map_parameter),
-      cv::FileStorage::READ);
-  fs_lidar["lidar_a_matrix"] >> a_matrix_;
-  AINFO << "\n a_matrix_:" << a_matrix_;
-
-  fs_lidar["lidar_r_matrix"] >> r_matrix_;
-  AINFO << "\n r_matrix_:" << r_matrix_;
-
-  fs_lidar["lidar_t_matrix"] >> t_matrix_;
-  AINFO << "\n t_matrix_:" << t_matrix_;
-}
-//这个 unused
-void AdasPerceptionComponent::load_calibrator_parameter(void)
-{
-
-  cv::FileStorage fs_short(apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(),
-                                                                  FLAGS_calibrator_cfg_short),
-                           cv::FileStorage::READ);
-  fs_short["camera_matrix"] >> camera_matrix_short_;
-  fs_short["distortion_coefficients"] >> camera_distCoeffs_short_;
-  AINFO << "matrix short:" << camera_matrix_short_ << "\ncoefficients:" << camera_distCoeffs_short_;
-
-  cv::FileStorage fs_long(apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(),
-                                                                 FLAGS_calibrator_cfg_long),
-                          cv::FileStorage::READ);
-
-  fs_long["camera_matrix"] >> camera_matrix_long_;
-  fs_long["distortion_coefficients"] >> camera_distCoeffs_long_;
-  AINFO << "matrix long:" << camera_matrix_long_ << "\ncoefficients:" << camera_distCoeffs_long_;
-
-  const int size = 1920 * 1080 * 2;
-  int *memblock = new int[size];
-  boost::filesystem::ifstream file(
-      apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(),
-                                             FLAGS_calibrator_cfg_distortTable),
-      std::ios::in | std::ios::binary | std::ios::ate);
-  if (file.is_open())
-  {
-    file.seekg(0, std::ios::beg);
-    file.read((char *)memblock, sizeof(float) * size);
-    file.close();
-
-    std::vector<std::pair<int, int>> temp;
-    for (int i = 0; i < size; i += 2)
+    namespace adas
     {
-      cv::Point2f pt;
-      pt.x = memblock[i];
-      pt.y = memblock[i + 1];
-      temp.push_back(std::make_pair(memblock[i], memblock[i + 1]));
-      if (temp.size() == 1920)
+
+      using apollo::cyber::common::GetAbsolutePath;
+
+      using namespace std;
+      using namespace cv;
+
+      //初始化yolo参数
+      void init_yolo_api(watrix::projects::adas::proto::YoloConfig perception_config)
       {
-        distortTable_.push_back(temp);
-        temp.clear();
+        watrix::algorithm::YoloNetConfig cfg;
+
+        cfg.net_count = perception_config.net().net_count();
+        cfg.proto_filepath = apollo::cyber::common::GetAbsolutePath(
+            watrix::projects::adas::GetAdasWorkRoot(),
+            perception_config.net().proto_filepath());
+
+        cfg.weight_filepath = apollo::cyber::common::GetAbsolutePath(
+            watrix::projects::adas::GetAdasWorkRoot(),
+            perception_config.net().weight_filepath());
+
+        cfg.label_filepath = apollo::cyber::common::GetAbsolutePath(
+            watrix::projects::adas::GetAdasWorkRoot(),
+            perception_config.label_filepath());
+
+        cfg.input_size = cv::Size(512, 512);
+        cfg.bgr_means = {104, 117, 123}; // 104,117,123 ERROR
+        cfg.normalize_value = 1.0;       //perception_config.normalize_value();; // 1/255.0
+        cfg.confidence_threshold = 0.50; //perception_config.confidence_threshold(); // for filter out box
+        cfg.resize_keep_flag = false;    //perception_config.resize_keep_flag(); // true, use ResizeKP; false use cv::resize
+
+        watrix::algorithm::YoloApi::Init(cfg);
       }
-    }
 
-    delete[] memblock;
-  }
-  file.close();
-}
-AdasPerceptionComponent::AdasPerceptionComponent()
-    : seq_num_(0)
-{
-}
+      void init_trainseg_api(watrix::projects::adas::proto::TrainSegConfig perception_config)
+      {
 
-AdasPerceptionComponent::~AdasPerceptionComponent()
-{
-}
+        int net_count = perception_config.net().net_count();
+        std::string proto_filepath =
+            apollo::cyber::common::GetAbsolutePath(
+                watrix::projects::adas::GetAdasWorkRoot(), perception_config.net().proto_filepath());
+        std::string weight_filepath = apollo::cyber::common::GetAbsolutePath(
+            watrix::projects::adas::GetAdasWorkRoot(), perception_config.net().weight_filepath());
 
-bool AdasPerceptionComponent::Init()
-{
-  if (!InitConfig())
-  {
-    AERROR << "InitConfig() failed.";
-    return false;
-  }
+        watrix::algorithm::caffe_net_file_t net_params = {proto_filepath, weight_filepath};
+        watrix::algorithm::TrainSegApi::init(net_params, net_count);
 
-  //初始化线程池
-  task_processor_.reset(new apollo::cyber::base::ThreadPool(perception_tasks_num_));
+        float b = perception_config.mean().b();
+        float g = perception_config.mean().g();
+        float r = perception_config.mean().r();
 
-  //初始化算法SDK
-  if (!InitAlgorithmPlugin())
-  {
-    AERROR << "InitAlgorithmPlugin() failed.";
-    return false;
-  }
-  //初始化接收器
-  if (!InitListeners())
-  {
-    AERROR << "InitCameraListeners() failed.";
-    return false;
-  }
-  //初始化发送器
-  if (!InitWriters())
-  {
-    AERROR << "InitWriters() failed.";
-    return false;
-  }
-  return true;
-}
+        // set bgr mean
+        std::vector<float> bgr_mean{b, g, r};
+        watrix::algorithm::TrainSegApi::set_bgr_mean(bgr_mean);
+      }
 
-bool AdasPerceptionComponent::InitConfig()
-{
-  //从模块配置中取得配置信息
-  bool ret = GetProtoConfig(&adas_perception_param_);
-  if (!ret)
-  {
-    return false;
-  }
-  //把proto格式的配置转换为C结构体格式
-  //其实不应该把计算参数放在proto里，应该定义一个yaml文件，直接赋值给算法SDK结构体
-  lane_invasion_config.use_tr34 = adas_perception_param_.laneinvasion().use_tr34(); //use_tr34;// true/false
-  // cluster params
-  dpoints_t tr33;
-  dpoints_t tr34_long_b;
-  dpoints_t tr34_short_b;
-  if (lane_invasion_config.use_tr34)
-  {
-    tr34_long_b.push_back(dpoint_t{
-        adas_perception_param_.laneinvasion().tr34_long_b().dpoints_1(),
-        adas_perception_param_.laneinvasion().tr34_long_b().dpoints_2(),
-        adas_perception_param_.laneinvasion().tr34_long_b().dpoints_3(),
-        adas_perception_param_.laneinvasion().tr34_long_b().dpoints_4()});
-    tr34_long_b.push_back(dpoint_t{
-        adas_perception_param_.laneinvasion().tr34_long_b().dpoints_5(),
-        adas_perception_param_.laneinvasion().tr34_long_b().dpoints_6(),
-        adas_perception_param_.laneinvasion().tr34_long_b().dpoints_7(),
-        adas_perception_param_.laneinvasion().tr34_long_b().dpoints_8()});
-    tr34_long_b.push_back(dpoint_t{
-        adas_perception_param_.laneinvasion().tr34_long_b().dpoints_9(),
-        adas_perception_param_.laneinvasion().tr34_long_b().dpoints_10(),
-        adas_perception_param_.laneinvasion().tr34_long_b().dpoints_11(),
-        adas_perception_param_.laneinvasion().tr34_long_b().dpoints_12()});
+      void init_laneseg_api(watrix::projects::adas::proto::LaneSegConfig perception_config)
+      {
+        int mode = 2;
+        watrix::algorithm::LaneSegApi::set_model_type(mode);
+        //if(perception_config.model_type()==LANE_MODEL_TYPE::LANE_MODEL_CAFFE){
+        if (mode == LANE_MODEL_TYPE::LANE_MODEL_CAFFE)
+        {
+          int net_count = perception_config.net().net_count();
+          std::string proto_filepath = apollo::cyber::common::GetAbsolutePath(
+              watrix::projects::adas::GetAdasWorkRoot(), perception_config.net().proto_filepath());
+          std::string weight_filepath = apollo::cyber::common::GetAbsolutePath(
+              watrix::projects::adas::GetAdasWorkRoot(), perception_config.net().weight_filepath());
 
-    tr34_short_b.push_back(dpoint_t{
-        adas_perception_param_.laneinvasion().tr34_short_b().dpoints_1(),
-        adas_perception_param_.laneinvasion().tr34_short_b().dpoints_2(),
-        adas_perception_param_.laneinvasion().tr34_short_b().dpoints_3(),
-        adas_perception_param_.laneinvasion().tr34_short_b().dpoints_4()});
-    tr34_short_b.push_back(dpoint_t{
-        adas_perception_param_.laneinvasion().tr34_short_b().dpoints_5(),
-        adas_perception_param_.laneinvasion().tr34_short_b().dpoints_6(),
-        adas_perception_param_.laneinvasion().tr34_short_b().dpoints_7(),
-        adas_perception_param_.laneinvasion().tr34_short_b().dpoints_8()});
-    tr34_short_b.push_back(dpoint_t{
-        adas_perception_param_.laneinvasion().tr34_short_b().dpoints_9(),
-        adas_perception_param_.laneinvasion().tr34_short_b().dpoints_10(),
-        adas_perception_param_.laneinvasion().tr34_short_b().dpoints_11(),
-        adas_perception_param_.laneinvasion().tr34_short_b().dpoints_12()});
-    lane_invasion_config.z_height = 1.0;
-  }
-  else
-  {
-    tr33.push_back(dpoint_t{
-        adas_perception_param_.laneinvasion().tr33().dpoints_1(),
-        adas_perception_param_.laneinvasion().tr33().dpoints_2(),
-        adas_perception_param_.laneinvasion().tr33().dpoints_3()});
-    tr33.push_back(dpoint_t{
-        adas_perception_param_.laneinvasion().tr33().dpoints_4(),
-        adas_perception_param_.laneinvasion().tr33().dpoints_5(),
-        adas_perception_param_.laneinvasion().tr33().dpoints_6()});
-    tr33.push_back(dpoint_t{
-        adas_perception_param_.laneinvasion().tr33().dpoints_7(),
-        adas_perception_param_.laneinvasion().tr33().dpoints_8(),
-        adas_perception_param_.laneinvasion().tr33().dpoints_9()});
-    lane_invasion_config.z_height = adas_perception_param_.laneinvasion().z_height();
-  }
-  lane_invasion_config.tr33 = tr33;
-  lane_invasion_config.tr34_long_b = tr34_long_b;
-  lane_invasion_config.tr34_short_b = tr34_short_b;
-  lane_invasion_config.output_dir = adas_perception_param_.laneinvasion().output_dir();
-  lane_invasion_config.b_save_temp_images = adas_perception_param_.laneinvasion().b_save_temp_images(); // save temp image results
+          watrix::algorithm::caffe_net_file_t net_params = {proto_filepath, weight_filepath};
+          int feature_dim = perception_config.feature_dim(); // 8;//16; // for v1,v2,v3, use 8; for v4, use 16
+          watrix::algorithm::LaneSegApi::init(net_params, feature_dim, net_count);
+          float b = perception_config.mean().b();
+          float g = perception_config.mean().g();
+          float r = perception_config.mean().r();
+          // set bgr mean
+          std::vector<float> bgr_mean{b, g, r};
+          watrix::algorithm::LaneSegApi::set_bgr_mean(bgr_mean);
+        }
+        else if (mode == 2)
+        {
+          watrix::algorithm::PtSimpleLaneSegNetParams params;
+          params.model_path = apollo::cyber::common::GetAbsolutePath(
+              watrix::projects::adas::GetAdasWorkRoot(), perception_config.net().weight_filepath());
+          params.surface_id = 0;
+          params.left_id = 1;
+          params.right_id = 2;
 
-  lane_invasion_config.b_draw_lane_surface = adas_perception_param_.laneinvasion().b_draw_lane_surface();
-  lane_invasion_config.b_draw_boxs = adas_perception_param_.laneinvasion().b_draw_boxs();
-  lane_invasion_config.b_draw_left_right_lane = adas_perception_param_.laneinvasion().b_draw_left_right_lane();
-  lane_invasion_config.b_draw_other_lane = adas_perception_param_.laneinvasion().b_draw_other_lane();
-  lane_invasion_config.b_draw_left_right_fitted_lane = adas_perception_param_.laneinvasion().b_draw_left_right_fitted_lane();
-  lane_invasion_config.b_draw_other_fitted_lane = adas_perception_param_.laneinvasion().b_draw_other_fitted_lane();
-  lane_invasion_config.b_draw_expand_left_right_lane = adas_perception_param_.laneinvasion().b_draw_expand_left_right_lane();
-  lane_invasion_config.b_draw_lane_keypoint = adas_perception_param_.laneinvasion().b_draw_lane_keypoint();
-  lane_invasion_config.b_draw_safe_area = adas_perception_param_.laneinvasion().b_draw_safe_area();
-  lane_invasion_config.b_draw_safe_area_corner = adas_perception_param_.laneinvasion().b_draw_safe_area_corner();
-  lane_invasion_config.b_draw_train_cvpoints = adas_perception_param_.laneinvasion().b_draw_train_cvpoints();
-  lane_invasion_config.b_draw_stats = adas_perception_param_.laneinvasion().b_draw_stats();
+          int net_count = 2;
+          watrix::algorithm::LaneSegApi::init(params, net_count);
+        }
+        else if (mode == LANE_MODEL_TYPE::LANE_MODEL_PT_COMPLEX)
+        {
+          //} else if (perception_config.model_type() == LANE_MODEL_TYPE::LANE_MODEL_PT_COMPLEX) {
+          // pt complex model
+        }
+      }
 
-  //lane_invasion_config.safe_area_y_step 			= perception_config.laneinvasion().safe_area_y_step();// y step for drawing safe area  >=1
-  //lane_invasion_config.safe_area_alpha 			= perception_config.laneinvasion().safe_area_alpha(); // overlay aplp
-  lane_invasion_config.grid_size = adas_perception_param_.laneinvasion().grid_size();                                 // cluster grid related paramsdefault 8
-  lane_invasion_config.min_grid_count_in_cluster = adas_perception_param_.laneinvasion().min_grid_count_in_cluster(); // if grid_count <=10 then filter out this cluste
-  //lane_invasion_config.cluster_type = MLPACK_MEANSHIFT; // // (1 USER_MEANSHIFT,2 MLPACK_MEANSHIFT, 3 MLPACK_DBSCAN)
-  lane_invasion_config.cluster_type = adas_perception_param_.laneinvasion().cluster_type(); // cluster algorithm params
-  lane_invasion_config.user_meanshift_kernel_bandwidth = adas_perception_param_.laneinvasion().user_meanshift_kernel_bandwidth();
-  lane_invasion_config.user_meanshift_cluster_epsilon = adas_perception_param_.laneinvasion().user_meanshift_cluster_epsilon();
+      void init_distance_api()
+      {
+        table_param_t params;
 
-  lane_invasion_config.mlpack_meanshift_radius = adas_perception_param_.laneinvasion().mlpack_meanshift_radius();
-  lane_invasion_config.mlpack_meanshift_max_iterations = adas_perception_param_.laneinvasion().mlpack_meanshift_max_iterations(); // max iterations
-  lane_invasion_config.mlpack_meanshift_bandwidth = adas_perception_param_.laneinvasion().mlpack_meanshift_bandwidth();           //  0.50, 0.51, 0.52, ...0.
+        params.long_a = apollo::cyber::common::GetAbsolutePath(
+            watrix::projects::adas::GetAdasWorkRoot(),
+            FLAGS_distance_cfg_long_a);
+        params.long_b = apollo::cyber::common::GetAbsolutePath(
+            watrix::projects::adas::GetAdasWorkRoot(),
+            FLAGS_distance_cfg_long_b);
+        params.short_a = apollo::cyber::common::GetAbsolutePath(
+            watrix::projects::adas::GetAdasWorkRoot(),
+            FLAGS_distance_cfg_short_a);
+        params.short_b = apollo::cyber::common::GetAbsolutePath(
+            watrix::projects::adas::GetAdasWorkRoot(),
+            FLAGS_distance_cfg_short_b);
 
-  lane_invasion_config.mlpack_dbscan_cluster_epsilon = adas_perception_param_.laneinvasion().mlpack_dbscan_cluster_epsilon(); // not same
-  lane_invasion_config.mlpack_dbscan_min_pts = adas_perception_param_.laneinvasion().mlpack_dbscan_min_pts();                 // cluster at least >=3 pt
+        MonocularDistanceApi::init(params);
+      }
 
-  lane_invasion_config.filter_out_lane_noise = adas_perception_param_.laneinvasion().filter_out_lane_noise(); // filter out lane noise
-  lane_invasion_config.min_area_threshold = adas_perception_param_.laneinvasion().min_area_threshold();       // min area for filter lane noise
-  lane_invasion_config.min_lane_pts = adas_perception_param_.laneinvasion().min_lane_pts();                   // at least >=10 points for one lan
+      //这个 unused
+      void AdasPerceptionComponent::load_lidar_map_parameter(void)
+      {
+        cv::FileStorage fs_lidar(
+            apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(),
+                                                   FLAGS_lidar_map_parameter),
+            cv::FileStorage::READ);
+        fs_lidar["lidar_a_matrix"] >> a_matrix_;
+        AINFO << "\n a_matrix_:" << a_matrix_;
 
-  lane_invasion_config.polyfit_order = adas_perception_param_.laneinvasion().polyfit_order(); // bottom_y default 4;  value range = 1,2,...9
-  lane_invasion_config.reverse_xy = adas_perception_param_.laneinvasion().reverse_xy();
-  lane_invasion_config.x_range_min = adas_perception_param_.laneinvasion().x_range_min();
-  lane_invasion_config.x_range_max = adas_perception_param_.laneinvasion().x_range_max();
-  lane_invasion_config.y_range_min = adas_perception_param_.laneinvasion().y_range_min();
-  lane_invasion_config.y_range_max = adas_perception_param_.laneinvasion().y_range_max();
-  // standard limit params (m)
-  lane_invasion_config.railway_standard_width = adas_perception_param_.laneinvasion().railway_standard_width();
-  lane_invasion_config.railway_half_width = adas_perception_param_.laneinvasion().railway_half_width();
-  lane_invasion_config.railway_limit_width = adas_perception_param_.laneinvasion().railway_limit_width();
-  lane_invasion_config.railway_delta_width = adas_perception_param_.laneinvasion().railway_delta_width();
+        fs_lidar["lidar_r_matrix"] >> r_matrix_;
+        AINFO << "\n r_matrix_:" << r_matrix_;
 
-  lane_invasion_config.case1_x_threshold = adas_perception_param_.laneinvasion().case1_x_threshold();
-  lane_invasion_config.case1_y_threshold = adas_perception_param_.laneinvasion().case1_y_threshold();
+        fs_lidar["lidar_t_matrix"] >> t_matrix_;
+        AINFO << "\n t_matrix_:" << t_matrix_;
+      }
+      //这个 unused
+      void AdasPerceptionComponent::load_calibrator_parameter(void)
+      {
 
-  lane_invasion_config.use_lane_status = adas_perception_param_.laneinvasion().use_lane_status();
-  lane_invasion_config.use_lidar_pointcloud_smallobj_invasion_detect = adas_perception_param_.laneinvasion().use_lidar_pointcloud_smallobj_invasion_detect();
+        cv::FileStorage fs_short(apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(),
+                                                                        FLAGS_calibrator_cfg_short),
+                                 cv::FileStorage::READ);
+        fs_short["camera_matrix"] >> camera_matrix_short_;
+        fs_short["distortion_coefficients"] >> camera_distCoeffs_short_;
+        AINFO << "matrix short:" << camera_matrix_short_ << "\ncoefficients:" << camera_distCoeffs_short_;
 
-  //是否采用仿真模式，很重要的一个参数
-  ///////////!!!!!!!!
-  if_use_simulator_ = adas_perception_param_.if_use_simulator();
-  ///////////!!!!!!!!
+        cv::FileStorage fs_long(apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(),
+                                                                       FLAGS_calibrator_cfg_long),
+                                cv::FileStorage::READ);
 
-  // 根据配置获得内置的接口配置信息
-  watrix::projects::adas::proto::InterfaceServiceConfig interface_config;
-  apollo::cyber::common::GetProtoFromFile(FLAGS_adas_cfg_interface_file, &interface_config);
+        fs_long["camera_matrix"] >> camera_matrix_long_;
+        fs_long["distortion_coefficients"] >> camera_distCoeffs_long_;
+        AINFO << "matrix long:" << camera_matrix_long_ << "\ncoefficients:" << camera_distCoeffs_long_;
 
-  // 取得线程池个数
-  perception_tasks_num_ = interface_config.perception_tasks_num();
-  //取得相机名
-  std::string camera_names_str = interface_config.camera_names();
-  boost::algorithm::split(camera_names_, camera_names_str, boost::algorithm::is_any_of(","));
-  // 目前一个功能组件支持2个相机，软件内部可以支持多个
-  if (camera_names_.size() != FLAGS_adas_camera_size)
-  {
-    AERROR << "Now Perception Component only support " << FLAGS_adas_camera_size << " cameras";
-    return false;
-  }
-  //取得相机通道名
-  std::string input_camera_channel_names_str =
-      interface_config.camera_channels();
-  boost::algorithm::split(input_camera_channel_names_,
-                          input_camera_channel_names_str,
-                          boost::algorithm::is_any_of(","));
-  if (input_camera_channel_names_.size() != camera_names_.size())
-  {
-    AERROR << "wrong input_camera_channel_names_.size(): "
-           << input_camera_channel_names_.size();
-    return false;
-  }
+        const int size = 1920 * 1080 * 2;
+        int *memblock = new int[size];
+        boost::filesystem::ifstream file(
+            apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(),
+                                                   FLAGS_calibrator_cfg_distortTable),
+            std::ios::in | std::ios::binary | std::ios::ate);
+        if (file.is_open())
+        {
+          file.seekg(0, std::ios::beg);
+          file.read((char *)memblock, sizeof(float) * size);
+          file.close();
 
-  //取得lidar名
-  std::string lidar_names_str = interface_config.lidar_names();
-  boost::algorithm::split(lidar_names_, lidar_names_str, boost::algorithm::is_any_of(","));
-  //软件内部可以支持多个
-  if (lidar_names_.size() != FLAGS_adas_lidar_size)
-  {
-    AERROR << "Now Perception Component only support " << FLAGS_adas_lidar_size << " cameras";
-    return false;
-  }
-  //取得lidar通道名
-  std::string input_lidar_channel_names_str =
-      interface_config.lidar_channels();
-  boost::algorithm::split(input_lidar_channel_names_,
-                          input_lidar_channel_names_str,
-                          boost::algorithm::is_any_of(","));
-  if (input_lidar_channel_names_.size() != lidar_names_.size())
-  {
-    AERROR << "wrong input_lidar_channel_names_.size(): "
-           << input_lidar_channel_names_.size();
-    return false;
-  }
+          std::vector<std::pair<int, int>> temp;
+          for (int i = 0; i < size; i += 2)
+          {
+            cv::Point2f pt;
+            pt.x = memblock[i];
+            pt.y = memblock[i + 1];
+            temp.push_back(std::make_pair(memblock[i], memblock[i + 1]));
+            if (temp.size() == 1920)
+            {
+              distortTable_.push_back(temp);
+              temp.clear();
+            }
+          }
 
-  std::string format_str = R"(
+          delete[] memblock;
+        }
+        file.close();
+      }
+      AdasPerceptionComponent::AdasPerceptionComponent()
+          : seq_num_(0)
+      {
+      }
+
+      AdasPerceptionComponent::~AdasPerceptionComponent()
+      {
+      }
+
+      bool AdasPerceptionComponent::Init()
+      {
+        // 根据配置获得内置的接口配置信息
+        //为了参数服务用上,这里必须重写node的name,
+        watrix::projects::adas::proto::InterfaceServiceConfig interface_config;
+        apollo::cyber::common::GetProtoFromFile(
+            apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(), FLAGS_adas_cfg_interface_file),
+            &interface_config);
+
+        if (!InitConfig())
+        {
+          AERROR << "InitConfig() failed.";
+          return false;
+        }
+
+        //初始化线程池
+        task_processor_.reset(new watrix::projects::adas::ThreadPool(perception_tasks_num_,
+                                                                     []() { //caffe初始化,一个线程初始化一次
+                                                                       watrix::algorithm::CaffeApi::set_mode(true, 0, 1234);
+                                                                     }));
+
+        //初始化算法SDK
+        if (!InitAlgorithmPlugin())
+        {
+          AERROR << "InitAlgorithmPlugin() failed.";
+          return false;
+        }
+        //初始化接收器
+        if (!InitListeners())
+        {
+          AERROR << "InitCameraListeners() failed.";
+          return false;
+        }
+        //初始化发送器
+        if (!InitWriters())
+        {
+          AERROR << "InitWriters() failed.";
+          return false;
+        }
+        return true;
+      }
+
+      bool AdasPerceptionComponent::InitConfig()
+      {
+        //从模块配置中取得配置信息
+        bool ret = GetProtoConfig(&adas_perception_param_);
+        if (!ret)
+        {
+          return false;
+        }
+        //把proto格式的配置转换为C结构体格式
+        //其实不应该把计算参数放在proto里，应该定义一个yaml文件，直接赋值给算法SDK结构体
+        lane_invasion_config_.use_tr34 = adas_perception_param_.laneinvasion().use_tr34(); //use_tr34;// true/false
+        // cluster params
+        dpoints_t tr33;
+        dpoints_t tr34_long_b;
+        dpoints_t tr34_short_b;
+        if (lane_invasion_config_.use_tr34)
+        {
+          tr34_long_b.push_back(dpoint_t{
+              adas_perception_param_.laneinvasion().tr34_long_b().dpoints_1(),
+              adas_perception_param_.laneinvasion().tr34_long_b().dpoints_2(),
+              adas_perception_param_.laneinvasion().tr34_long_b().dpoints_3(),
+              adas_perception_param_.laneinvasion().tr34_long_b().dpoints_4()});
+          tr34_long_b.push_back(dpoint_t{
+              adas_perception_param_.laneinvasion().tr34_long_b().dpoints_5(),
+              adas_perception_param_.laneinvasion().tr34_long_b().dpoints_6(),
+              adas_perception_param_.laneinvasion().tr34_long_b().dpoints_7(),
+              adas_perception_param_.laneinvasion().tr34_long_b().dpoints_8()});
+          tr34_long_b.push_back(dpoint_t{
+              adas_perception_param_.laneinvasion().tr34_long_b().dpoints_9(),
+              adas_perception_param_.laneinvasion().tr34_long_b().dpoints_10(),
+              adas_perception_param_.laneinvasion().tr34_long_b().dpoints_11(),
+              adas_perception_param_.laneinvasion().tr34_long_b().dpoints_12()});
+
+          tr34_short_b.push_back(dpoint_t{
+              adas_perception_param_.laneinvasion().tr34_short_b().dpoints_1(),
+              adas_perception_param_.laneinvasion().tr34_short_b().dpoints_2(),
+              adas_perception_param_.laneinvasion().tr34_short_b().dpoints_3(),
+              adas_perception_param_.laneinvasion().tr34_short_b().dpoints_4()});
+          tr34_short_b.push_back(dpoint_t{
+              adas_perception_param_.laneinvasion().tr34_short_b().dpoints_5(),
+              adas_perception_param_.laneinvasion().tr34_short_b().dpoints_6(),
+              adas_perception_param_.laneinvasion().tr34_short_b().dpoints_7(),
+              adas_perception_param_.laneinvasion().tr34_short_b().dpoints_8()});
+          tr34_short_b.push_back(dpoint_t{
+              adas_perception_param_.laneinvasion().tr34_short_b().dpoints_9(),
+              adas_perception_param_.laneinvasion().tr34_short_b().dpoints_10(),
+              adas_perception_param_.laneinvasion().tr34_short_b().dpoints_11(),
+              adas_perception_param_.laneinvasion().tr34_short_b().dpoints_12()});
+          lane_invasion_config_.z_height = 1.0;
+        }
+        else
+        {
+          tr33.push_back(dpoint_t{
+              adas_perception_param_.laneinvasion().tr33().dpoints_1(),
+              adas_perception_param_.laneinvasion().tr33().dpoints_2(),
+              adas_perception_param_.laneinvasion().tr33().dpoints_3()});
+          tr33.push_back(dpoint_t{
+              adas_perception_param_.laneinvasion().tr33().dpoints_4(),
+              adas_perception_param_.laneinvasion().tr33().dpoints_5(),
+              adas_perception_param_.laneinvasion().tr33().dpoints_6()});
+          tr33.push_back(dpoint_t{
+              adas_perception_param_.laneinvasion().tr33().dpoints_7(),
+              adas_perception_param_.laneinvasion().tr33().dpoints_8(),
+              adas_perception_param_.laneinvasion().tr33().dpoints_9()});
+          lane_invasion_config_.z_height = adas_perception_param_.laneinvasion().z_height();
+        }
+        lane_invasion_config_.tr33 = tr33;
+        lane_invasion_config_.tr34_long_b = tr34_long_b;
+        lane_invasion_config_.tr34_short_b = tr34_short_b;
+        lane_invasion_config_.output_dir = adas_perception_param_.laneinvasion().output_dir();
+        lane_invasion_config_.b_save_temp_images = adas_perception_param_.laneinvasion().b_save_temp_images(); // save temp image results
+
+        lane_invasion_config_.b_draw_lane_surface = adas_perception_param_.laneinvasion().b_draw_lane_surface();
+        lane_invasion_config_.b_draw_boxs = adas_perception_param_.laneinvasion().b_draw_boxs();
+        lane_invasion_config_.b_draw_left_right_lane = adas_perception_param_.laneinvasion().b_draw_left_right_lane();
+        lane_invasion_config_.b_draw_other_lane = adas_perception_param_.laneinvasion().b_draw_other_lane();
+        lane_invasion_config_.b_draw_left_right_fitted_lane = adas_perception_param_.laneinvasion().b_draw_left_right_fitted_lane();
+        lane_invasion_config_.b_draw_other_fitted_lane = adas_perception_param_.laneinvasion().b_draw_other_fitted_lane();
+        lane_invasion_config_.b_draw_expand_left_right_lane = adas_perception_param_.laneinvasion().b_draw_expand_left_right_lane();
+        lane_invasion_config_.b_draw_lane_keypoint = adas_perception_param_.laneinvasion().b_draw_lane_keypoint();
+        lane_invasion_config_.b_draw_safe_area = adas_perception_param_.laneinvasion().b_draw_safe_area();
+        lane_invasion_config_.b_draw_safe_area_corner = adas_perception_param_.laneinvasion().b_draw_safe_area_corner();
+        lane_invasion_config_.b_draw_train_cvpoints = adas_perception_param_.laneinvasion().b_draw_train_cvpoints();
+        lane_invasion_config_.b_draw_stats = adas_perception_param_.laneinvasion().b_draw_stats();
+
+        //lane_invasion_config_.safe_area_y_step 			= perception_config.laneinvasion().safe_area_y_step();// y step for drawing safe area  >=1
+        //lane_invasion_config_.safe_area_alpha 			= perception_config.laneinvasion().safe_area_alpha(); // overlay aplp
+        lane_invasion_config_.grid_size = adas_perception_param_.laneinvasion().grid_size();                                 // cluster grid related paramsdefault 8
+        lane_invasion_config_.min_grid_count_in_cluster = adas_perception_param_.laneinvasion().min_grid_count_in_cluster(); // if grid_count <=10 then filter out this cluste
+        //lane_invasion_config_.cluster_type = MLPACK_MEANSHIFT; // // (1 USER_MEANSHIFT,2 MLPACK_MEANSHIFT, 3 MLPACK_DBSCAN)
+        lane_invasion_config_.cluster_type = adas_perception_param_.laneinvasion().cluster_type(); // cluster algorithm params
+        lane_invasion_config_.user_meanshift_kernel_bandwidth = adas_perception_param_.laneinvasion().user_meanshift_kernel_bandwidth();
+        lane_invasion_config_.user_meanshift_cluster_epsilon = adas_perception_param_.laneinvasion().user_meanshift_cluster_epsilon();
+
+        lane_invasion_config_.mlpack_meanshift_radius = adas_perception_param_.laneinvasion().mlpack_meanshift_radius();
+        lane_invasion_config_.mlpack_meanshift_max_iterations = adas_perception_param_.laneinvasion().mlpack_meanshift_max_iterations(); // max iterations
+        lane_invasion_config_.mlpack_meanshift_bandwidth = adas_perception_param_.laneinvasion().mlpack_meanshift_bandwidth();           //  0.50, 0.51, 0.52, ...0.
+
+        lane_invasion_config_.mlpack_dbscan_cluster_epsilon = adas_perception_param_.laneinvasion().mlpack_dbscan_cluster_epsilon(); // not same
+        lane_invasion_config_.mlpack_dbscan_min_pts = adas_perception_param_.laneinvasion().mlpack_dbscan_min_pts();                 // cluster at least >=3 pt
+
+        lane_invasion_config_.filter_out_lane_noise = adas_perception_param_.laneinvasion().filter_out_lane_noise(); // filter out lane noise
+        lane_invasion_config_.min_area_threshold = adas_perception_param_.laneinvasion().min_area_threshold();       // min area for filter lane noise
+        lane_invasion_config_.min_lane_pts = adas_perception_param_.laneinvasion().min_lane_pts();                   // at least >=10 points for one lan
+
+        lane_invasion_config_.polyfit_order = adas_perception_param_.laneinvasion().polyfit_order(); // bottom_y default 4;  value range = 1,2,...9
+        lane_invasion_config_.reverse_xy = adas_perception_param_.laneinvasion().reverse_xy();
+        lane_invasion_config_.x_range_min = adas_perception_param_.laneinvasion().x_range_min();
+        lane_invasion_config_.x_range_max = adas_perception_param_.laneinvasion().x_range_max();
+        lane_invasion_config_.y_range_min = adas_perception_param_.laneinvasion().y_range_min();
+        lane_invasion_config_.y_range_max = adas_perception_param_.laneinvasion().y_range_max();
+        // standard limit params (m)
+        lane_invasion_config_.railway_standard_width = adas_perception_param_.laneinvasion().railway_standard_width();
+        lane_invasion_config_.railway_half_width = adas_perception_param_.laneinvasion().railway_half_width();
+        lane_invasion_config_.railway_limit_width = adas_perception_param_.laneinvasion().railway_limit_width();
+        lane_invasion_config_.railway_delta_width = adas_perception_param_.laneinvasion().railway_delta_width();
+
+        lane_invasion_config_.case1_x_threshold = adas_perception_param_.laneinvasion().case1_x_threshold();
+        lane_invasion_config_.case1_y_threshold = adas_perception_param_.laneinvasion().case1_y_threshold();
+
+        lane_invasion_config_.use_lane_status = adas_perception_param_.laneinvasion().use_lane_status();
+        lane_invasion_config_.use_lidar_pointcloud_smallobj_invasion_detect = adas_perception_param_.laneinvasion().use_lidar_pointcloud_smallobj_invasion_detect();
+
+        //是否采用仿真模式，很重要的一个参数
+        ///////////!!!!!!!!
+        if_use_simulator_ = adas_perception_param_.if_use_simulator();
+        ///////////!!!!!!!!
+        //是否保存图片
+        if_save_image_result_ = adas_perception_param_.if_save_image_result();
+        save_image_dir_ = adas_perception_param_.save_image_dir();
+        // 根据配置获得内置的接口配置信息
+        watrix::projects::adas::proto::InterfaceServiceConfig interface_config;
+        apollo::cyber::common::GetProtoFromFile(
+            apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(), FLAGS_adas_cfg_interface_file),
+            &interface_config);
+
+        // 取得线程池个数
+        perception_tasks_num_ = interface_config.perception_tasks_num();
+        //取得相机名
+        std::string camera_names_str = interface_config.camera_names();
+        boost::algorithm::split(camera_names_, camera_names_str, boost::algorithm::is_any_of(","));
+        // 目前一个功能组件支持2个相机，软件内部可以支持多个
+        if (camera_names_.size() != FLAGS_adas_camera_size)
+        {
+          AERROR << "Now Perception Component only support " << FLAGS_adas_camera_size << " cameras";
+          return false;
+        }
+        //取得相机通道名
+        std::string input_camera_channel_names_str =
+            interface_config.camera_channels();
+        boost::algorithm::split(input_camera_channel_names_,
+                                input_camera_channel_names_str,
+                                boost::algorithm::is_any_of(","));
+        if (input_camera_channel_names_.size() != camera_names_.size())
+        {
+          AERROR << "wrong input_camera_channel_names_.size(): "
+                 << input_camera_channel_names_.size();
+          return false;
+        }
+
+        //取得lidar名
+        std::string lidar_names_str = interface_config.lidar_names();
+        boost::algorithm::split(lidar_names_, lidar_names_str, boost::algorithm::is_any_of(","));
+        //软件内部可以支持多个
+        if (lidar_names_.size() != FLAGS_adas_lidar_size)
+        {
+          AERROR << "Now Perception Component only support " << FLAGS_adas_lidar_size << " cameras";
+          return false;
+        }
+        //取得lidar通道名
+        std::string input_lidar_channel_names_str =
+            interface_config.lidar_channels();
+        boost::algorithm::split(input_lidar_channel_names_,
+                                input_lidar_channel_names_str,
+                                boost::algorithm::is_any_of(","));
+        if (input_lidar_channel_names_.size() != lidar_names_.size())
+        {
+          AERROR << "wrong input_lidar_channel_names_.size(): "
+                 << input_lidar_channel_names_.size();
+          return false;
+        }
+
+        std::string format_str = R"(
       AdasPerceptionComponent InitConfig success
       camera_names:    %s,%s
       input_camera_channel_names:     %s,%s
       lidar_names:    %s
-      input_lidar_channel_names:     %s)";
-  std::string config_info_str =
-      boost::str(boost::format(format_str.c_str()) % camera_names_[0] % camera_names_[1] %
-                 input_camera_channel_names_[0] % input_camera_channel_names_[1] %
-                 lidar_names_[0] %
-                 input_lidar_channel_names_[0]);
-  AINFO << config_info_str;
+      input_lidar_channel_names:     %s
+      perception  pool size: %d )";
+        std::string config_info_str =
+            boost::str(boost::format(format_str.c_str()) % camera_names_[0] % camera_names_[1] %
+                       input_camera_channel_names_[0] % input_camera_channel_names_[1] %
+                       lidar_names_[0] %
+                       input_lidar_channel_names_[0] %
+                       perception_tasks_num_);
+        AINFO << config_info_str;
 
-  //初始化空间
-  images_.resize(FLAGS_adas_camera_size);
-  sim_image_files_.resize(FLAGS_adas_camera_size);
+        //初始化空间
+        images_.resize(FLAGS_adas_camera_size);
+        sim_image_files_.resize(FLAGS_adas_camera_size);
 
-  return true;
-}
+        return true;
+      }
 
-bool AdasPerceptionComponent::InitAlgorithmPlugin()
-{
-  load_lidar_map_parameter();
+      bool AdasPerceptionComponent::InitAlgorithmPlugin()
+      {
+        load_lidar_map_parameter();
 
-  if (adas_perception_param_.if_use_detect_model())
-  {
-    init_yolo_api(adas_perception_param_.yolo());
-  }
+        if (adas_perception_param_.if_use_detect_model())
+        {
+          init_yolo_api(adas_perception_param_.yolo());
+        }
 
-  if (adas_perception_param_.if_use_train_seg_model())
-  {
-    init_trainseg_api(adas_perception_param_.trainseg());
-  }
+        if (adas_perception_param_.if_use_train_seg_model())
+        {
+          init_trainseg_api(adas_perception_param_.trainseg());
+        }
 
-  if (adas_perception_param_.if_use_lane_seg_model())
-  {
-    init_laneseg_api(adas_perception_param_.laneseg());
+        if (adas_perception_param_.if_use_lane_seg_model())
+        {
+          init_laneseg_api(adas_perception_param_.laneseg());
 
-    cv::Mat image_0 = cv::Mat::zeros(cv::Size(480, 160), CV_8UC1);
 
-    v_image_lane_front_result.push_back(image_0);
+          if (v_image_lane_front_result_.size() == 0)
+          {
+            cv::Mat image_0 = cv::Mat::zeros(272, 480, CV_32FC(5));
+            for (int h = 0; h < 272; h++)
+            {
+              for (int w = 0; w < 480; w++)
+              {
+                for (int idx_c = 0; idx_c < 5; idx_c++)
+                {
+                  image_0.at<cv::Vec<float, 5>>(h, w)[idx_c] = 0.2;
+                }
+              }
+            }
+            for (int i = 0; i < 2; i++)
+            {
+              v_image_lane_front_result_.push_back(image_0);
+            }
+          }
+          FindContours_v2::load_params();
+        }
 
-    if (camera_names_.size() == FLAGS_adas_camera_size)
-    {
+        init_distance_api();
 
-      v_image_lane_front_result.push_back(image_0);
-    }
+        load_calibrator_parameter();
 
-    FindContours_v2::load_params();
-  }
+        return true;
+      }
 
-  init_distance_api();
+      bool AdasPerceptionComponent::InitWriters()
+      {
+        // 根据配置获得内置的接口配置信息
+        watrix::projects::adas::proto::InterfaceServiceConfig interface_config;
+        apollo::cyber::common::GetProtoFromFile(
+            apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(), FLAGS_adas_cfg_interface_file),
+            &interface_config);
+        //取得输出通道
+        std::string output_channels_str = interface_config.camera_output_channels();
+        boost::algorithm::split(output_camera_channel_names_, output_channels_str, boost::algorithm::is_any_of(","));
+        // 目前一个功能组件支持2个相机，软件内部可以支持多个
+        if (output_camera_channel_names_.size() != FLAGS_adas_camera_size)
+        {
+          AERROR << "Now Perception Component only support " << FLAGS_adas_camera_size << " cameras output";
+          return false;
+        }
 
-  load_calibrator_parameter();
+        //取得调试通道
+        std::string debug_channels_str = interface_config.camera_debug_channels();
+        boost::algorithm::split(debug_camera_channel_names_, debug_channels_str, boost::algorithm::is_any_of(","));
 
-  return true;
-}
+        //实际输出，
+        camera_out_writers_[camera_names_[0]] =
+            node_->CreateWriter<watrix::projects::adas::proto::SendResult>(output_camera_channel_names_[0]);
+        camera_out_writers_[camera_names_[1]] =
+            node_->CreateWriter<watrix::projects::adas::proto::SendResult>(output_camera_channel_names_[1]);
 
-bool AdasPerceptionComponent::InitWriters()
-{
-  // 根据配置获得内置的接口配置信息
-  watrix::projects::adas::proto::InterfaceServiceConfig interface_config;
-  apollo::cyber::common::GetProtoFromFile(FLAGS_adas_cfg_interface_file, &interface_config);
+        //可以支持多个调试通道
+        camera_debug_writers_[camera_names_[0]] =
+            node_->CreateWriter<watrix::projects::adas::proto::CameraImages>(debug_camera_channel_names_[0]);
+        camera_debug_writers_[camera_names_[1]] =
+            node_->CreateWriter<watrix::projects::adas::proto::CameraImages>(debug_camera_channel_names_[1]);
 
-  //取得输出通道
-  std::string output_channels_str = interface_config.camera_output_channels();
-  boost::algorithm::split(output_camera_channel_names_, output_channels_str, boost::algorithm::is_any_of(","));
-  // 目前一个功能组件支持2个相机，软件内部可以支持多个
-  if (output_camera_channel_names_.size() != FLAGS_adas_camera_size)
-  {
-    AERROR << "Now Perception Component only support " << FLAGS_adas_camera_size << " cameras output";
-    return false;
-  }
+        //参数服务,触发记录存档用
+        std::string node_name = interface_config.records_record_servicename();
+        param_node_ = apollo::cyber::CreateNode(node_name);
 
-  //取得调试通道
-  std::string debug_channels_str = interface_config.camera_debug_channels();
-  boost::algorithm::split(debug_camera_channel_names_, debug_channels_str, boost::algorithm::is_any_of(","));
+        param_server_ = std::make_shared<apollo::cyber::ParameterServer>(param_node_);
+        record_para_name_ = interface_config.record_parameter_name();
+        // 初始化为false
+        apollo::cyber::Parameter record_parameter(record_para_name_, false);
+        param_server_->SetParameter(record_parameter);
 
-  //实际输出，
-  camera_out_writers_[camera_names_[0]] =
-      node_->CreateWriter<aiwsys::projects::adas::proto::SendResult>(output_camera_channel_names_[0]);
-  camera_out_writers_[camera_names_[1]] =
-      node_->CreateWriter<aiwsys::projects::adas::proto::SendResult>(output_camera_channel_names_[1]);
+        return true;
+      }
+      bool AdasPerceptionComponent::InitListeners()
+      {
+        //仿真模式下
+        // 相同的通道名称，不同的接收类型，不同的处理回调
 
-  //可以支持多个调试通道
-  camera_debug_writers_[camera_names_[0]] =
-      node_->CreateWriter<aiwsys::projects::adas::proto::CameraImages>(debug_camera_channel_names_[0]);
-  camera_debug_writers_[camera_names_[1]] =
-      node_->CreateWriter<aiwsys::projects::adas::proto::CameraImages>(debug_camera_channel_names_[1]);
-  return true;
-}
-bool AdasPerceptionComponent::InitListeners()
-{
-  //仿真模式下
-  // 相同的通道名称，不同的接收类型，不同的处理回调
+        //初始化图像接收器
+        for (size_t i = 0; i < camera_names_.size(); ++i)
+        {
+          const std::string &camera_name = camera_names_[i];
+          const std::string &channel_name = input_camera_channel_names_[i];
 
-  //初始化图像接收器
-  for (size_t i = 0; i < camera_names_.size(); ++i)
-  {
-    const std::string &camera_name = camera_names_[i];
-    const std::string &channel_name = input_camera_channel_names_[i];
+          typedef std::shared_ptr<apollo::drivers::Image> ImageMsgType;
+          std::function<void(const ImageMsgType &)> camera_callback =
+              std::bind(&AdasPerceptionComponent::OnReceiveImage, this,
+                        std::placeholders::_1, camera_name);
 
-    typedef std::shared_ptr<apollo::drivers::Image> ImageMsgType;
-    std::function<void(const ImageMsgType &)> camera_callback =
-        std::bind(&AdasPerceptionComponent::OnReceiveImage, this,
-                  std::placeholders::_1, camera_name);
+          auto camera_reader = node_->CreateReader(channel_name, camera_callback);
+        }
+        //初始化lidar接收器
+        for (size_t i = 0; i < lidar_names_.size(); ++i)
+        {
+          const std::string &lidar_name = lidar_names_[i];
+          const std::string &lidar_channel_name = input_lidar_channel_names_[i];
 
-    typedef std::shared_ptr<SimulatorImage> SimImageMsgType;
-    std::function<void(const SimImageMsgType &)> sim_camera_callback =
-        std::bind(&AdasPerceptionComponent::OnReceiveSimulatorImage, this,
-                  std::placeholders::_1, camera_name);
+          typedef std::shared_ptr<apollo::drivers::PointCloud> PointCloudMsgType;
+          std::function<void(const PointCloudMsgType &)> lidar_callback =
+              std::bind(&AdasPerceptionComponent::OnReceivePointCloud, this,
+                        std::placeholders::_1, lidar_name);
 
-    if (!if_use_simulator_)
-      auto camera_reader = node_->CreateReader(channel_name, camera_callback);
-    else
-      auto camera_reader = node_->CreateReader(channel_name, sim_camera_callback);
-  }
-  //初始化lidar接收器
-  for (size_t i = 0; i < lidar_names_.size(); ++i)
-  {
-    const std::string &lidar_name = lidar_names_[i];
-    const std::string &lidar_channel_name = input_lidar_channel_names_[i];
+          auto lidar_reader = node_->CreateReader(lidar_channel_name, lidar_callback);
+        }
 
-    typedef std::shared_ptr<apollo::drivers::PointCloud> PointCloudMsgType;
-    std::function<void(const PointCloudMsgType &)> lidar_callback =
-        std::bind(&AdasPerceptionComponent::OnReceivePointCloud, this,
-                  std::placeholders::_1, lidar_name);
+        return true;
+      }
 
-    typedef std::shared_ptr<SimulatorPointCloud> SimPointCloudMsgType;
-    std::function<void(const SimPointCloudMsgType &)> sim_lidar_callback =
-        std::bind(&AdasPerceptionComponent::OnReceiveSimulatorPointCloud, this,
-                  std::placeholders::_1, lidar_name);
+      void AdasPerceptionComponent::OnReceiveImage(
+          const std::shared_ptr<apollo::drivers::Image> &message,
+          const std::string &camera_name)
+      {
+        std::lock_guard<std::mutex> lock(camera_mutex_);
 
-    if (!if_use_simulator_)
-      auto lidar_reader = node_->CreateReader(lidar_channel_name, lidar_callback);
-    else
-      auto lidar_reader = node_->CreateReader(lidar_channel_name, sim_lidar_callback);
-  }
+        const double msg_timestamp = message->measurement_time() + timestamp_offset_;
 
-  return true;
-}
+        AERROR << "OnReceiveImage(), "
+               << " camera_name: " << camera_name
+               << " image ts: " + std::to_string(msg_timestamp);
 
-void AdasPerceptionComponent::OnReceiveImage(
-    const std::shared_ptr<apollo::drivers::Image> &message,
-    const std::string &camera_name)
-{
-  std::lock_guard<std::mutex> lock(camera_mutex_);
+        // timestamp should be almost monotonic
+        if (last_timestamp_ - msg_timestamp > ts_diff_)
+        {
+          AINFO << "Received an old message. Last ts is " << std::setprecision(19)
+                << last_timestamp_ << " current ts is " << msg_timestamp
+                << " last - current is " << last_timestamp_ - msg_timestamp;
+          return;
+        }
+        last_timestamp_ = msg_timestamp;
+        ++seq_num_;
 
-  const double msg_timestamp = message->measurement_time() + timestamp_offset_;
-  AERROR << "Enter FusionCameraDetectionComponent::Proc(), "
-         << " camera_name: " << camera_name
-         << " image ts: " + std::to_string(msg_timestamp);
-  // timestamp should be almost monotonic
-  if (last_timestamp_ - msg_timestamp > ts_diff_)
-  {
-    AINFO << "Received an old message. Last ts is " << std::setprecision(19)
-          << last_timestamp_ << " current ts is " << msg_timestamp
-          << " last - current is " << last_timestamp_ - msg_timestamp;
-    return;
-  }
-  last_timestamp_ = msg_timestamp;
-  ++seq_num_;
+        //内部处理
+        if (InternalProc(message, camera_name) != apollo::cyber::SUCC)
+        {
+          AERROR << "InternalProc failed ";
+        }
+      }
 
-  {
-    const double cur_time = apollo::common::time::Clock::NowInSeconds();
-    const double start_latency = (cur_time - message->measurement_time()) * 1e3;
-    AINFO << "FRAME_STATISTICS:Camera:Start:msg_time[" << camera_name << "-"
-          << GLOG_TIMESTAMP(message->measurement_time()) << "]:cur_time["
-          << GLOG_TIMESTAMP(cur_time) << "]:cur_latency[" << start_latency
-          << "]";
-  }
-  //内部处理
-  if (InternalProc(message, camera_name) != apollo::cyber::SUCC)
-  {
-    AERROR << "InternalProc failed ";
-  }
+      int AdasPerceptionComponent::InternalProc(
+          const std::shared_ptr<apollo::drivers::Image const> &in_message,
+          const std::string &camera_name)
+      {
+        //过滤长宽不对的img
+        if (in_message->height() <= 0 || in_message->width() <= 0)
+          return apollo::cyber::FAIL;
 
-  //统计时间
-  {
-    const double end_timestamp = apollo::common::time::Clock::NowInSeconds();
-    const double end_latency =
-        (end_timestamp - message->measurement_time()) * 1e3;
-    AINFO << "FRAME_STATISTICS:Camera:End:msg_time[" << camera_name << "-"
-          << GLOG_TIMESTAMP(end_timestamp) << "]:cur_latency[" << end_latency
-          << "]";
-  }
-}
+        apollo::cyber::Time measure_time(in_message->measurement_time());
 
-void AdasPerceptionComponent::OnReceiveSimulatorImage(const std::shared_ptr<SimulatorImage> &in_message,
-                                                      const std::string &camera_name)
-{
-  //仿真模式其实就多了一层仿真文件信息
-  for (auto i = 0; i < camera_names_.size(); i++)
-  {
-    if (camera_names_[i] == camera_name)
-    {
-      sim_image_files_[i] = in_message->sim_img_file();
-    }
-  }
-  typedef apollo::drivers::Image ImgType;
+        for (auto i = 0; i < camera_names_.size(); i++)
+        {
+          //根据camera_name 把 image赋值给对应的缓存
+          if (camera_names_[i] == camera_name)
+          {
 
-  std::shared_ptr<ImgType> tmp = std::make_shared<ImgType>();
-  *tmp = in_message->image();
-  OnReceiveImage(std::move(tmp), camera_name);
-}
+            //如果是仿真的，就需要 仿真文件信息,不是仿真则用采集时间作为文件名
+            sim_image_files_[i] = if_use_simulator_ ? in_message->header().module_name() : measure_time.ToString() + ".jpg";
 
-int AdasPerceptionComponent::InternalProc(
-    const std::shared_ptr<apollo::drivers::Image const> &in_message,
-    const std::string &camera_name)
-{
-  if (in_message->height() <= 0 || in_message->width() <= 0)
-    return false;
+            int image_size = in_message->height() * in_message->step();
 
-  for (auto i = 0; i < camera_names_.size(); i++)
-  {
-    if (camera_names_[i] == camera_name)
-    {
-      int image_size = in_message->height() * in_message->step();
+            cv::Mat tmp = cv::Mat::zeros(in_message->height(), in_message->width(), CV_8UC3);
 
-      cv::Mat tmp = cv::Mat::zeros(in_message->width(), in_message->height(), CV_8UC3);
+            memcpy(tmp.data, in_message->data().c_str(), image_size);
 
-      memcpy(tmp.data, in_message->data().c_str(), image_size);
-      //填充本地cv::Mat
-      // images_[i].release();
-      images_[i] = tmp;
-    }
-  }
-  //暂时只有一路相机出发计算线程
-  if (camera_names_[0] == camera_name)
-    return apollo::cyber::SUCC;
+            cv::cvtColor(tmp, tmp, CV_RGB2BGR); //将RGB图像转换为BGR
 
-  //进入线程池处理
-  task_processor_->Enqueue(std::bind(&AdasPerceptionComponent::doPerceptionTask, this));
+            //填充本地cv::Mat
+            images_[i] = tmp;
+            frame_id_ = in_message->header().frame_id();
+          }
+        }
+        //暂时只有一路相机出发计算线程
+        if (camera_names_[0] == camera_name)
+          return apollo::cyber::SUCC;
 
-  return apollo::cyber::SUCC;
-}
-void AdasPerceptionComponent::doPerceptionTask()
-{
+        //进入线程池处理
+        task_processor_->Enqueue(std::bind(&AdasPerceptionComponent::doPerceptionTask, this));
 
-  AERROR << "[ TID:" << std::this_thread::get_id() << "] doPerceptionTask";
-  std::shared_ptr<AdasPerceptionComponent> share_this =
-      std::dynamic_pointer_cast<AdasPerceptionComponent>(shared_from_this());
-  //新建PerceptionTask 任务
-  std::shared_ptr<PerceptionTask> task = make_shared<PerceptionTask>(share_this);
-  task->Excute();
-}
+        return apollo::cyber::SUCC;
+      }
+      void AdasPerceptionComponent::doPerceptionTask()
+      {
+        std::shared_ptr<AdasPerceptionComponent> share_this =
+            std::dynamic_pointer_cast<AdasPerceptionComponent>(shared_from_this());
+        //新建PerceptionTask 任务
+        std::shared_ptr<PerceptionTask> task = make_shared<PerceptionTask>(share_this);
+        task->Excute();
+      }
 
-void AdasPerceptionComponent::OnReceivePointCloud(const std::shared_ptr<apollo::drivers::PointCloud> &in_message,
-                                                  const std::string &lidar_name)
-{
-  std::lock_guard<std::mutex> lock(camera_mutex_);
-  AERROR << "OnReceiveSimulatorPointCloud , Frame ID :" << in_message->header().frame_id();
-  const double msg_timestamp = in_message->measurement_time() + timestamp_offset_;
-  AINFO << "Enter OnReceivePointCloud(), "
-        << " lidar_name: " << lidar_name
-        << " image ts: " + std::to_string(msg_timestamp);
-  // timestamp should be almost monotonic
-  if (last_timestamp_ - msg_timestamp > ts_diff_)
-  {
-    AINFO << "Received an old message. Last ts is " << std::setprecision(19)
-          << last_timestamp_ << " current ts is " << msg_timestamp
-          << " last - current is " << last_timestamp_ - msg_timestamp;
-    return;
-  }
-  last_timestamp_ = msg_timestamp;
-  // ++seq_num_;
-  //核心处理
-  int effect_point = 0;
-  FindContours_v2::OnPointCloud(
-      *(in_message.get()),
-      lidar2image_paint_,
-      lidar_safe_area_,
-      lidar_cloud_buf_,
-      effect_point);
-}
+      void AdasPerceptionComponent::OnReceivePointCloud(const std::shared_ptr<apollo::drivers::PointCloud> &in_message,
+                                                        const std::string &lidar_name)
+      {
+        std::lock_guard<std::mutex> lock(camera_mutex_);
+        AERROR << "OnReceivePointCloud , Frame ID :" << in_message->header().frame_id();
+        const double msg_timestamp = in_message->measurement_time() + timestamp_offset_;
+        AINFO << "Enter OnReceivePointCloud(), "
+              << " lidar_name: " << lidar_name
+              << " image ts: " + std::to_string(msg_timestamp);
 
-void AdasPerceptionComponent::OnReceiveSimulatorPointCloud(const std::shared_ptr<SimulatorPointCloud> &in_message,
-                                                           const std::string &lidar_name)
-{
-  //Lidar的文件名在暂时不用
-  //todo：
-  //in_message->sim_lidar_file()
+        if (last_timestamp_ - msg_timestamp > ts_diff_)
+        {
+          AINFO << "Received an old message. Last ts is " << std::setprecision(19)
+                << last_timestamp_ << " current ts is " << msg_timestamp
+                << " last - current is " << last_timestamp_ - msg_timestamp;
+          return;
+        }
+        last_timestamp_ = msg_timestamp;
+        // ++seq_num_;
+        //核心处理
+        int effect_point = 0;
+        FindContours_v2::OnPointCloud(
+            *(in_message.get()),
+            lidar2image_paint_,
+            lidar_safe_area_,
+            lidar_cloud_buf_,
+            effect_point);
+      }
 
-  typedef apollo::drivers::PointCloud LidarType;
-
-  std::shared_ptr<LidarType> tmp = std::make_shared<LidarType>();
-  *tmp = in_message->piontclound();
-  OnReceivePointCloud(std::move(tmp), lidar_name);
-}
-
-} // namespace adas
-} // namespace projects
+    } // namespace adas
+  }   // namespace projects
 } // namespace watrix

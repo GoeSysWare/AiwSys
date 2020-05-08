@@ -4,15 +4,16 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "cyber/cyber.h"
 #include "cyber/component/component.h"
 #include "cyber/common/file.h"
 #include "cyber/parameter/parameter_client.h"
 #include "cyber/parameter/parameter_server.h"
-#include "cyber/base/thread_pool.h"
+#include "cyber/common/time_conversion.h"
+#include "cyber/time/time.h"
 
 #include "modules/common/time/time.h"
 #include "modules/common/time/time_util.h"
-
 #include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
 
@@ -21,6 +22,7 @@
 #include "projects/adas/proto/adas_perception.pb.h"
 #include "projects/adas/proto/adas_simulator.pb.h"
 #include "projects/adas/proto/adas_config.pb.h"
+#include "projects/adas/component/common/threadpool.h"
 
 #include "projects/adas/configs/config_gflags.h"
 
@@ -36,10 +38,9 @@
 #include <opencv2/calib3d.hpp>
 
 
-#define SYNC_BUF_SIZE 20
-#define LIDAR_QUEUE_SIZE 20
-typedef std::vector<int> point_status_t;
-typedef std::vector<point_status_t> points_status_t;
+
+// typedef std::vector<int> point_status_t;
+// typedef std::vector<point_status_t> points_status_t;
 
 namespace watrix
 {
@@ -67,8 +68,8 @@ using namespace watrix::algorithm;
 
 class AdasPerceptionComponent : public apollo::cyber::Component<>
 {
-    using OutputWriters = std::map<std::string , std::shared_ptr<apollo::cyber::Writer<aiwsys::projects::adas::proto::SendResult>> >;
-    using DebugWriters = std::map<std::string ,std::shared_ptr<apollo::cyber::Writer<aiwsys::projects::adas::proto::CameraImages>> >;
+    using OutputWriters = std::map<std::string , std::shared_ptr<apollo::cyber::Writer<watrix::projects::adas::proto::SendResult>> >;
+    using DebugWriters = std::map<std::string ,std::shared_ptr<apollo::cyber::Writer<watrix::projects::adas::proto::CameraImages>> >;
 
 public:
     AdasPerceptionComponent() ;
@@ -91,16 +92,6 @@ private:
     void OnReceiveImage(const std::shared_ptr<apollo::drivers::Image> &in_message,
                         const std::string &camera_name);
     void OnReceivePointCloud(const std::shared_ptr<apollo::drivers::PointCloud> &in_message,
-                        const std::string &lidar_name);
-    /**
-     * @brief  仿真时触发
-     * 
-     * @param in_message 
-     * @param camera_name 
-     */
-    void OnReceiveSimulatorImage(const std::shared_ptr<SimulatorImage> &in_message,
-                        const std::string &camera_name);
-    void OnReceiveSimulatorPointCloud(const std::shared_ptr<SimulatorPointCloud> &in_message,
                         const std::string &lidar_name);
     /**
      * @brief 初始化配置
@@ -133,9 +124,11 @@ private:
     //这是要传递到task中的参数
 public:
     bool if_use_simulator_ = false;
+    bool if_save_image_result_ = false;
+     std::string save_image_dir_;
      watrix::projects::adas::proto::PerceptionConfig   adas_perception_param_;
-    LaneInvasionConfig lane_invasion_config;
-    std::vector<cv::Mat> v_image_lane_front_result;
+    LaneInvasionConfig lane_invasion_config_;
+    std::vector<cv::Mat> v_image_lane_front_result_;
     //接收缓存
     std::vector<cv::Mat> images_;
     //仿真模式时的仿真文件名
@@ -144,9 +137,21 @@ public:
 	 apollo::drivers::PointCloud lidar2image_paint_;
 	 apollo::drivers::PointCloud lidar_safe_area_;
 	std::vector<cv::Point3f> lidar_cloud_buf_;
+      std::shared_ptr<apollo::cyber::Node> param_node_ = nullptr;
+    std::string frame_id_;
+
+    //参数服务
+    std::shared_ptr<apollo::cyber::ParameterServer> param_server_ = nullptr;
+    std::string record_para_name_;
+        //相机名称
+    std::vector<std::string> camera_names_; // camera sensor names
+        //输出发送器
+    OutputWriters camera_out_writers_;
+    //调试发送器
+    DebugWriters camera_debug_writers_;
 private:
     //处理线程池
-    std::shared_ptr<apollo::cyber::base::ThreadPool> task_processor_;
+    std::shared_ptr< watrix::projects::adas::ThreadPool> task_processor_;
     //线程池的线程个数
     int  perception_tasks_num_;
     std::mutex camera_mutex_;
@@ -159,8 +164,7 @@ private:
    double ts_diff_ = 1.0;
 
 
-    //相机名称
-    std::vector<std::string> camera_names_; // camera sensor names
+
     //实际运行时的的输入通道名称
     std::vector<std::string> input_camera_channel_names_;
     //仿真运行时的的输入通道名称
@@ -172,12 +176,8 @@ private:
     std::vector<std::string> output_camera_channel_names_;
     std::vector<std::string> debug_camera_channel_names_;
 
-    //输出发送器
-    OutputWriters camera_out_writers_;
-    //调试发送器
-    DebugWriters camera_debug_writers_;
-    //参数服务
-    std::shared_ptr<apollo::cyber::ParameterServer> param_server_ = nullptr;
+
+
 
 
     //

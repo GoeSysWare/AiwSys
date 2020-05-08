@@ -8,13 +8,15 @@
 #include "projects/adas/algorithm/core/util/polyfiter.h"
 #include "projects/adas/algorithm/core/util/lane_util.h"
 
-
+// user defined mean shift 
+//#include "algorithm/third/NumCpp.hpp"
 // user defined mean shift 
 //#include "algorithm/third/NumCpp.hpp"
 #include "projects/adas/algorithm/third/cluster_util.h"
 
 
 #include "projects/adas/algorithm/autotrain/monocular_distance_api.h"
+
 
 // opencv
 #include <opencv2/core.hpp>

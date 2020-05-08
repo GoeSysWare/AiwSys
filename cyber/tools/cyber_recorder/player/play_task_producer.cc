@@ -205,8 +205,7 @@ bool PlayTaskProducer::CreateWriters() {
         continue;
       }
       proto::RoleAttributes attr;
-      //添加前缀，区分原通道名 shuimujie
-      attr.set_channel_name(std::string(record_channel_prefix_ )+ channel_name);
+      attr.set_channel_name(channel_name);
       attr.set_message_type(msg_type);
       auto writer = node_->CreateWriter<message::RawMessage>(attr);
       if (writer == nullptr) {

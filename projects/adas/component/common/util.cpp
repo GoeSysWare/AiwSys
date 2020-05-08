@@ -36,6 +36,15 @@ float GetFloatRound2(double fValue, int bits)
     return r;
 }
 
+
+std::string  str_pad(unsigned int n)
+{
+			// 000001,000002
+			std::stringstream ss;
+			ss << std::setw(6) << std::setfill('0')<< n;
+			return ss.str();
+}
+
 } // namespace adas
 } // namespace projects
 } // namespace watrix

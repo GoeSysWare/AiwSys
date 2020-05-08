@@ -108,6 +108,7 @@
         "qlabel": "cpp",
         "qpushbutton": "cpp",
         "qatomicint": "cpp",
-        "*.idl": "cpp"
+        "*.idl": "cpp",
+        "*.txx": "cpp"
     }
 }

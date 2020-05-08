@@ -43,6 +43,7 @@ cc_library(
         "//modules/common/util",
         "//modules/drivers/velodyne/proto:velodyne_proto",
         "@pcl",
+        "@vtk",
     ],
 )
 

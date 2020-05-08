@@ -38,8 +38,6 @@
 */
 #pragma once
 #include "projects/adas/algorithm/algorithm_type.h" 
-
-
 #include "projects/adas/algorithm/core/caffe/internal/caffe_def.h"
 #include "projects/adas/algorithm/core/caffe/internal/caffe_net.h"
 

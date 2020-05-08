@@ -38,7 +38,6 @@ namespace apollo {
 namespace cyber {
 namespace record {
 
-#define     record_channel_prefix_   "records/"
 
 
 class PlayTaskProducer {
@@ -51,7 +50,7 @@ class PlayTaskProducer {
   using WriterMap = std::unordered_map<std::string, WriterPtr>;
   using MessageTypeMap = std::unordered_map<std::string, std::string>;
 
-  PlayTaskProducer(  std::shared_ptr<Node> node,const TaskBufferPtr& task_buffer,
+  PlayTaskProducer(  std::shared_ptr<Node> node,std::string   channel_prefix,const TaskBufferPtr& task_buffer,
                    const PlayParam& play_param);
   virtual ~PlayTaskProducer();
 
@@ -87,6 +86,8 @@ class PlayTaskProducer {
   static const uint32_t kMinTaskBufferSize;
   static const uint32_t kPreloadTimeSec;
   static const uint64_t kSleepIntervalNanoSec;
+  std::string  record_channelname_prefix_;
+
 };
 
 }  // namespace record

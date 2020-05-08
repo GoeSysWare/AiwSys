@@ -47,6 +47,10 @@ class PerceptionTask {
 
  private:
   PerceptionComponentPtr perception_;
+  bool if_use_simulator_ = false;
+  bool if_save_image_result_ = false;
+  std::string frame_id_;
+  std::string save_image_dir_;
   std::vector<cv::Mat> v_image_;
   std::vector<std::string> sim_image_files_;
   std::vector<cv::Mat>  v_image_lane_front_result_;
@@ -54,6 +58,7 @@ class PerceptionTask {
 	 apollo::drivers::PointCloud lidar_safe_area_;
 	std::vector<cv::Point3f> lidar_cloud_buf_;
   watrix::algorithm::LaneInvasionConfig lane_invasion_config_;
+  std::string parameter_name_;
 
 //算法需要的参数
 private:
@@ -61,8 +66,8 @@ private:
 
 detection_boxs_t yolo_detection_boxs0_;
 detection_boxs_t yolo_detection_boxs1_;
-channel_mat_t laneseg_binary_mask0_;
-channel_mat_t laneseg_binary_mask1_;
+cv::Mat laneseg_binary_mask0_;
+cv::Mat laneseg_binary_mask1_;
 channel_mat_t v_instance_mask0_;
 channel_mat_t v_instance_mask1_;
 
@@ -77,6 +82,7 @@ void SyncPerceptionResult();
  cvpoints_t GetTrainCVPoints(
    detection_boxs_t &detection_boxs,
   std::vector<cvpoints_t> &v_trains_cvpoint);
+cvpoints_t GetLidarData();
 
 };
 

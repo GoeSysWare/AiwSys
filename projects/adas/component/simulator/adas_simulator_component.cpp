@@ -63,7 +63,7 @@ static std::vector<std::vector<std::string>> ParseFiles(std::string &filename, s
   return file_list;
 }
 //封装image
-static void makeProtoImageFormMat(cv::Mat &in_Mat, apollo::drivers::Image &out_Image)
+static void makeProtoImageFormMat(cv::Mat &in_Mat, std::string &model_name,std::shared_ptr<apollo::drivers::Image>  out_Image)
 {
   int width = in_Mat.cols;
   int height = in_Mat.rows;
@@ -73,17 +73,20 @@ static void makeProtoImageFormMat(cv::Mat &in_Mat, apollo::drivers::Image &out_I
   //计数器+1
   AdasSimulatorComponent::element_num_.fetch_add(1);
   
-  out_Image.mutable_header()->set_frame_id(std::to_string(AdasSimulatorComponent::procs_num_.load()));
-  out_Image.set_frame_id(std::to_string(AdasSimulatorComponent::element_num_.load()));
-  out_Image.set_width(width);
-  out_Image.set_height(height);
-  out_Image.mutable_data()->reserve(img_size);
-  out_Image.set_encoding("bgr8");
-  out_Image.set_step(step);
-  out_Image.mutable_header()->set_timestamp_sec(apollo::cyber::Time::Now().ToSecond());
-  out_Image.set_measurement_time(apollo::cyber::Time::Now().ToSecond());
+  //仿真模式下模块名可以定义为文件名
+  out_Image->mutable_header()->set_module_name(model_name);
+
+  out_Image->mutable_header()->set_frame_id(std::to_string(AdasSimulatorComponent::procs_num_.load()));
+  out_Image->set_frame_id(std::to_string(AdasSimulatorComponent::element_num_.load()));
+  out_Image->set_width(width);
+  out_Image->set_height(height);
+  out_Image->mutable_data()->reserve(img_size);
+  out_Image->set_encoding("rgb8");
+  out_Image->set_step(step);
+  out_Image->mutable_header()->set_timestamp_sec(apollo::cyber::Time::Now().ToSecond());
+  out_Image->set_measurement_time(apollo::cyber::Time::Now().ToSecond());
   // out_Image.mutable_data()->copy(in_Mat.data,img_size);
-   out_Image.set_data(in_Mat.data, img_size);
+   out_Image->set_data(in_Mat.data, img_size);
 }
 
 std::atomic<uint64_t> AdasSimulatorComponent::procs_num_ = {0};
@@ -99,7 +102,11 @@ bool AdasSimulatorComponent::InitConfig()
   }
   // 根据配置获得内置的接口配置信息
   watrix::projects::adas::proto::InterfaceServiceConfig interface_config;
-  apollo::cyber::common::GetProtoFromFile(FLAGS_adas_cfg_interface_file, &interface_config);
+
+
+  apollo::cyber::common::GetProtoFromFile(
+    apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(), FLAGS_adas_cfg_interface_file),
+        &interface_config);
 
   //取得图像输出通道名
   std::string output_image_channels_str = interface_config.camera_channels();
@@ -130,8 +137,8 @@ bool AdasSimulatorComponent::InitConfig()
       Simulator dir:    %s
       Simulator config file:    %s
       Simulator Interval:  %ld ms
-      input_camera_channel_names:     %s,%s
-      input_lidar_channel_names:   %s)";
+      output_camera_channel_names:     %s,%s
+      output_lidar_channel_names:   %s)";
   std::string config_info_str =
       boost::str(boost::format(format_str.c_str()) 
       % sim_files_dir_
@@ -158,12 +165,13 @@ bool AdasSimulatorComponent::Init()
   {
     AERROR << "AdasSimulatorComponent InitConfig  failed.Please check simulator config file";
   }
+    AERROR <<" Simulator  files:  " <<sim_config_file_ << " num : " << filesList_.size();
   //初始化当前的iter
   cur_Iter_ = filesList_.begin();
   //实际输出
-  front_6mm_writer_ = node_->CreateWriter<SimulatorImage>(output_camera_channel_names_[0]);
-  front_12mm_writer_ = node_->CreateWriter<SimulatorImage>(output_camera_channel_names_[1]);
-  lidar_writer_ = node_->CreateWriter<SimulatorPointCloud>(output_lidar_channel_names_[0]);
+  front_6mm_writer_ = node_->CreateWriter<apollo::drivers::Image>(output_camera_channel_names_[0]);
+  front_12mm_writer_ = node_->CreateWriter<apollo::drivers::Image>(output_camera_channel_names_[1]);
+  lidar_writer_ = node_->CreateWriter< apollo::drivers::PointCloud>(output_lidar_channel_names_[0]);
 
   return true;
 }
@@ -212,23 +220,30 @@ bool AdasSimulatorComponent::Proc()
 }
 void AdasSimulatorComponent::ParseCameraFiles(std::string file_6mm, std::string file_12mm)
 {
-
   cv::Mat mat_6mm = cv::imread(file_6mm); // bgr, 0-255
 
-  makeProtoImageFormMat(mat_6mm, *front_6mm_image_.mutable_image());
-  front_6mm_image_.set_sim_img_file(file_6mm);
+    cv::cvtColor(mat_6mm, mat_6mm, CV_BGR2RGB);     
+
+
+  front_6mm_image_.reset(new apollo::drivers::Image);
+
+  makeProtoImageFormMat(mat_6mm, file_6mm,front_6mm_image_);
+
+  front_12mm_image_.reset(new apollo::drivers::Image);
 
   cv::Mat mat_12mm = cv::imread(file_12mm); // bgr, 0-255
-  makeProtoImageFormMat(mat_12mm, *front_12mm_image_.mutable_image());
-  front_12mm_image_.set_sim_img_file(file_12mm);
+
+  cv::cvtColor(mat_12mm, mat_12mm, CV_BGR2RGB);     
+  makeProtoImageFormMat(mat_12mm, file_12mm,front_12mm_image_);
 }
 ///解析雷达文件的
 void AdasSimulatorComponent::ParseLidarFiles(std::string file_lidar)
 {
 
   std::ifstream pcd_file;
-  lidar_pointcloud_.mutable_piontclound()->clear_point();
-  lidar_pointcloud_.set_sim_lidar_file(file_lidar);
+  lidar_pointcloud_.reset(new apollo::drivers::PointCloud);
+  //仿真模式下模块名可以定义为文件名
+  lidar_pointcloud_->mutable_header()->set_module_name(file_lidar);
   pcd_file.open(file_lidar); //将文件流对象与文件连接起来
   std::string str_line;
   int hang_t = 0;
@@ -262,17 +277,20 @@ void AdasSimulatorComponent::ParseLidarFiles(std::string file_lidar)
       }
       ix++;
     }
-    PointXYZIT *pt = lidar_pointcloud_.mutable_piontclound()->add_point();
+    PointXYZIT *pt = lidar_pointcloud_->add_point();
     pt->set_x(x);
     pt->set_y(y);
     pt->set_z(z);
   }
+
+  pcd_file.close();
+
   //一些辅助信息也要添加
-  lidar_pointcloud_.mutable_piontclound()->set_measurement_time(apollo::cyber::Time::Now().ToSecond());
-  lidar_pointcloud_.mutable_piontclound()->mutable_header()->set_frame_id(std::to_string(AdasSimulatorComponent::procs_num_.load()));
+  lidar_pointcloud_->set_measurement_time(apollo::cyber::Time::Now().ToSecond());
+  lidar_pointcloud_->mutable_header()->set_frame_id(std::to_string(AdasSimulatorComponent::procs_num_.load()));
   //计数器+1
   AdasSimulatorComponent::element_num_.fetch_add(1);
-  lidar_pointcloud_.mutable_piontclound()->set_frame_id(std::to_string(AdasSimulatorComponent::element_num_.load()));
+  lidar_pointcloud_->set_frame_id(std::to_string(AdasSimulatorComponent::element_num_.load()));
 }
 
 void AdasSimulatorComponent::SendSimulator()

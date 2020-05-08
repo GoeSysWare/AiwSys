@@ -29,7 +29,7 @@ namespace record
 
 const uint64_t Player::kSleepIntervalMiliSec = 100;
 
-Player::Player(std::shared_ptr<Node> node,const PlayParam &play_param)
+Player::Player(std::shared_ptr<Node> node,std::string  channel_prefix,const PlayParam &play_param)
     : is_initialized_(false),
       is_stopped_(true),
       consumer_(nullptr),
@@ -40,7 +40,7 @@ Player::Player(std::shared_ptr<Node> node,const PlayParam &play_param)
   //这个buffer是生产者和消费者共享的
   task_buffer_ = std::make_shared<PlayTaskBuffer>();
   consumer_.reset(new PlayTaskConsumer(task_buffer_, play_param.play_rate));
-  producer_.reset(new PlayTaskProducer(this->node_,  task_buffer_, play_param));
+  producer_.reset(new PlayTaskProducer(this->node_,  channel_prefix,task_buffer_, play_param));
 }
 
 Player::~Player() { Stop(); }

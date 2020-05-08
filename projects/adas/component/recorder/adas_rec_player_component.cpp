@@ -35,12 +35,14 @@ bool AdasRecPlayerComponent::InitConfig()
     record_save_dir_ =  apollo::cyber::common::GetAbsolutePath(GetAdasWorkRoot(),config_.records_save_dir());
 
     // 根据配置获得内置的记录的通道名
-    watrix::projects::adas::proto::InterfaceServiceConfig interface_config;
-    common::GetProtoFromFile(FLAGS_adas_cfg_interface_file, &interface_config);
+  watrix::projects::adas::proto::InterfaceServiceConfig interface_config;
+  apollo::cyber::common::GetProtoFromFile(
+    apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(), FLAGS_adas_cfg_interface_file),
+        &interface_config);
 
     file_q_servicename_ = interface_config.records_file_servicename();
-    record_q_servicename_ = interface_config.records_record_servicename();
-
+    record_q_servicename_ = interface_config.records_play_servicename();
+    record_channelname_prefix_= interface_config.record_channelname_prefix();
     return true; 
 }
 
@@ -116,7 +118,7 @@ void AdasRecPlayerComponent::RecordQueryCallback(const std::shared_ptr<RecordQue
                 play_param.is_loop_playback = false;
                 play_param.play_rate = 1.0;
                 play_param.files_to_play.emplace(filename);
-                std::shared_ptr<Player> player(new Player(share_this->node_,play_param));
+                std::shared_ptr<Player> player(new Player(share_this->node_,share_this->record_channelname_prefix_,play_param));
                 player->Init();
                 player->Start();
             });

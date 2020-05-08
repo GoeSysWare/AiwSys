@@ -10,9 +10,9 @@ min_range: 0.4
 use_gps_time: false
 calibration_online: false
 #calibration_file: "/apollo/modules/drivers/velodyne/params/VLP32C_calibration_example.yaml"
-calibration_file: "/home/shuimujie/01.works/AutoSys/bazel-AutoSys/modules/drivers/velodyne/params/VLP32C_calibration_example.yaml"
+calibration_file: "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-AiwSys/modules/drivers/velodyne/params/VLP32C_calibration_example.yaml"
 
 organized: false
-convert_channel_name: "/apollo/sensor/velodyne32/PointCloud2"
+convert_channel_name: "/adas/sensor/pointcloud2"
 use_poll_sync: true
 is_main_frame: true

@@ -52,12 +52,15 @@ bool AdasRecRecorderComponent::InitConfig()
     record_model_ = config_.records_save_model();
 
     //取得默认的内置参数
-    watrix::projects::adas::proto::InterfaceServiceConfig interface_config;
-    common::GetProtoFromFile(FLAGS_adas_cfg_interface_file, &interface_config);
+  watrix::projects::adas::proto::InterfaceServiceConfig interface_config;
+  apollo::cyber::common::GetProtoFromFile(
+    apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(), FLAGS_adas_cfg_interface_file),
+        &interface_config);
     //此作为参数服务的客户端，名字需要根服务端一致
     parameter_service_name_ = interface_config.records_parameter_servicename();
+    record_parameter_name_ = interface_config.record_parameter_name();
     // 记录的通道名
-    //没有成功，则用默认的通道名称
+    //一般用默认的通道名称
     boost::algorithm::split(channel_vec_, interface_config.camera_channels(), boost::algorithm::is_any_of(","));
 
     return true;
@@ -280,7 +283,7 @@ void AdasRecRecorderComponent::ReaderCallback(const std::shared_ptr<RawMessage> 
     switch (record_model_)
     {
     case RecorderModel::RECORD_INTERVAL:
-        param_client_->GetParameter("is_record", &parameter);
+        param_client_->GetParameter(record_parameter_name_, &parameter);
         if (parameter.AsBool())
         {
             message_time_ = Time::Now().ToNanosecond();

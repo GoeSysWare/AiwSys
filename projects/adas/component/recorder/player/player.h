@@ -36,7 +36,7 @@ class Player {
   using ProducerPtr = std::unique_ptr<PlayTaskProducer>;
   using TaskBufferPtr = std::shared_ptr<PlayTaskBuffer>;
 
-  explicit Player(std::shared_ptr<Node> node,const PlayParam& play_param);
+  explicit Player(std::shared_ptr<Node> node, std::string   channel_prefix,const PlayParam& play_param);
   virtual ~Player();
 
   bool Init();

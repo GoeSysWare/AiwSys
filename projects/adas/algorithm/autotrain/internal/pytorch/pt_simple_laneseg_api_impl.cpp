@@ -570,6 +570,7 @@ namespace watrix {
 #endif
 
 
+
 #pragma region my softmax argmax
 // 					torch::Tensor top_idxs = out_tensor[i].toType(torch::kFloat32).cpu(); // [1, 160, 480]
 
@@ -639,6 +640,7 @@ namespace watrix {
 					cv::Mat stats; // N*5  表示每个连通区域的外接矩形和面积 [x,y,w,h, area]   CV_32S = 4
 					cv::Mat centroids; // N*2  (x,y)                                     CV_32S = 4
 					int num_components; // 连通区域number
+
 					
 					num_components = connectedComponentsWithStats(result_img_bp, labels, stats, centroids, 4, CV_32S);
 
@@ -724,6 +726,7 @@ namespace watrix {
 						const std::string outputFileName1 = "./result_left_right_img_new"+std::to_string(i)+".png";
 						cv::imwrite(outputFileName1, result_left_right_img_new);
 #endif
+
 
 
 					channel_mat_t output_instance_seg;

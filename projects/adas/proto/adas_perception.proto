@@ -131,11 +131,14 @@ message PerceptionConfig
   optional bool if_use_detect_model = 1;
   optional bool if_use_train_seg_model = 2;
   optional bool if_use_lane_seg_model = 3;
-  optional bool save_image_result = 4;
+  optional bool if_save_image_result = 4;
+
   optional YoloConfig yolo = 5;
   optional TrainSegConfig trainseg = 6;
   optional LaneSegConfig laneseg = 7;
   optional LaneInvasionParameter laneinvasion = 8;
   //是否采用启动仿真器的仿真模式
   optional bool if_use_simulator = 9[default = false];  
+  optional string save_image_dir =10 ;  
+
 }

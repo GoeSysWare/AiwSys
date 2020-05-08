@@ -40,6 +40,7 @@
 #include "projects/adas/algorithm/algorithm_shared_export.h" 
 #include "projects/adas/algorithm/algorithm_type.h" 
 
+
 namespace watrix {
 	namespace algorithm {
 
@@ -112,7 +113,7 @@ namespace watrix {
 					box_invasion_results_t& box_invasion_results,
 					std::vector<int>& lidar_invasion_status,
 					lane_safe_area_corner_t& lane_safe_area_corner,
-					bool& is_open_long_camera,
+					bool& is_open_long_camera, // �Ƿ�Զ��
 					std::vector<lidar_invasion_cvbox>& cv_obstacle_box // lidar invasion object cv box
 				);
 		};

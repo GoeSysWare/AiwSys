@@ -66,6 +66,7 @@ private:
 
     ParameterClientPtr param_client_ = nullptr;
     std::string parameter_service_name_;
+      std::string record_parameter_name_;
     bool is_started_ = false;
     bool is_stopping_ = false;
     std::shared_ptr<RecordWriter> writer_ = nullptr;

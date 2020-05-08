@@ -1,5 +1,6 @@
 #include"ObjectAndTrainDetection.h"
 
+using namespace std;
 namespace watrix {
 	namespace algorithm {
 		std::unordered_map<int, std::pair<int, int>> LOD::getInvasionMap(std::vector<cv::Point2i> input_l, std::vector<cv::Point2i> input_r, int& top_y) {
@@ -96,24 +97,26 @@ namespace watrix {
 		}
 
 		pcl::PointCloud<pcl::PointXYZ>::Ptr LOD::getPointFrom2DAnd3D(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, std::unordered_map<int, std::pair<int, int>> invasionP,
-			int top_y, InvasionData invasion, Eigen::Matrix4f& rotation) {
+			int top_y, InvasionData invasion, Eigen::Matrix4d& rotation, float distance_limit) {
 
 			pcl::PointCloud<pcl::PointXYZ>::Ptr output(new pcl::PointCloud<pcl::PointXYZ>);
+			pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_standard(new pcl::PointCloud<pcl::PointXYZ>);
+			pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_change_standard(new pcl::PointCloud<pcl::PointXYZ>);
+			pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_change(new pcl::PointCloud<pcl::PointXYZ>);
 
 			int min_y = top_y;
 
-			cv::Mat cameraMatrix(3, 3, CV_32F);//Ïà»úµÄÄÚ²Î¾ØÕó
-			std::vector<float> distCoeff;//Ïà»ú»û±ä²ÎÊı
-			cv::Mat rvec(3, 3, CV_64F), tvec(3, 1, CV_64F);//±ä»»¾ØÕó
+			cv::Mat cameraMatrix(3, 3, CV_32F);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú²Î¾ï¿½ï¿½ï¿½
+			std::vector<float> distCoeff;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			cv::Mat rvec(3, 3, CV_64F), tvec(3, 1, CV_64F);//ï¿½ä»»ï¿½ï¿½ï¿½ï¿½
 
-			distCoeff.push_back(-0.23358974291192533);
-			distCoeff.push_back(0.22278135444539487);
-			distCoeff.push_back(-0.001896006018748501);
-			distCoeff.push_back(0.0006900095357958706);
-			distCoeff.push_back(-0.11847552089880027);
+			distCoeff.push_back(-0.2283);
+			distCoeff.push_back(0.1710);
+			distCoeff.push_back(-0.0013);
+			distCoeff.push_back(-8.2250e-06);
+			distCoeff.push_back(0);
 
-
-			float tempMatrix[3][3] = { { 2047.835036975324, 0, 960 }, { 0, 2088.973405583949, 540 }, { 0, 0, 1.0 } };
+			float tempMatrix[3][3] = { { 2.1334e+03, 0, 931.1503 }, { 0, 2.1322e+03, 580.8112 }, { 0, 0, 1.0 } };
 
 			for (int i = 0; i < 3; ++i) {
 				for (int j = 0; j < 3; ++j) {
@@ -130,86 +133,96 @@ namespace watrix {
 					rvec.at<double>(i, j) = tempRvec[i][j];
 			cv::Rodrigues(rvec, rvec);
 
-			double tempTvec[3] = { -0.029,0.89,0.0 };
+			double tempTvec[3] = { 0.0,0.80,0.177 };
 
 			for (int i = 0; i < 3; ++i)
 				tvec.at<double>(i, 0) = tempTvec[i];
 
-			Eigen::Matrix4f rotation1, rotation2;
-			//7ÔÂ10ÈÕÀ×´ïĞı×ª²ÎÊı,Í¨¹ı±ê¶¨µÃ³ö
-			rotation1 << 0.998985, 0.000149, -0.045041, 0.000000,     //À×´ï×ø±êÏµµ½ÊÀ½ç×ø±êÏµµÄ±ä»»£¬¸ß¶ÈÃ»±ä
-				0.000149, 0.999978, 0.006600, 0.000000,
-				0.045041, -0.006600, 0.998963, 0.000000,
+			Eigen::Matrix4d rotation1, rotation2, rotation3;
+
+			rotation1 << 0.999832, 0.000000, -0.015292, 0.000000,
+				0.000905, 1.000000, -0.000008, 0.000000,
+				0.015292, 0.000008, 0.999833, 0.000000,
 				0.000000, 0.000000, 0.000000, 1.000000;
 
-			rotation2 << 1, 0, 0, 0,                                  //À×´ïË®Æ½·½ÏòĞı×ª¾ØÕó 
-				0, cos(-0.8 * CV_PI / 180), sin(-0.8 * CV_PI / 180), -0.0046961,
-				0, -sin(-0.8 * CV_PI / 180), cos(-0.8 * CV_PI / 180), 0.1784611,
+			rotation2 << 1, 0, 0, 0,
+				0, cos(-0.21 * CV_PI / 180), sin(-0.21 * CV_PI / 180), 0.000000,
+				0, -sin(-0.21 * CV_PI / 180), cos(-0.21 * CV_PI / 180), 0.000000,
 				0, 0, 0, 1;
 
-			rotation = rotation2 * rotation1;
+			rotation3 << 1, 0, 0, 0,
+				0, cos(0.15 * CV_PI / 180), -sin(0.15 * CV_PI / 180), 0.000000,
+				0, sin(0.15 * CV_PI / 180), cos(0.15 * CV_PI / 180), 0.000000,
+				0, 0, 0, 1;
 
+			rotation = rotation3 * rotation1;
+
+			pcl::transformPointCloud(*cloud, *cloud_standard, rotation1);
 			pcl::transformPointCloud(*cloud, *cloud, rotation);
-
-			std::vector<cv::Point2d> projectedPoints;
-			std::vector<cv::Point3d> point_need;
-			std::vector<double> point_need_x;
-			for (int i = 0; i < cloud->points.size(); ++i) {
-				pcl::PointXYZ pt = cloud->points[i];
-				if (pt.z >= DIVIDE_DIS + 18.0f && pt.z <= 80.0f) {     //4
-					point_need.push_back(cv::Point3d(pt.y, -GROUND_HEIGHT, pt.z));
-					point_need_x.push_back(pt.x);
-				}
-			}
-
-			if (point_need.size() == 0)
-				return output;
-			cv::projectPoints(point_need, rvec, tvec, cameraMatrix, distCoeff, projectedPoints);
-
-			for (int i = 0; i < projectedPoints.size(); i++)
-			{
-				cv::Point2i p = projectedPoints[i];
-				p.x -= 3;   //-18
-				p.y += 37;  //131
-
-				if (p.y < min_y)
-					continue;
-
-				if (p.x >= invasionP[p.y].first && p.x <= invasionP[p.y].second) {
-
-					if (invasionP[p.y].first != 0 && invasionP[p.y].second != 0) {
-						pcl::PointXYZ pt;
-						pt.x = point_need_x[i];
-						pt.y = point_need[i].x;
-						pt.z = point_need[i].z;
-						output->points.push_back(pt);
-					}
-
-				}
-			}
 
 			int left_num = invasion.coeff_left.size();
 			int right_num = invasion.coeff_right.size();
 
-			for (int i = 0; i < cloud->points.size(); ++i) {
+			std::vector<float> points_z;
+			std::vector<pcl::PointXYZ> mat_need_points;
+			bool isShort = false;   //Í¼ï¿½ï¿½ï¿½Ğ¹ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
+			float z_limit = DIVIDE_DIS + 20.0f;
+			if (z_limit > distance_limit) {
+
+				z_limit = distance_limit;
+				isShort = true;
+			}
+			for (int i = 0;i < cloud->points.size();++i) {
 
 				pcl::PointXYZ pt = cloud->points[i];
 
-				if (pt.z >= DIVIDE_DIS + 20.0f)    //5
+				if (pt.z >= z_limit || pt.y <= -4.0f || pt.y >= 4.0f)    //ï¿½ï¿½Ğ¡×ªï¿½ï¿½ë¾¶150m
 					continue;
+				points_z.push_back(pt.z);
+				mat_need_points.push_back(pt);
+			}
 
-				double l_limit = 0;
-				double r_limit = 0;
-				for (int j = 0; j < left_num; ++j)
-					l_limit += invasion.coeff_left[j] * std::pow(pt.z, left_num - 1 - j);
-				for (int j = 0; j < right_num; ++j)
-					r_limit += invasion.coeff_right[j] * std::pow(pt.z, right_num - 1 - j);
+			if (points_z.size() == 0){
+				return output;
+			}
 
-				//µ±ÄâºÏµÄÏŞ½ç·¢É¢Ê±£¬ÒÔÏŞ½çÖĞµãÎª»ù×¼£¬ÖØĞÂÏò×óÓÒÀ©Õ¹ÏŞ½ç,ËõĞ¡ÁËÏŞ½ç
+			cv::Mat m_combine;
+			cv::Mat m_x0 = cv::Mat::ones(1, points_z.size(), CV_32F);
+			cv::Mat m_x1(1, points_z.size(), CV_32F, points_z.data());
+			cv::Mat m_x2 = m_x1.mul(m_x1);
+			cv::Mat m_x3 = m_x1.mul(m_x2);
+			cv::Mat m_x4 = m_x1.mul(m_x3);
+			cv::Mat m_x5 = m_x1.mul(m_x4);
+
+			m_x5.push_back(m_x4);
+			m_x5.push_back(m_x3);
+			m_x5.push_back(m_x2);
+			m_x5.push_back(m_x1);
+			m_x5.push_back(m_x0);
+			m_combine = m_x5.t();
+
+			cv::Mat left_coeff = (cv::Mat_<float>(left_num, 1) << invasion.coeff_left[0], invasion.coeff_left[1],
+				invasion.coeff_left[2], invasion.coeff_left[3], invasion.coeff_left[4], invasion.coeff_left[5]);
+			cv::Mat right_coeff = (cv::Mat_<float>(right_num, 1) << invasion.coeff_right[0], invasion.coeff_right[1],
+				invasion.coeff_right[2], invasion.coeff_right[3], invasion.coeff_right[4], invasion.coeff_right[5]);
+
+			cv::Mat left_result, right_result;
+			left_result = m_combine * left_coeff;
+			right_result = m_combine * right_coeff;
+
+
+			for (int i = 0;i < mat_need_points.size();++i) {
+
+				pcl::PointXYZ pt = mat_need_points[i];
+				float l_limit = left_result.at<float>(i, 0);
+				if (pt.y < l_limit - POINT_EXPAND)
+					continue;
+				float r_limit = right_result.at<float>(i, 0);
+
 				double virtual_mid;
 
-				/*if (pt.y >= l_limit - POINT_EXPAND && pt.y <= r_limit + POINT_EXPAND)
-					output->points.push_back(pt);*/
+				/*if (pt.y >= l_limit - 0.3f && pt.y <= r_limit + 0.3f)
+					output->points.push_back(cloud_standard->points[i]);*/
 
 				if (r_limit - l_limit > 1.435f) {
 					virtual_mid = (l_limit + r_limit) / 2.0f;
@@ -223,13 +236,64 @@ namespace watrix {
 						output->points.push_back(pt);
 					}
 				}
+			}
 
+			if (isShort)
+				return output;
+
+			std::vector<cv::Point2d> projectedPoints;
+			std::vector<cv::Point3d> point_need;
+			for (int i = 0; i < cloud->points.size(); ++i) {
+				pcl::PointXYZ pt = cloud->points[i];
+				if (pt.z >= DIVIDE_DIS + 18.0f && pt.z <= 45.0f) {    //50
+
+					cloud_change->points.push_back({ pt.y, -pt.x, pt.z + 0.2f });
+					cloud_change_standard->points.push_back(cloud_standard->points[i]);
+				}
+
+			}
+
+			Eigen::Matrix4d rotation_cv;
+
+			rotation_cv << 0.9999960856928221, 0.0003353891285046393, -0.002777789258835963, 0,
+				-0.0003158570188030314, 0.9999752464831646, 0.007028986788848552, 0,
+				0.002780077944536163, -0.007028081891000952, 0.9999714382078898, 0,
+				0.000000, 0.000000, 0.000000, 1.000000;
+
+			pcl::transformPointCloud(*cloud_change, *cloud_change, rotation_cv);
+
+			for (int i = 0; i < cloud_change->points.size(); ++i) {
+				pcl::PointXYZ pt = cloud_change->points[i];
+				point_need.push_back(cv::Point3d(pt.x, -GROUND_HEIGHT, pt.z));
+			}
+
+			if (point_need.size() == 0)
+				return output;
+			cv::projectPoints(point_need, rvec, tvec, cameraMatrix, distCoeff, projectedPoints);
+
+			for (int i = 0; i < projectedPoints.size(); i++)
+			{
+				cv::Point2i p = projectedPoints[i];
+				p.x += 7;
+				p.y += 5;
+
+				if (p.y < min_y)
+					continue;
+
+				if (p.x >= invasionP[p.y].first && p.x <= invasionP[p.y].second) {
+
+					if (invasionP[p.y].first != 0 && invasionP[p.y].second != 0) {
+
+						output->points.push_back(cloud_change_standard->points[i]);
+					}
+
+				}
 			}
 
 			return output;
 		}
 
-		float LOD::calHeightVar(std::vector<Point3> object) {  //¼ÆËãÒ»¸öÄ¿±êµÄ¸ß¶È·½²î£¬ÎªÁËÅĞ¶ÏÆäÊÇ·ñÊÇÒ»¸öÆ½Ãæ£¬½øĞĞÂË³ı
+		float LOD::calHeightVar(std::vector<Point3> object) {  //ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ä¿ï¿½ï¿½Ä¸ß¶È·ï¿½ï¿½î£¬Îªï¿½ï¿½ï¿½Ğ¶ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Æ½ï¿½æ£¬ï¿½ï¿½ï¿½ï¿½ï¿½Ë³ï¿½
 
 			float total_x = 0.0f;
 			for (int j = 0; j < object.size(); ++j) {
@@ -279,7 +343,7 @@ namespace watrix {
 			ifstream inFile(csv_file.c_str(), ios::in);
 			if (!inFile)
 			{
-				cout << "´ò¿ªcsvÊ§°Ü£¡" << endl;
+				cout << "ï¿½ï¿½csvÊ§ï¿½Ü£ï¿½" << endl;
 				exit(1);
 			}
 
@@ -310,19 +374,20 @@ namespace watrix {
 		}
 
 		void LOD::getInvasionData(std::vector<cv::Point2i>& input_l, std::vector<cv::Point2i>& input_r,
-			std::string csv_file_l,std::string csv_file_r) {
+			std::string csv_file_l, std::string csv_file_r) {
 
 			ifstream inFile_l(csv_file_l.c_str(), ios::in);
 			ifstream inFile_r(csv_file_r.c_str(), ios::in);
 
 			if (!inFile_l || !inFile_r)
 			{
-				cout << "´ò¿ªcsvÊ§°Ü£¡" << endl;
+				cout << "ï¿½ï¿½csvÊ§ï¿½Ü£ï¿½" << endl;
 				exit(1);
 			}
 
 			std::string line;
 			std::string field;
+			getline(inFile_l, line);
 			while (getline(inFile_l, line))
 			{
 				std::string field;
@@ -374,7 +439,7 @@ namespace watrix {
 
 			float k, b, temp = 0;
 
-			if (temp = (lines.size() * A - B * B)) {// ÅĞ¶Ï·ÖÄ¸²»Îª0
+			if (temp = (lines.size() * A - B * B)) {// ï¿½Ğ¶Ï·ï¿½Ä¸ï¿½ï¿½Îª0
 
 				k = (lines.size() * C - B * D) / temp;
 				b = (A * D - B * C) / temp;
@@ -409,7 +474,7 @@ namespace watrix {
 
 			std::vector<float> mid_y;
 			std::vector<cv::Point2d> track_coor;
-			//¶ÁÈ¡ÓĞÏŞ½çÊı¾İµÄµãÔÆ²Ù×÷
+			//ï¿½ï¿½È¡ï¿½ï¿½ï¿½Ş½ï¿½ï¿½ï¿½ï¿½İµÄµï¿½ï¿½Æ²ï¿½ï¿½ï¿½
 			int left_num = invasion.coeff_left.size();
 			int right_num = invasion.coeff_right.size();
 			for (int i = 0; i < trackdata.trackBottomFit.size(); ++i) {
@@ -498,7 +563,7 @@ namespace watrix {
 			std::vector<cv::Point2d> track_lines;
 			float height_diff;
 			bool isFind = false;
-			for (int i = 5;i < GROUND_JUDGE;++i) {
+			for (int i = 3;i < trackdata.trackTop.size();++i) {
 
 				cv::Point2d pt;
 				pt.x = (float)i * row_radio + row_radio / 2;
@@ -521,47 +586,37 @@ namespace watrix {
 
 				track_lines.push_back(pt);
 			}
-			//¿ÉÄÜ³öÏÖµãÊı²»¹»µÄÇé¿ö£¬´ı¶¨
-			if (track_lines.size() == 0)
+			//ï¿½ï¿½ï¿½Ü³ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			if (track_lines.size() < 3)
 				return;
 			FitLineData track_line_data = fitNextPoint(track_lines, row_radio);
 			trackdata.trackBottom.assign(trackdata.trackBottomFit.begin(), trackdata.trackBottomFit.end());
 
-			for (int i = 0; i < GROUND_JUDGE; ++i) {
+			int nearby_fit_num = GROUND_JUDGE;
+			if (GROUND_JUDGE > trackdata.trackBottomFit.size())
+				nearby_fit_num = trackdata.trackBottomFit.size();
+			for (int i = 0; i < nearby_fit_num; ++i) {
 
 				float predict_track = track_line_data.k * ((float)i * row_radio + row_radio / 2) + track_line_data.b;
 				if (fabs(trackdata.trackTop[i] - predict_track) > 0.06f)
 					trackdata.trackTop[i] = predict_track;
 
-				trackdata.trackBottomFit[i] = trackdata.trackTop[i] - 0.25f;     //25cmÊÇËíµÀÄÚµÄ¹ìÃæ¹ìµ×²îÖµ
+				trackdata.trackBottomFit[i] = trackdata.trackTop[i] - 0.25f;     //25cmï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÚµÄ¹ï¿½ï¿½ï¿½ï¿½×²ï¿½Öµ
 
 			}
 
-			//µ±ÅĞ¶ÏÔÚ³µ¿âÄÚ¡¢Á½¹ìÖ®¼äÓĞ¿ÓµÄÇé¿öÏÂ£¬Ö´ĞĞÒÔÏÂ¹ı³Ì
+			//ï¿½ï¿½ï¿½Ğ¶ï¿½ï¿½Ú³ï¿½ï¿½ï¿½ï¿½Ú¡ï¿½ï¿½ï¿½ï¿½ï¿½Ö®ï¿½ï¿½ï¿½Ğ¿Óµï¿½ï¿½ï¿½ï¿½ï¿½Â£ï¿½Ö´ï¿½ï¿½ï¿½ï¿½ï¿½Â¹ï¿½ï¿½ï¿½
 			if (isHole) {
 				for (int i = GROUND_JUDGE;i < trackdata.trackBottomFit.size();++i)
 					trackdata.trackBottomFit[i] = trackdata.trackBottomFit[GROUND_JUDGE - 1];
 
+				trackdata.trackBottom.clear();
 				trackdata.trackBottom.assign(trackdata.trackBottomFit.begin(), trackdata.trackBottomFit.end());
 
 				return;
 			}
 
-			//Ô­Ê¼µÄÈ«¾ÖÄâºÏµãÑ¡È¡
-			/*std::vector<cv::Point2d> whole_line;
-			float whole_diff = trackdata.trackBottomFit[5];
-			for (int i = 5; i < trackdata.trackBottomFit.size(); ++i) {
-
-				cv::Point2d pt;
-				pt.x = (float)i * row_radio + row_radio / 2;
-				pt.y = trackdata.trackBottomFit[i];
-				if (pt.y == 100.0f || fabs(pt.y - whole_diff) >= 0.5f)
-					continue;
-				whole_line.push_back(pt);
-				whole_diff = pt.y;
-			}*/
-
-			//¸ù¾İ¹ìµÀÆÂ½ÇÏŞÖÆÑ¡È¡È«¾ÖÄâºÏµã
+			//ï¿½ï¿½ï¿½İ¹ï¿½ï¿½ï¿½Â½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡È¡È«ï¿½ï¿½ï¿½ï¿½Ïµï¿½
 			std::vector<cv::Point2d> whole_line;
 			float whole_diff = trackdata.trackBottomFit[5];
 			float slope_limit_k = -SLOPE_LIMIT / 100.0f;
@@ -583,16 +638,7 @@ namespace watrix {
 
 			FitLineData whole_line_data = fitNextPoint(whole_line, row_radio);
 
-			std::vector<cv::Point2d> lines_first;
-			for (int j = 5; j < GROUND_JUDGE - 1; ++j) {
-				cv::Point2d pt;
-				pt.x = (float)j * row_radio + row_radio / 2;
-				pt.y = trackdata.trackBottomFit[j];
-				lines_first.push_back(pt);
-			}
-			FitLineData first_line_data = fitNextPoint(lines_first, row_radio);
-
-			std::unordered_map<int, float> point_backup;
+			//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½GROUND_JUDGEï¿½ï¿½ï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½ß¶ï¿½
 			for (int i = GROUND_JUDGE; i < trackdata.trackBottomFit.size(); ++i) {
 
 				std::vector<cv::Point2d> lines_data;
@@ -623,7 +669,8 @@ namespace watrix {
 				}
 			}
 
-			for (int i = GROUND_JUDGE; i < trackdata.trackBottomFit.size(); ++i) {
+			trackdata.trackBottom[0] = trackdata.trackBottomFit[0];
+			for (int i = 1; i < trackdata.trackBottomFit.size(); ++i) {
 
 				if (trackdata.trackBottomFit[i] > trackdata.trackBottom[i] || trackdata.trackBottom[i] == 100.0f)
 					trackdata.trackBottom[i] = trackdata.trackBottomFit[i];
@@ -724,14 +771,14 @@ namespace watrix {
 						visited[i][j] = true;
 						continue;
 					}
-					//¾àÀëĞ¡ÓÚ30m£¬½«ÀëµØÃæ30cm¸ßµÄµãÊÓÎªÕÏ°­Îïµã
+					//ï¿½ï¿½ï¿½ï¿½Ğ¡ï¿½ï¿½30mï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½30cmï¿½ßµÄµï¿½ï¿½ï¿½Îªï¿½Ï°ï¿½ï¿½ï¿½ï¿½
 					if (grid[i][j].min_z > DIVIDE_DIS && grid[i][j].max_z < 30.0f &&
 						grid[i][j].max_x - trackdata.trackBottom[i] < 0.15f) {    //0.3
 
 						visited[i][j] = true;
 						continue;
 					}
-					//¾àÀë´óÓÚ30m£¬½«ÀëµØÃæ10cm¸ßµÄµãÊÓÎª¿ÉÄÜÊÇÕÏ°­Îïµã
+					//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½30mï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½10cmï¿½ßµÄµï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ï¿½ï¿½ï¿½
 					if (grid[i][j].max_z >= 30.0f && grid[i][j].max_x - trackdata.trackBottom[i] < 0.1f) {
 
 						visited[i][j] = true;
@@ -791,13 +838,13 @@ namespace watrix {
 								if (ob_size.min_z > DIVIDE_DIS && ob_size.max_x - ob_size.min_x < 0.25f)
 									continue;
 
-								//Èç¹û¼ì²âµ½µÄÎïÌåÔÚ5mÄÚ£¬²¢ÇÒyÖáÉÏµÄ¿í¶ÈĞ¡ÓÚ25cm£¬½«ÆäÂË³ı
+								//ï¿½ï¿½ï¿½ï¿½ï¿½âµ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½5mï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½yï¿½ï¿½ï¿½ÏµÄ¿ï¿½ï¿½ï¿½Ğ¡ï¿½ï¿½20cmï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë³ï¿½
 								if (ob_size.max_z < 10.0f && ob_size.max_y - ob_size.min_y <= 0.25f)
 									continue;
 								if (ob_size.max_z < 25.0f && ob_size.max_y - ob_size.min_y <= 0.12f)
 									continue;
 
-								//¼ì²âµ½ÎïÌåÔÚ10mÒÔÄÚ£¬Æä¸ß¶ÈµÄ±ê×¼²îÈç¹ûĞ¡ÓÚ3cm£¬Ôò½«Æä°´Îó¼ì´¦Àí
+								//ï¿½ï¿½âµ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½10mï¿½ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ß¶ÈµÄ±ï¿½×¼ï¿½ï¿½ï¿½ï¿½ï¿½Ğ¡ï¿½ï¿½3cmï¿½ï¿½ï¿½ï¿½ï¿½ä°´ï¿½ï¿½ì´¦ï¿½ï¿½
 								if (ob_size.min_z < DIVIDE_DIS) {
 									std::vector<Point3> object;
 									for (int grid_index = 0; grid_index < obstacle_grid_group.gridIndex.size(); ++grid_index) {
@@ -842,34 +889,34 @@ namespace watrix {
 					row_extend = 2;
 				}*/
 				extend.pop();
-				//ÉÏ
+				//ï¿½ï¿½
 				for (int i = 0; i < row_extend; ++i)
 					search_fork(grid, visited, extend, obstacle_grid_group, grids_total_x, ob_size, cur.first - 1 - i, cur.second, trackdata);
-				//ÏÂ
+				//ï¿½ï¿½
 				for (int i = 0; i < row_extend; ++i)
 					search_fork(grid, visited, extend, obstacle_grid_group, grids_total_x, ob_size, cur.first + 1 + i, cur.second, trackdata);
-				//×ó
+				//ï¿½ï¿½
 				for (int i = 0; i < col_extend; ++i)
 					search_fork(grid, visited, extend, obstacle_grid_group, grids_total_x, ob_size, cur.first, cur.second - 1 - i, trackdata);
-				//ÓÒ
+				//ï¿½ï¿½
 				for (int i = 0; i < col_extend; ++i)
 					search_fork(grid, visited, extend, obstacle_grid_group, grids_total_x, ob_size, cur.first, cur.second + 1 + i, trackdata);
 
 				if (grid[cur.first][cur.second].total_z / grid[cur.first][cur.second].grid_points.size() >= 20) {
 
-					//×óÉÏ
+					//ï¿½ï¿½ï¿½ï¿½
 					for (int i = 0; i < row_extend; ++i)
 						for (int j = 0; j < col_extend; ++j)
 							search_fork(grid, visited, extend, obstacle_grid_group, grids_total_x, ob_size, cur.first - 1 - i, cur.second - 1 - j, trackdata);
-					//ÓÒÉÏ
+					//ï¿½ï¿½ï¿½ï¿½
 					for (int i = 0; i < row_extend; ++i)
 						for (int j = 0; j < col_extend; ++j)
 							search_fork(grid, visited, extend, obstacle_grid_group, grids_total_x, ob_size, cur.first - 1 - i, cur.second + 1 + j, trackdata);
-					//×óÏÂ
+					//ï¿½ï¿½ï¿½ï¿½
 					for (int i = 0; i < row_extend; ++i)
 						for (int j = 0; j < col_extend; ++j)
 							search_fork(grid, visited, extend, obstacle_grid_group, grids_total_x, ob_size, cur.first + 1 + i, cur.second - 1 - j, trackdata);
-					//ÓÒÏÂ
+					//ï¿½ï¿½ï¿½ï¿½
 					for (int i = 0; i < row_extend; ++i)
 						for (int j = 0; j < col_extend; ++j)
 							search_fork(grid, visited, extend, obstacle_grid_group, grids_total_x, ob_size, cur.first + 1 + i, cur.second + 1 + j, trackdata);
@@ -947,20 +994,21 @@ namespace watrix {
 		void LOD::drawImage(std::vector<LidarBox> obstacle_box, std::string image_file) {
 
 			std::vector<std::vector<cv::Point3d>> all_points;
+			pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_box(new pcl::PointCloud<pcl::PointXYZ>);
 			std::vector<cv::Point3d> all_temp;
 			cv::Mat cameraMatrix(3, 3, CV_32F);
 			std::vector<float> distCoeff;
 			cv::Mat rvec(3, 3, CV_64F), tvec(3, 1, CV_64F);
 
-			//7ÔÂ10ÈÕ¶Ì½¹»û±ä²ÎÊı
-			distCoeff.push_back(-0.23358974291192533);
-			distCoeff.push_back(0.22278135444539487);
-			distCoeff.push_back(-0.001896006018748501);
-			distCoeff.push_back(0.0006900095357958706);
-			distCoeff.push_back(-0.11847552089880027);
+			//11ï¿½Â¶Ì½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			distCoeff.push_back(-0.2283);
+			distCoeff.push_back(0.1710);
+			distCoeff.push_back(-0.0013);
+			distCoeff.push_back(-8.2250e-06);
+			distCoeff.push_back(0);
 
-			//7ÔÂ10ÈÕ¶Ì½¹ÄÚ²Î²ÎÊı
-			float tempMatrix[3][3] = { { 2047.835036975324, 0, 960 }, { 0, 2088.973405583949, 540 }, { 0, 0, 1.0 } };
+			//11ï¿½Â¶Ì½ï¿½ï¿½Ú²Î²ï¿½ï¿½ï¿½
+			float tempMatrix[3][3] = { { 2.1334e+03, 0, 931.1503 }, { 0, 2.1322e+03, 580.8112 }, { 0, 0, 1.0 } };
 
 			for (int i = 0; i < 3; ++i) {
 				for (int j = 0; j < 3; ++j) {
@@ -977,42 +1025,75 @@ namespace watrix {
 					rvec.at<double>(i, j) = tempRvec[i][j];
 			cv::Rodrigues(rvec, rvec);
 
-			double tempTvec[3] = { -0.029,0.89,0 };
+			double tempTvec[3] = { 0.0,0.80,0.177 };
 
 			for (int i = 0; i < 3; ++i)
 				tvec.at<double>(i, 0) = tempTvec[i];
 
 			for (int i = 0; i < obstacle_box.size(); ++i) {
-				all_temp.clear();
 
-				all_temp.push_back(cv::Point3d(obstacle_box[i].left_bottom.y, -obstacle_box[i].left_bottom.x, obstacle_box[i].left_bottom.z));
-				all_temp.push_back(cv::Point3d(obstacle_box[i].left_top.y, -obstacle_box[i].left_top.x, obstacle_box[i].left_top.z));
-				all_temp.push_back(cv::Point3d(obstacle_box[i].right_top.y, -obstacle_box[i].right_top.x, obstacle_box[i].right_top.z));
-				all_temp.push_back(cv::Point3d(obstacle_box[i].right_bottom.y, -obstacle_box[i].right_bottom.x, obstacle_box[i].right_bottom.z));
+				cloud_box->points.push_back({ obstacle_box[i].left_bottom.x, obstacle_box[i].left_bottom.y, obstacle_box[i].left_bottom.z });
+				cloud_box->points.push_back({ obstacle_box[i].left_top.x, obstacle_box[i].left_top.y, obstacle_box[i].left_top.z });
+				cloud_box->points.push_back({ obstacle_box[i].right_top.x, obstacle_box[i].right_top.y, obstacle_box[i].right_top.z });
+				cloud_box->points.push_back({ obstacle_box[i].right_bottom.x, obstacle_box[i].right_bottom.y, obstacle_box[i].right_bottom.z });
 
-				all_points.push_back(all_temp);
 			}
 
-			cv::Mat image = cv::imread("E:\\Cal_data\\_2019-07-12-11-01-39\\pcd_bin\\cam1\\"
-				+ image_file + "_imag.png");
+			Eigen::Matrix4d rotation, rotation_cv;
+			rotation << 1, 0, 0, 0,
+				0, cos(0.15 * CV_PI / 180), -sin(0.15 * CV_PI / 180), 0.000000,
+				0, sin(0.15 * CV_PI / 180), cos(0.15 * CV_PI / 180), 0.000000,
+				0, 0, 0, 1;
 
-			cv::Point left_near(724, 858);
-			cv::Point left_far(902, 606);
-			cv::Point right_near(1150, 855);
-			cv::Point right_far(969, 606);
+			pcl::transformPointCloud(*cloud_box, *cloud_box, rotation);
+
+			for (int i = 0;i < cloud_box->points.size();++i) {
+
+				pcl::PointXYZ pt = cloud_box->points[i];
+				float temp = pt.x;
+				pt.x = pt.y;
+				pt.y = -temp;
+				pt.z = pt.z + 0.2f;
+				cloud_box->points[i].x = pt.x;
+				cloud_box->points[i].y = pt.y;
+				cloud_box->points[i].z = pt.z;
+
+			}
+
+			rotation_cv << 0.9999960856928221, 0.0003353891285046393, -0.002777789258835963, 0,
+				-0.0003158570188030314, 0.9999752464831646, 0.007028986788848552, 0,
+				0.002780077944536163, -0.007028081891000952, 0.9999714382078898, 0,
+				0.000000, 0.000000, 0.000000, 1.000000;
+
+			pcl::transformPointCloud(*cloud_box, *cloud_box, rotation_cv);
+
+			for (int i = 0;i < cloud_box->points.size();i += 4) {
+
+				all_temp.clear();
+				all_temp.push_back(cv::Point3d(cloud_box->points[i].x, cloud_box->points[i].y, cloud_box->points[i].z));
+				all_temp.push_back(cv::Point3d(cloud_box->points[i + 1].x, cloud_box->points[i + 1].y, cloud_box->points[i + 1].z));
+				all_temp.push_back(cv::Point3d(cloud_box->points[i + 2].x, cloud_box->points[i + 2].y, cloud_box->points[i + 2].z));
+				all_temp.push_back(cv::Point3d(cloud_box->points[i + 3].x, cloud_box->points[i + 3].y, cloud_box->points[i + 3].z));
+
+				all_points.push_back(all_temp);
+
+			}
+
+			cv::Mat image = cv::imread("E:\\Cal_data\\results\\cam1\\"
+				+ image_file + "_imag.png");
 
 			for (int i = 0; i < all_points.size(); ++i) {
 
 				std::vector<cv::Point2d> projectedPoints;
 				cv::projectPoints(all_points[i], rvec, tvec, cameraMatrix, distCoeff, projectedPoints);
-				projectedPoints[0].x -= 18;
-				projectedPoints[1].x -= 18;
-				projectedPoints[2].x -= 18;
-				projectedPoints[3].x -= 18;
-				projectedPoints[0].y += 131;
-				projectedPoints[1].y += 131;
-				projectedPoints[2].y += 131;
-				projectedPoints[3].y += 131;
+				projectedPoints[0].x += 7;
+				projectedPoints[1].x += 7;
+				projectedPoints[2].x += 7;
+				projectedPoints[3].x += 7;
+				projectedPoints[0].y += 5;
+				projectedPoints[1].y += 5;
+				projectedPoints[2].y += 5;
+				projectedPoints[3].y += 5;
 
 				cv::line(image, projectedPoints[0], projectedPoints[1], cv::Scalar(0, 0, 255), 2);
 				cv::line(image, projectedPoints[1], projectedPoints[2], cv::Scalar(0, 0, 255), 2);
@@ -1023,11 +1104,11 @@ namespace watrix {
 				cv::putText(image, std::to_string(obstacle_box.size()), cv::Point(100, 100), cv::FONT_HERSHEY_TRIPLEX, 2.0, cv::Scalar(0, 0, 255), 5);
 			}
 
-			cv::imwrite("E:\\Cal_data\\_2019-07-12-11-01-39\\pcd_bin\\pic_result\\"
+			cv::imwrite("E:\\Cal_data\\results\\pic_result\\"
 				+ image_file + "_imag.png", image);
 		}
 
-		std::vector<LidarBox> LOD::object_detection(pcl::PointCloud<pcl::PointXYZ>::Ptr& points, Eigen::Matrix4f rotation, InvasionData invasion, std::string image_file) {
+		std::vector<LidarBox> LOD::object_detection(pcl::PointCloud<pcl::PointXYZ>::Ptr& points, Eigen::Matrix4d rotation, InvasionData invasion, std::string image_file) {
 
 			std::vector<LidarBox> obstacle_box;
 			LidarBox obstacle_temp;
@@ -1073,10 +1154,11 @@ namespace watrix {
 				show_cloud->points.push_back(pp);
 #endif
 
+
 			}
 
 			float row_radio = 0.4f;   //0.1
-			float col_radio = 0.2f;   //0.05   ãĞÖµµ÷Õû
+			float col_radio = 0.2f;   //0.05   ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½
 			int grid_row = (max_p.z - min_p.z) / row_radio + 1;
 			int grid_col = (max_p.y - min_p.y) / col_radio + 1;
 
@@ -1101,14 +1183,14 @@ namespace watrix {
 					grid[i][j].min_y = 0.0f;
 					grid[i][j].max_z = 0.0f;
 					grid[i][j].min_z = 0.0f;
-					grid[i][j].loss_min_x = 0.0f;
+					grid[i][j].loss_min_x = 100.0f;
 				}
 			}
 
 			create_grid(cloud_limit, grid, min_p, max_p, row_radio, col_radio, trackdata);
 			auto obstacle_grid = cluster(grid, trackdata);
 
-			//Ïû³ıÓÉÓÚÍ¼ÏñÖĞ½«ÏŞ½çÍâÄ¿±êÎóµ¼ÈëÏŞ½çÄÚµÄÎÊÌâ
+			//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½Ğ½ï¿½ï¿½Ş½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ş½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½
 			int left_num = invasion.coeff_left.size();
 			int right_num = invasion.coeff_right.size();
 			for (int i = 0; i < obstacle_grid.size();) {
@@ -1129,53 +1211,58 @@ namespace watrix {
 					++i;
 			}
 
-			//ÂË³ıµãÔÆ´òµ½µØÃæÒÔÏÂµÄÎÊÌâ
-			for (int i = 0;i < obstacle_grid.size();) {
-
-				double loss_min_x = obstacle_grid[i].ob_size.loss_min_x;
-				double trackBottomAvr = 0.0f;
-				for (int j = 0;j < obstacle_grid[i].gridIndex.size();++j) {
-
-					trackBottomAvr += trackdata.trackBottomFit[obstacle_grid[i].gridIndex[j].first];
-				}
-				trackBottomAvr /= obstacle_grid[i].gridIndex.size();
-				if (trackBottomAvr - loss_min_x < 0.08f) {     //¸ß¶ÈãĞÖµ
-					++i;
-					continue;
-				}
-				else {
-					if (obstacle_grid[i].ob_size.max_x - trackBottomAvr < 0.3f)
-						obstacle_grid.erase(obstacle_grid.begin() + i);
-					else
-						++i;
-				}
-			}
-
-			//¶Ô¼ì²âµ½µÄÄ¿±ê½øĞĞ¶ş´Î´¦Àí£¬ÅĞ¶ÏÆä¸ß¶ÈÊÇ·ñ´ïµ½30cm
-			for (int i = 0; i < obstacle_grid.size();) {
-
-				if (obstacle_grid[i].ob_size.loss_min_x == 0.0f) {
-					if (obstacle_grid[i].ob_size.max_x - obstacle_grid[i].ob_size.min_x <= 0.3f)
-						obstacle_grid.erase(obstacle_grid.begin() + i);
-					else
-						++i;
-				}
-				else {
-					if (obstacle_grid[i].ob_size.max_x - obstacle_grid[i].ob_size.loss_min_x <= 0.3f)
-						obstacle_grid.erase(obstacle_grid.begin() + i);
-					else
-						++i;
-				}
-			}
-
-			//Ïû³ıÓÉÓÚÔëµãÎó¾ÛÀàµÄÄ¿±ê
+			//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Âµï¿½)
 			for (int i = 0;i < obstacle_grid.size();) {
 
 				float lowest_height = obstacle_grid[i].ob_size.loss_min_x;
 				float highest_height = obstacle_grid[i].ob_size.max_x;
-				if (lowest_height > obstacle_grid[i].ob_size.min_x)
+
+				//ï¿½Ë³ï¿½ï¿½ï¿½ï¿½Ú´ï¿½ï¿½Úµï¿½ï¿½Âµï¿½ï¿½ï¿½Éµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+				if (lowest_height != 100.0f) {
+					double trackBottomAvr = 0.0f;
+					for (int j = 0;j < obstacle_grid[i].gridIndex.size();++j) {
+
+						trackBottomAvr += trackdata.trackBottomFit[obstacle_grid[i].gridIndex[j].first];
+					}
+					trackBottomAvr /= obstacle_grid[i].gridIndex.size();
+					if (trackBottomAvr - lowest_height >= 0.05f) {     //ï¿½ß¶ï¿½ï¿½ï¿½Öµ
+						if (obstacle_grid[i].ob_size.min_x - trackBottomAvr > 0.05f)
+							lowest_height = obstacle_grid[i].ob_size.min_x;
+						else
+							lowest_height = trackBottomAvr;
+						if (highest_height - lowest_height < 0.33f) {   //Ä¿ï¿½ï¿½ß¶ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½ï¿½Öµï¿½Ë³ï¿½
+
+							obstacle_grid.erase(obstacle_grid.begin() + i);
+							continue;
+						}
+					}
+					else if (trackBottomAvr - lowest_height >= 0.0f) {
+
+						lowest_height = (trackBottomAvr + lowest_height) / 2.0f;
+					}
+				}
+
+				//ï¿½Ğ¶ï¿½Ä¿ï¿½ï¿½ß¶ï¿½ï¿½Ç·ï¿½ïµ½30cm
+				if (lowest_height == 100.0f) {
 					lowest_height = obstacle_grid[i].ob_size.min_x;
-				float limit_height = lowest_height / 3 + 2.0f * highest_height / 3.0f;
+					if (highest_height - obstacle_grid[i].ob_size.min_x <= 0.33f) {  //Ä¿ï¿½ï¿½ß¶ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½ï¿½Öµï¿½Ë³ï¿½
+
+						obstacle_grid.erase(obstacle_grid.begin() + i);
+						continue;
+					}
+
+				}
+				else {
+					if (highest_height - lowest_height <= 0.33f) {   //Ä¿ï¿½ï¿½ß¶ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½ï¿½Öµï¿½Ë³ï¿½
+
+						obstacle_grid.erase(obstacle_grid.begin() + i);
+						continue;
+					}
+
+				}
+
+				//ï¿½Ë³ï¿½ï¿½ï¿½ï¿½Õµï¿½
+				float limit_height = 7.0f * lowest_height / 12.0f + 5.0f * highest_height / 12.0f;   // 2/3
 
 				if (SUSPENDED_OBJECT && obstacle_grid[i].ob_size.min_x > obstacle_grid[i].ob_size.loss_min_x + 1.0f) {   //0.5
 					obstacle_grid.erase(obstacle_grid.begin() + i);
@@ -1233,10 +1320,7 @@ namespace watrix {
 					isTrain = true;
 			}
 
-			Eigen::Matrix4f r_t;
-			r_t = rotation.inverse();
-
-			//ÓÃÁĞ³µÇ°·½ÓëÁĞ³µ¹éÎªÍ¬Ò»¸ö¿òµÄÕÏ°­ÎïµÄ¾àÀëÌæ»»ÁĞ³µ¾àÀë
+			//ï¿½ï¿½ï¿½Ğ³ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½Ğ³ï¿½ï¿½ï¿½ÎªÍ¬Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ï¿½ï¿½Ä¾ï¿½ï¿½ï¿½ï¿½æ»»ï¿½Ğ³ï¿½ï¿½ï¿½ï¿½ï¿½
 			float modifyDis = 0.0f;
 			if (isTrain)
 				modifyDis = obstacle_grid[idx_train].ob_size.min_z;
@@ -1250,19 +1334,17 @@ namespace watrix {
 						if (boxOverlap(obstacle_grid[idx_train].ob_size, obstacle_grid[i].ob_size) >= 0.3f) {
 							if (modifyDis > obstacle_grid[i].ob_size.min_z)
 								modifyDis = obstacle_grid[i].ob_size.min_z;
-							/*if (i <= idx_train)
-								idx_train -= 1;*/
+
 							continue;
 						}
 
 					}
 					if (glass_dis_behind > 0.0f) {
-						/*if (i <= idx_train)
-							idx_train -= 1;*/
-						continue;
 
+						continue;
 					}
-						
+					//if (glass_dis_behind > 0.0f && glass_dis_behind <= 5.0f)
+
 				}
 				cloud_result->points.clear();
 				OB_Size ob_s = obstacle_grid[i].ob_size;
@@ -1272,7 +1354,7 @@ namespace watrix {
 				cloud_result->points.push_back({ ob_s.max_x, ob_s.min_y, ob_s.min_z });
 				cloud_result->points.push_back({ ob_s.max_x, ob_s.max_y, ob_s.min_z });
 				cloud_result->points.push_back({ ob_s.loss_min_x, ob_s.max_y, ob_s.min_z });
-				pcl::transformPointCloud(*cloud_result, *cloud_result, r_t);
+
 				obstacle_temp.left_bottom = Point3(cloud_result->points[0]);
 				obstacle_temp.left_top = Point3(cloud_result->points[1]);
 				obstacle_temp.right_top = Point3(cloud_result->points[2]);
@@ -1282,41 +1364,44 @@ namespace watrix {
 
 				obstacle_box.push_back(obstacle_temp);
 			}
-			/*if (obstacle_box.size()>0 && isTrain)
+			//ï¿½Ş½ï¿½ï¿½ï¿½ï¿½âµ¼ï¿½Â»ï¿½ï¿½Ş·ï¿½ï¿½ï¿½ï¿½
+			/*if (isTrain)
 				obstacle_box[idx_train].distance_z = modifyDis;*/
 
 #ifdef SHOW_PCD			
-				srand((unsigned)time(NULL));
-				pcl::PointXYZRGB point_view;
-				for (int i = 0; i < obstacle_grid.size(); ++i) {
-					int r = rand() % 255;
-					int g = rand() % 255;
-					int b = rand() % 255;
-					r = 255;
-					g = 0;
-					b = 0;
-					for (int j = 0; j < obstacle_grid[i].gridIndex.size(); ++j) {
-						for (int k = 0; k < grid[obstacle_grid[i].gridIndex[j].first][obstacle_grid[i].gridIndex[j].second].grid_points.size(); ++k) {
-							point_view.x = grid[obstacle_grid[i].gridIndex[j].first][obstacle_grid[i].gridIndex[j].second].grid_points[k][0];
-							point_view.y = grid[obstacle_grid[i].gridIndex[j].first][obstacle_grid[i].gridIndex[j].second].grid_points[k][1];
-							point_view.z = grid[obstacle_grid[i].gridIndex[j].first][obstacle_grid[i].gridIndex[j].second].grid_points[k][2];
-							point_view.r = r;
-							point_view.g = g;
-							point_view.b = b;
+			srand((unsigned)time(NULL));
+			pcl::PointXYZRGB point_view;
+			for (int i = 0; i < obstacle_grid.size(); ++i) {
+				int r = rand() % 255;
+				int g = rand() % 255;
+				int b = rand() % 255;
+				r = 255;
+				g = 0;
+				b = 0;
+				for (int j = 0; j < obstacle_grid[i].gridIndex.size(); ++j) {
+					for (int k = 0; k < grid[obstacle_grid[i].gridIndex[j].first][obstacle_grid[i].gridIndex[j].second].grid_points.size(); ++k) {
+						point_view.x = grid[obstacle_grid[i].gridIndex[j].first][obstacle_grid[i].gridIndex[j].second].grid_points[k][0];
+						point_view.y = grid[obstacle_grid[i].gridIndex[j].first][obstacle_grid[i].gridIndex[j].second].grid_points[k][1];
+						point_view.z = grid[obstacle_grid[i].gridIndex[j].first][obstacle_grid[i].gridIndex[j].second].grid_points[k][2];
+						point_view.r = r;
+						point_view.g = g;
+						point_view.b = b;
 
-							show_cloud->points.push_back(point_view);
-						}
+						show_cloud->points.push_back(point_view);
 					}
 				}
-				pcl::visualization::CloudViewer viewer("Show");
-				viewer.showCloud(show_cloud);
-				// system("pause");
-				while (!viewer.wasStopped()){ };
+			}
+			pcl::visualization::CloudViewer viewer("Show");
+			viewer.showCloud(show_cloud);
+			// system("pause");
+			while (!viewer.wasStopped()){ };
 #endif
 
 			delete& grid;
 			return obstacle_box;
 		}
+
+
 
 		
 		// fwc
@@ -1324,20 +1409,21 @@ namespace watrix {
 			std::vector<lidar_invasion_cvbox> v_cvbox;
 
 			std::vector<std::vector<cv::Point3d>> all_points;
+			pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_box(new pcl::PointCloud<pcl::PointXYZ>);
 			std::vector<cv::Point3d> all_temp;
 			cv::Mat cameraMatrix(3, 3, CV_32F);
 			std::vector<float> distCoeff;
 			cv::Mat rvec(3, 3, CV_64F), tvec(3, 1, CV_64F);
 
-			//7æœ?10æ—¥çŸ­ç„¦ç•¸å˜å‚æ•?
-			distCoeff.push_back(-0.23358974291192533);
-			distCoeff.push_back(0.22278135444539487);
-			distCoeff.push_back(-0.001896006018748501);
-			distCoeff.push_back(0.0006900095357958706);
-			distCoeff.push_back(-0.11847552089880027);
+			//11ï¿½Â¶Ì½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			distCoeff.push_back(-0.2283);
+			distCoeff.push_back(0.1710);
+			distCoeff.push_back(-0.0013);
+			distCoeff.push_back(-8.2250e-06);
+			distCoeff.push_back(0);
 
-			//7æœ?10æ—¥çŸ­ç„¦å†…å‚å‚æ•?
-			float tempMatrix[3][3] = { { 2047.835036975324, 0, 960 }, { 0, 2088.973405583949, 540 }, { 0, 0, 1.0 } };
+			//11ï¿½Â¶Ì½ï¿½ï¿½Ú²Î²ï¿½ï¿½ï¿½
+			float tempMatrix[3][3] = { { 2.1334e+03, 0, 931.1503 }, { 0, 2.1322e+03, 580.8112 }, { 0, 0, 1.0 } };
 
 			for (int i = 0; i < 3; ++i) {
 				for (int j = 0; j < 3; ++j) {
@@ -1354,37 +1440,92 @@ namespace watrix {
 					rvec.at<double>(i, j) = tempRvec[i][j];
 			cv::Rodrigues(rvec, rvec);
 
-			double tempTvec[3] = { -0.029,0.89,0 };
+			double tempTvec[3] = { 0.0,0.80,0.177 };
 
 			for (int i = 0; i < 3; ++i)
 				tvec.at<double>(i, 0) = tempTvec[i];
 
 			for (int i = 0; i < obstacle_box.size(); ++i) {
-				all_temp.clear();
+#ifdef SHOW_PCD_BOX_NUM
+				std::cout << "obstacle_box " << i << ":" << std::endl;
+				std::cout << obstacle_box[i].left_bottom.x << " " << obstacle_box[i].left_bottom.y << " " << obstacle_box[i].left_bottom.z << std::endl;
+				std::cout << obstacle_box[i].left_top.x << " " << obstacle_box[i].left_top.y << " " << obstacle_box[i].left_top.z << std::endl;
+				std::cout << obstacle_box[i].right_top.x << " " << obstacle_box[i].right_top.y << " " << obstacle_box[i].right_top.z << std::endl;
+				std::cout << obstacle_box[i].right_bottom.x << " " << obstacle_box[i].right_bottom.y << " " << obstacle_box[i].right_bottom.z << std::endl;
+#endif
+				cloud_box->points.push_back({ obstacle_box[i].left_bottom.x, obstacle_box[i].left_bottom.y, obstacle_box[i].left_bottom.z });
+				cloud_box->points.push_back({ obstacle_box[i].left_top.x, obstacle_box[i].left_top.y, obstacle_box[i].left_top.z });
+				cloud_box->points.push_back({ obstacle_box[i].right_top.x, obstacle_box[i].right_top.y, obstacle_box[i].right_top.z });
+				cloud_box->points.push_back({ obstacle_box[i].right_bottom.x, obstacle_box[i].right_bottom.y, obstacle_box[i].right_bottom.z });
 
-				all_temp.push_back(cv::Point3d(obstacle_box[i].left_bottom.y, -obstacle_box[i].left_bottom.x, obstacle_box[i].left_bottom.z));
-				all_temp.push_back(cv::Point3d(obstacle_box[i].left_top.y, -obstacle_box[i].left_top.x, obstacle_box[i].left_top.z));
-				all_temp.push_back(cv::Point3d(obstacle_box[i].right_top.y, -obstacle_box[i].right_top.x, obstacle_box[i].right_top.z));
-				all_temp.push_back(cv::Point3d(obstacle_box[i].right_bottom.y, -obstacle_box[i].right_bottom.x, obstacle_box[i].right_bottom.z));
-
-				all_points.push_back(all_temp);
 			}
 
-			for (int i = 0;i < all_points.size();++i) {
+			Eigen::Matrix4d rotation, rotation_cv;
+			rotation << 1, 0, 0, 0,
+				0, cos(0.15 * CV_PI / 180), -sin(0.15 * CV_PI / 180), 0.000000,
+				0, sin(0.15 * CV_PI / 180), cos(0.15 * CV_PI / 180), 0.000000,
+				0, 0, 0, 1;
+
+			pcl::transformPointCloud(*cloud_box, *cloud_box, rotation);
+
+			for (int i = 0;i < cloud_box->points.size();++i) {
+
+				pcl::PointXYZ pt = cloud_box->points[i];
+				float temp = pt.x;
+				pt.x = pt.y;
+				pt.y = -temp;
+				pt.z = pt.z + 0.2f;
+				cloud_box->points[i].x = pt.x;
+				cloud_box->points[i].y = pt.y;
+				cloud_box->points[i].z = pt.z;
+
+			}
+
+			rotation_cv << 0.9999960856928221, 0.0003353891285046393, -0.002777789258835963, 0,
+				-0.0003158570188030314, 0.9999752464831646, 0.007028986788848552, 0,
+				0.002780077944536163, -0.007028081891000952, 0.9999714382078898, 0,
+				0.000000, 0.000000, 0.000000, 1.000000;
+
+			pcl::transformPointCloud(*cloud_box, *cloud_box, rotation_cv);
+
+			for (int i = 0;i < cloud_box->points.size();i += 4) {
+
+				all_temp.clear();
+				all_temp.push_back(cv::Point3d(cloud_box->points[i].x, cloud_box->points[i].y, cloud_box->points[i].z));
+				all_temp.push_back(cv::Point3d(cloud_box->points[i + 1].x, cloud_box->points[i + 1].y, cloud_box->points[i + 1].z));
+				all_temp.push_back(cv::Point3d(cloud_box->points[i + 2].x, cloud_box->points[i + 2].y, cloud_box->points[i + 2].z));
+				all_temp.push_back(cv::Point3d(cloud_box->points[i + 3].x, cloud_box->points[i + 3].y, cloud_box->points[i + 3].z));
+
+				all_points.push_back(all_temp);
+
+			}
+
+
+			for (int i = 0; i < all_points.size(); ++i) {
+
 				std::vector<cv::Point2d> projectedPoints;
 				cv::projectPoints(all_points[i], rvec, tvec, cameraMatrix, distCoeff, projectedPoints);
+
 				int x_min = 10000, y_min = 10000;
 				int x_max = -1, y_max = -1;
+
+#ifdef SHOW_PCD_BOX_NUM
+				std::cout << "projectedPoints " << i << ":" << std::endl;
+#endif
+
 				for (int idx=0; idx < projectedPoints.size(); idx++){
+#ifdef SHOW_PCD_BOX_NUM
+					std::cout << projectedPoints[idx].x << " " << projectedPoints[idx].y << std::endl;
+#endif
 					if (projectedPoints[idx].x <=  x_min) x_min = projectedPoints[idx].x;
 					if (projectedPoints[idx].x >=  x_max) x_max = projectedPoints[idx].x;
 					if (projectedPoints[idx].y <=  y_min) y_min = projectedPoints[idx].y;
 					if (projectedPoints[idx].y >=  y_max) y_max = projectedPoints[idx].y;
 				}
-				x_min -= 18;
-				x_max -= 18;
-				y_min += 131;
-				y_max += 131;
+				x_min += 7;
+				x_max += 7;
+				y_min += 5;
+				y_max += 5;
 
 				lidar_invasion_cvbox cvbox;
 				cvbox.xmin = x_min;
@@ -1395,6 +1536,7 @@ namespace watrix {
 
 				v_cvbox.push_back(cvbox);
 			}
+
 			return v_cvbox;
 		}
 

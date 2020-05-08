@@ -15,6 +15,7 @@ cyber/Logs/*
 logs
 Logs
 records
+data
 
 # python proto
 py_proto

@@ -19,9 +19,15 @@
 #include <pcl/common/transforms.h>
 //#include <pcl/surface/convex_hull.h>
 #include <pcl/common/common.h>
-#include <pcl/visualization/cloud_viewer.h>
+// #include <pcl/visualization/cloud_viewer.h>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/filters/statistical_outlier_removal.h>
+
+#ifdef DEBUG_INFO_FWC
+#include <pcl/common/common_headers.h>
+#include <pcl/visualization/pcl_visualizer.h>
+#include <pcl/console/parse.h>
+#endif
 
 #include "projects/adas/algorithm/algorithm_type.h" 
 
@@ -44,7 +50,7 @@ namespace watrix {
 			public:
 				static std::unordered_map<int, std::pair<int, int>> getInvasionMap(std::vector<cv::Point2i> input_l, std::vector<cv::Point2i> input_r, int& top_y);
 				static pcl::PointCloud<pcl::PointXYZ>::Ptr getPointFrom2DAnd3D(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, std::unordered_map<int, std::pair<int, int>> invasionP,
-					int top_y, InvasionData invasion, Eigen::Matrix4f& rotation);
+					int top_y, InvasionData invasion, Eigen::Matrix4d& rotation, float distance_limit);
 				static float calHeightVar(std::vector<Point3> object);
 				static cv::Point2f calHeightVar(std::vector<float> object);
 				static void getInvasionData(InvasionData& invasion_data, std::string csv_file);
@@ -62,7 +68,7 @@ namespace watrix {
 					OB_index_data& obstacle_grid_group, float& grids_total_x, OB_Size& ob_size, int row, int col, TrackData trackdata);
 				static float boxOverlap(OB_Size train_box, OB_Size ob_box);
 				static void drawImage(std::vector<LidarBox> obstacle_box, std::string image_file);
-				static std::vector<LidarBox> object_detection(pcl::PointCloud<pcl::PointXYZ>::Ptr& points, Eigen::Matrix4f rotation, InvasionData invasion, std::string image_file);
+				static std::vector<LidarBox> object_detection(pcl::PointCloud<pcl::PointXYZ>::Ptr& points, Eigen::Matrix4d rotation, InvasionData invasion, std::string image_file);
 
 				static std::vector<lidar_invasion_cvbox> lidarboxTocvbox(std::vector<LidarBox> obstacle_box);
 		};

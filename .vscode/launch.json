@@ -26,7 +26,7 @@
             "name": "Debug Test",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bazel-bin/modules/test/test_cc/test_move",
+            "program": "${workspaceFolder}/bazel-bin/modules/test/test_cc/test_string",
             "args": ["",],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -156,7 +156,7 @@
             "name": "Debug  HMI",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bazel-bin/projects/adas/hmi/perception_hmi",
+            "program": "${workspaceFolder}/bazel-bin/projects/adas/component/hmi/perception_hmi",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -258,7 +258,7 @@
                 },
                 {
                     "name": "ADAS_PATH",
-                    "value": "${workspaceFolder}/projects/adas/production"
+                    "value": "${workspaceFolder}/projects/adas/"
                 },
                 {
                     "name": "CYBER_IP",

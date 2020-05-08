@@ -2,4 +2,4 @@
 
 
     simulator_files_dir:"/media/remote_pc"
-    config_file:"cam1_cam0_pcd_no.txt"
+    config_file:"cam1_cam0_pcd.txt"

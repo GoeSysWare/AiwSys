@@ -32,7 +32,7 @@ const uint32_t PlayTaskProducer::kMinTaskBufferSize = 500;
 const uint32_t PlayTaskProducer::kPreloadTimeSec = 1;
 const uint64_t PlayTaskProducer::kSleepIntervalNanoSec = 1000000;
 
-PlayTaskProducer::PlayTaskProducer(std::shared_ptr<Node> node,const TaskBufferPtr& task_buffer,
+PlayTaskProducer::PlayTaskProducer(std::shared_ptr<Node> node,std::string   channel_prefix,const TaskBufferPtr& task_buffer,
                                    const PlayParam& play_param)
     : play_param_(play_param),
       task_buffer_(task_buffer),
@@ -42,7 +42,8 @@ PlayTaskProducer::PlayTaskProducer(std::shared_ptr<Node> node,const TaskBufferPt
       node_(node),
       earliest_begin_time_(UINT64_MAX),
       latest_end_time_(0),
-      total_msg_num_(0)
+      total_msg_num_(0),
+      record_channelname_prefix_(channel_prefix)
        {
 
        }
@@ -213,7 +214,7 @@ bool PlayTaskProducer::CreateWriters() {
       }
       proto::RoleAttributes attr;
       //添加前缀，区分原通道名 shuimujie
-      attr.set_channel_name(std::string(record_channel_prefix_ )+ channel_name);
+      attr.set_channel_name(record_channelname_prefix_ + channel_name);
       attr.set_message_type(msg_type);
       auto writer = node_->CreateWriter<message::RawMessage>(attr);
       if (writer == nullptr) {

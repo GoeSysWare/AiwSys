@@ -7,6 +7,8 @@
 // sim_map, routing_topo_grapth, etc.
 
 DECLARE_string(adas_cfg_interface_file);
+DECLARE_string(adas_debug_output_dir);
+
 
 DECLARE_int32(adas_camera_size);
 DECLARE_int32(adas_lidar_size);

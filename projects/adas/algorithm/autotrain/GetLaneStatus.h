@@ -1,5 +1,5 @@
-
 #include "projects/adas/algorithm/algorithm_type.h" 
+
 namespace watrix {
 	namespace algorithm {
         class LaneStatus{
@@ -11,6 +11,8 @@ namespace watrix {
 
                 static std::vector<double> polyfit(std::vector<double>& x, std::vector<double>& y, int n);
                 static double polyfit_predict(std::vector<double>& param_list, double x);
+
+                static bool is_lane_straight(std::vector<dpoints_t>& v_src_dist_lane_points);
 
                 static int GetLaneStatus(
                     dpoints_t& v_param_list, std::vector<dpoints_t>& v_src_dist_lane_points,

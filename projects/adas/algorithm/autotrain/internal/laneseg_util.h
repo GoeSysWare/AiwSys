@@ -37,9 +37,9 @@
 *
 */
 #pragma once
-
 #include "projects/adas/algorithm/algorithm_shared_export.h" // SHARED_EXPORT
 #include "projects/adas/algorithm/algorithm_type.h" //caffe_net_file_t,  Mat, Keypoint, box_t, detection_boxs_t
+
 
 
 namespace watrix {
@@ -58,21 +58,30 @@ namespace watrix {
 
 				static const int PT_SIMPLE_LANE_COUNT = 2; // only left + right lane for simple lane
 
+	#pragma region get_lane_full_binary_mask
 
 				static cv::Mat get_lane_full_binary_mask(
 					const cv::Mat& binary_mask
 				);
 
+	#pragma endregion
 
+
+	#pragma region point cvpoint/dpoints
 				
 				static dpoints_t cvpoints_to_dpoints(const cvpoints_t& cvpoints);
 				static cvpoints_t dpoints_to_cvpoints(const dpoints_t& points);
 				static void print_points(const std::string& name, const dpoints_t& points);
 				static void print_points(const std::string& name, const cvpoints_t& cvpoints);
 
+	#pragma endregion
 
+
+	#pragma region transform points
+				
 				static dpoints_t get_tr33_from_tr34(const dpoints_t& tr34);
 
+	#pragma region transform v0
 				static dpoints_t image_points_to_distance_points_v0(
 					const dpoints_t& points, 
 					const dpoints_t& tr33,
@@ -86,7 +95,9 @@ namespace watrix {
 					double z_height
 				);
 
+	#pragma endregion
 
+	#pragma region transform v1
 				static dpoints_t nouse_image_points_to_distance_points_v1(
 					const dpoints_t& points, 
 					const dpoints_t& tr33,
@@ -105,7 +116,9 @@ namespace watrix {
 					double z_height
 				);
 
+				#pragma endregion
 
+	#pragma region transform vector
 				static dpoints_t image_points_to_distance_points(
 					CAMERA_TYPE camera_type, // long_a, short_a
 					const LaneInvasionConfig& config,
@@ -118,7 +131,9 @@ namespace watrix {
 					const dpoints_t& coord_trans
 				);
 
+	#pragma endregion
 
+	#pragma region transform sigle
 				static dpoint_t image_point_to_dist_point(
 					CAMERA_TYPE camera_type, // long_a, short_a
 					const LaneInvasionConfig& config,
@@ -132,15 +147,21 @@ namespace watrix {
 				);
 
 				static void bound_cvpoint(cvpoint_t& point, cv::Size size, int delta = 0);
-	
+	#pragma endregion
 
 
+	#pragma endregion			
+
+
+	#pragma region find x points by y
 				
 				static std::vector<double> get_lane_x_coords(const dpoints_t& lane_coord_trans, double y);
 				static std::vector<int> get_lane_x_image_points(const cvpoints_t& lane_image_points, double y);
 
+	#pragma endregion 
 
 
+	#pragma region get clustered lane points
 
 				static void x_get_clustered_lane_points(
 					int lane_model_type, // caffe, pt_simple, pt_complex
@@ -149,7 +170,10 @@ namespace watrix {
 					const channel_mat_t& instance_mask, // [8, 256,1024] 8-dim float feature map
 					std::vector<dpoints_t>& v_src_lane_points
 				);
-	
+	#pragma endregion
+
+
+	#pragma region binary lanes to origin lanes			
 
 				static void __transform_binary_lanes_to_origin_lanes(
 					std::vector<dpoints_t>& v_lane_points,
@@ -160,7 +184,11 @@ namespace watrix {
 					int lane_model_type, // caffe, pt_simple, pt_complex
 					std::vector<dpoints_t>& v_lane_points
 				);
+				
+	#pragma endregion
 
+
+	#pragma region polyfit
 				static void lane_polyfit(
 					CAMERA_TYPE camera_type,
 					const LaneInvasionConfig& config,
@@ -172,14 +200,20 @@ namespace watrix {
 					std::vector<cv::Mat>& v_left_right_polyfit_matk
 				);
 
+	#pragma endregion
 
+
+	#pragma region polyline intersect
 
 				static bool polyline_intersect(
 					const LaneInvasionConfig& config,
 					const cvpoints_t& lane_cvpoints,
 					const cvpoints_t& train_points
 				);
+	#pragma endregion
 
+
+	#pragma region get left/right lane 
 
 				static void get_left_right_lane(
 					CAMERA_TYPE camera_type, // long, short
@@ -197,8 +231,13 @@ namespace watrix {
 					dpoints_t& coord_right
 				);
 
+	#pragma endregion
 
 
+	#pragma region detection boxs invasion detect
+
+
+	#pragma region case1 box
 				static bool is_case1_box(
 					const detection_box_t& box,
 					double case1_x_threshold, 
@@ -206,10 +245,25 @@ namespace watrix {
 				);
 
 				static box_invasion_result_t do_case1_box_invasion_detect(const detection_box_t& box);
+	#pragma endregion
 
+	/* 
+	#pragma region train box
+				static bool is_train_box(
+					const detection_box_t& box
+				);
 
+				static box_invasion_result_t do_train_box_invasion_detect(
+					CAMERA_TYPE camera_type, // long, short
+					const LaneInvasionConfig& config,
+					const cvpoints_t& left_expand_lane_cvpoints,
+					const cvpoints_t& right_expand_lane_cvpoints,
+					const cvpoints_t& train_points
+				);
+	#pragma endregion
+	*/
 
-
+	#pragma region other/common box invasion detect
 				static box_invasion_result_t __do_box_invasion_detect(
 					const LaneInvasionConfig& config,
 					const dpoints_t& coord_expand_left,
@@ -223,9 +277,12 @@ namespace watrix {
 					const LaneInvasionConfig& config,
 					const dpoints_t& coord_expand_left,
 					const dpoints_t& coord_expand_right,
+					const cvpoints_t& left_expand_lane_cvpoints,
+					const cvpoints_t& right_expand_lane_cvpoints,
+					const std::vector<dpoints_t>& v_src_dist_lane_points,
 					const detection_box_t& detection_box
 				);
-
+	#pragma endregion
 
 				static box_invasion_results_t box_image_points_invasion_detect(
 					CAMERA_TYPE camera_type, // long, short
@@ -234,11 +291,14 @@ namespace watrix {
 					const dpoints_t& coord_expand_right,
 					const cvpoints_t& left_expand_lane_cvpoints,
 					const cvpoints_t& right_expand_lane_cvpoints,
+					const std::vector<dpoints_t>& v_src_dist_lane_points,
 					const detection_boxs_t& detection_boxs,
 					const std::vector<cvpoints_t>& trains_cvpoints
 				);
+	#pragma endregion
 
 
+	#pragma region lidar invasion detect		
 
 				static INVASION_STATUS do_point_invasion_detect(
 					const LaneInvasionConfig& config,
@@ -255,30 +315,41 @@ namespace watrix {
 					const cvpoints_t& cvpoints
 				);
 
+	#pragma endregion
+
+
+	#pragma region lidar pointcloud small objects invasion detect
 				static void lidar_pointcloud_smallobj_invasion_detect(
 					// pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, 
 					std::vector<cv::Point3f> cloud, 
 					InvasionData  invasion,
+					float distance_limit, 
 					cvpoints_t& input_l,
 					cvpoints_t& input_r,
 					std::vector<LidarBox>& obstacle_box,
 					std::vector<lidar_invasion_cvbox>& cv_obstacle_box
 				);
+	#pragma endregion
 
+
+	#pragma region get lane status
 				static int get_lane_status(
 					InvasionData  invasion,
 					std::vector<dpoints_t>& v_src_dist_lane_points,
 					dpoints_t& curved_point_list, // out
 					std::vector<double>& curved_r_list // out
 				);
+	#pragma endregion
 
+
+	#pragma region draw lane with mask
 				
 				static cvpoint_t get_nearest_invasion_box_point(
 					const detection_boxs_t& detection_boxs,
 					const box_invasion_results_t& box_invasion_results
 				);
 
-
+	#pragma region clip lane by nearest point
 				static cvpoints_t clip_lane_by_nearest_box_point(
 					const dpoints_t& lane,
 					int near_x, int near_y
@@ -289,7 +360,9 @@ namespace watrix {
 					int near_x, int near_y
 				);
 
+	#pragma endregion
 
+	#pragma region draw safe area
 
 				static cv::Mat draw_lane_safe_area(
 					const LaneInvasionConfig& config,
@@ -309,7 +382,9 @@ namespace watrix {
 					const cvpoints_t& right_lane_cvpoints
 				);
 
+	#pragma endregion
 
+	#pragma region draw final lane 
 				
 				static void x_draw_lane_with_mask(
 					int lane_model_type, // caffe, pt_simple, pt_complex
@@ -326,13 +401,18 @@ namespace watrix {
 					const cvpoints_t& left_expand_lane_cvpoints,
 					const cvpoints_t& right_expand_lane_cvpoints,
 					const detection_boxs_t& detection_boxs,
-					const box_invasion_results_t& box_invasion_results,
+					const box_invasion_results_t& box_invasion_results, 
 					const std::vector<cvpoints_t>& trains_cvpoints,
 					cv::Mat& out,
 					lane_safe_area_corner_t& lane_safe_area_corner
 				);
 
+	#pragma endregion
 
+	#pragma endregion
+
+
+	#pragma region do lane invasion detect
 
 				static bool lane_invasion_detect(
 					int lane_model_type, // caffe, pt_simple, pt_complex
@@ -353,10 +433,10 @@ namespace watrix {
 					box_invasion_results_t& box_invasion_results,
 					std::vector<int>& lidar_invasion_status,
 					lane_safe_area_corner_t& lane_safe_area_corner,
-					bool& is_open_long_camera,
+					bool& is_open_long_camera, // �Ƿ�Զ��
 					std::vector<lidar_invasion_cvbox>& cv_obstacle_box // lidar invasion object cv box
 				);
-
+	#pragma endregion
 
 
 			};

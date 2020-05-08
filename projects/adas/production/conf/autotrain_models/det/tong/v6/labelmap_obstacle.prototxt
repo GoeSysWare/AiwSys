@@ -1,0 +1,35 @@
+item {
+  name: "none_of_the_above"
+  label: 0
+  display_name: "background"
+}
+item {
+  name: "person"
+  label: 1
+  display_name: "person"
+}
+item {
+  name: "traffic light"
+  label: 2
+  display_name: "traffic light"
+}
+item {
+  name: "train"
+  label: 3
+  display_name: "train"
+}
+item {
+  name: "box"
+  label: 4
+  display_name: "box"
+}
+item {
+  name: "tool"
+  label: 5
+  display_name: "tool"
+}
+item {
+  name: "balloon"
+  label: 6
+  display_name: "balloon"
+}

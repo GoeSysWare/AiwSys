@@ -13,9 +13,11 @@ cc_library(
     hdrs = [
         "util.h",
         "timer.h",
+        "threadpool.h"
     ],
     deps = [
         "//cyber/common",
+        "//cyber/base",       
     ],
 )
 

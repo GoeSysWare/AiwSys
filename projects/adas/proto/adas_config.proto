@@ -9,27 +9,34 @@ package watrix.projects.adas.proto;
 // 不对一般用户开放,高级设置可以自定义
 message InterfaceServiceConfig
 {
-  //记录文件查询服务名称
+  //记录文件查询服务名称,主要给  perception 和recorder模块用
   optional string  records_file_servicename = 1[default = "record_service_file"];
-  //记录回放启动服务名称
-  optional string  records_record_servicename = 2[default = "record_service_record"];
-  //参数服务名称：用于ADAS发现有物体时的全局通知设定
-  optional string records_parameter_servicename = 3[default = "adas_perception"];
-  //从drivers里发出的通道名称，注意
+    //记录文件播放服务名称,主要给  perception 和recorder模块用
+  optional string  records_play_servicename = 2[default = "record_service_play"];
+  //记录回放启动服务名称,主要给  perception 和recorder模块用
+  optional string  records_record_servicename = 3[default = "record_parameter_service_node"];
+  //参数服务名称：用于ADAS需要回放存档的全局通知设定, 主要给  perception 和recorder模块用
+  optional string records_parameter_servicename = 4[default = "adas_perception"];
+  //从drivers里发出的通道名称，主要给 perception和recorder模块用
   //!!!!注意: 一定要与modules/drivers/camera里设定要保持一致
-  optional string  camera_channels = 4 [default = "adas/camera/front_6mm/image,adas/camera/front_12mm/image"];
-  //相机名称
-  optional string   camera_names = 5 [default = "front_6mm,front_12mm"];
-  //lidar名称  
-  optional string   lidar_names = 6 [default = "front_lidar"];
-  //从drivers里发出的通道名称，注意要与modules/drivers/velodyne里设定要保持一致
-  optional string   lidar_channels= 7 [default = "/adas/sensor/pointcloud2"];
-  //这是perception之后图像结果通道名称
-  optional string   camera_output_channels= 8 [default = "adas/camera/front_6mm/result,adas/camera/front_12mm/result"];
-  //这是debug的图像通道名称
-  optional string   camera_debug_channels= 9 [default = "adas/camera/front_6mm/debug,adas/camera/front_12mm/debug"];
-  // perception的默认线程池的size
-  optional sint32   perception_tasks_num = 10 [default = 4];
+  optional string  camera_channels = 5 [default = "adas/camera/front_6mm/image,adas/camera/front_12mm/image"];
+  //相机名称,主要给 perception
+  optional string   camera_names = 6 [default = "front_6mm,front_12mm"];
+  //lidar名称  ,主要给 perception
+  optional string   lidar_names = 7 [default = "front_lidar"];
+  //从drivers里发出的通道名称，主要给  perception模块用
+  // 注意要与modules/drivers/velodyne里设定要保持一致
+  optional string   lidar_channels= 8 [default = "/adas/sensor/pointcloud2"];
+  //这是perception之后图像结果通道名称,主要给 perception和hmi模块用
+  optional string   camera_output_channels= 9 [default = "adas/camera/front_6mm/result,adas/camera/front_12mm/result"];
+  //这是debug的图像通道名称,主要给  perception模块用
+  optional string   camera_debug_channels= 10 [default = "adas/camera/front_6mm/debug,adas/camera/front_12mm/debug"];
+  // perception的默认线程池的size,主要给  perception模块用
+  optional sint32   perception_tasks_num = 11 [default = 2];
+  //回放动作触发的参数名字 主要给  perception 和recorder模块用
+  optional string   record_parameter_name = 12 [default = "is_record"];
+  //从回放出来的通道名前缀 主要给 recordplayer和hmi模块用
+  optional string  record_channelname_prefix=13[default = "records/"];
 
 }
 
@@ -37,7 +44,7 @@ message InterfaceServiceConfig
 message AlgorithmConfig
 {
     //仿真测试时的sdk版本
-    optional string sdk_version = 1;
+    optional string sdk_version = 1[default = "1.X.X"];
     //仿真测试时的Lidar版本
-    optional string lidar_version = 2;
+    optional string lidar_version = 2[default = "2.X"];;
 }

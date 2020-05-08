@@ -38,7 +38,7 @@
 */
 #pragma once
 #include "projects/adas/algorithm/algorithm_shared_export.h" 
-#include "projects/adas/algorithm/algorithm_type.h" 
+#include "projects/adas/algorithm/algorithm_type.h"
 
 // std
 #include <vector>

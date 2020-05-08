@@ -15,6 +15,7 @@
 #include "projects/adas/algorithm/autotrain/ObjectAndTrainDetection.h"
 #include "projects/adas/algorithm/autotrain/GetLaneStatus.h"
 
+
 // std
 #include <iostream>
 #include <map>
@@ -329,15 +330,14 @@ namespace watrix {
 					unsigned int X = int(points[i][0]);
 					unsigned int Y = int(points[i][1]);
 
-
 					float x,y;
 					bool success = MonocularDistanceApi::get_distance(table_type, Y,X, x, y);
+					// std::cout << success << "," << X << "," << Y << "," << x << "," << y << std::endl;
 					//  (X,z1,Y) (3,n)
 					if (success){
 						// CAMERA_TYPE::CAMERA_LONG  1 
 						if (table_type == 1){
 							if (round(x) > -10 && round(x) < 10 && round(y) > 30 && round(y) < 350){
-								// std::cout << success << "," << X << "," << Y << "," << x << "," << y << std::endl;
 								//std::cout << success << ",long " << points[i][0] << "," << points[i][1] << "," << X << "," << Y << "," << x << "," << y << std::endl;
 								coord_trans[0].push_back(x);
 								coord_trans[1].push_back(0);
@@ -578,6 +578,7 @@ namespace watrix {
 				*/
 				//printf(" coord_trans[2] Y.size = %d \n", coord_trans[2].size());
 				std::vector<int> y_idx = NumpyUtil::np_argwhere_eq(lane_coord_trans[2], y);
+				// std::cout << "y_idx size:" << y_idx.size() << " " << y_idx[0] << std::endl;
 				std::vector<double> x_coords;
 				for(auto& index: y_idx){
 					x_coords.push_back(lane_coord_trans[0][index]);
@@ -740,13 +741,9 @@ namespace watrix {
 							config.y_range_max
 						); 
 				
-						TABLE_TYPE table_type = TABLE_LONG_A;
-						if (camera_type == CAMERA_SHORT){
-							table_type = TABLE_SHORT_A;
-						}
 						// CAMERA_TYPE::CAMERA_LONG  1 
 						double thresh = 0.0;
-						// if (table_type == 1){
+						// if (camera_type != CAMERA_SHORT){
 						// 	thresh = 0.05;
 						// }
 						
@@ -1225,6 +1222,9 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 				const LaneInvasionConfig& config,
 				const dpoints_t& coord_expand_left,
 				const dpoints_t& coord_expand_right,
+				const cvpoints_t& left_expand_lane_cvpoints,
+				const cvpoints_t& right_expand_lane_cvpoints,
+				const std::vector<dpoints_t>& v_src_dist_lane_points,
 				const detection_box_t& detection_box
 			)
 			{
@@ -1244,8 +1244,13 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 				right_point.push_back(detection_box.xmax);
 				right_point.push_back(detection_box.ymax);
 
+				dpoint_t center_point;
+				center_point.push_back((detection_box.xmin+detection_box.xmax) / 2);
+				center_point.push_back(detection_box.ymax);
+
 				box_points.push_back(left_point);
 				box_points.push_back(right_point);
+				box_points.push_back(center_point);
 				
 
 				// for box point: image coord 1080,1920  ===> distance coord  x=[-5,5] y=[15,60]
@@ -1258,40 +1263,79 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 
 				// classname == train
 				if (detection_box.class_index == 3){
-					if (box_trans[0].size() == 2){
-						// (2) do real invasion detection with distance coords
-						// left point
-						int i=0;
-						double y1 = box_trans[2][i*2];
-						double x1 = box_trans[0][i*2];
+					// std::cout << "train" << std::endl;
+					// classname == train
+					if (box_trans[0].size() > 0){
+						double dist_lane = \
+						(coord_expand_right[2][coord_expand_right[2].size()-1] < coord_expand_left[2][coord_expand_left[2].size()-1])?coord_expand_right[2][coord_expand_right[2].size()-1]:coord_expand_left[2][coord_expand_left[2].size()-1];
+						double dist_train_box = box_trans[2][0];
 
-						// right point
-						double y2 = box_trans[2][i*2+1];
-						double x2 = box_trans[0][i*2+1];
+						dpoints_t coord_expand_left_xy = {v_src_dist_lane_points[0][0], v_src_dist_lane_points[0][1]};
+						for(int left_idx=2; left_idx < v_src_dist_lane_points[0].size(); left_idx++){
+							if (v_src_dist_lane_points[0][left_idx][1] <= dist_lane){
+								coord_expand_left_xy.push_back(v_src_dist_lane_points[0][left_idx]);
+							}
+						}
+						dpoints_t coord_expand_right_xy = {v_src_dist_lane_points[1][0], v_src_dist_lane_points[1][1]};
+						for(int right_idx=2; right_idx < v_src_dist_lane_points[1].size(); right_idx++){
+							if (v_src_dist_lane_points[1][right_idx][1] <= dist_lane){
+								coord_expand_right_xy.push_back(v_src_dist_lane_points[1][right_idx]);
+							}
+						}
+						std::vector<dpoints_t> left_right_lane_coord = {coord_expand_left_xy, coord_expand_right_xy};
 
-						// std::cout << detection_box.class_name << std::endl;
-						// std::cout << box_points[0][0] << " " << box_points[0][1] << " " << box_points[1][0] << " " << box_points[1][1] << std::endl;
-						// std::cout << x1 << " " << y1 << " " << x2 << " " << y2 << std::endl;
-						// std::cout << coord_expand_left.size() << std::endl;
-						// std::cout << coord_expand_left[0][0] << " " << coord_expand_left[0][coord_expand_left.size()-1] << std::endl;
-						// std::cout << coord_expand_left[2][0] << " " << coord_expand_left[2][coord_expand_left.size()-1] << std::endl;
-						// std::cout << coord_expand_right[0][0] << " " << coord_expand_right[0][coord_expand_right.size()-1] << std::endl;
-						// std::cout << coord_expand_right[2][0] << " " << coord_expand_right[2][coord_expand_right.size()-1] << std::endl;
+						bool is_lane_result = LaneStatus::is_lane_straight(left_right_lane_coord);
 
-						// train_box 的正中心在三维世界坐标系的坐标为 x，y，z；x要在两轨x范围之间，并且距离小于220m时则为侵界
-						if (x1 > coord_expand_right[0][coord_expand_right[0].size()-1] || x2 < coord_expand_left[0][coord_expand_left[0].size()-1]){
+						bool is_usefule = false;
+						// straight
+						if(is_lane_result){
+							// std::cout << "straight" << std::endl;
+							
+							cvpoint_t left_cvpoint = left_expand_lane_cvpoints[left_expand_lane_cvpoints.size()-1];
+							cvpoint_t right_cvpoint = right_expand_lane_cvpoints[right_expand_lane_cvpoints.size()-1];
+
+							int max_left_idx = coord_expand_left[2].size()-1;
+							int max_right_idx = coord_expand_right[2].size()-1;
+							// std::cout << max_left_idx << " " << max_right_idx << std::endl;
+							// 长焦阈值
+							if (camera_type == CAMERA_LONG){
+								// std::cout << coord_expand_left[2][max_left_idx] << " " << coord_expand_right[2][max_right_idx] << std::endl;
+								if (dist_train_box < 220 && (coord_expand_left[2][max_left_idx] < 220 && coord_expand_right[2][max_right_idx] < 220)){
+									if (detection_box.xmin > right_cvpoint.x || detection_box.xmax < left_cvpoint.x){
+										box_invasion_result.invasion_status = INVASION_STATUS::NO_INVASION;
+									}
+									else{
+										box_invasion_result.invasion_status = INVASION_STATUS::YES_INVASION;
+										box_invasion_result.invasion_distance = dist_train_box;
+									}
+								}
+								else{
+									box_invasion_result.invasion_status = INVASION_STATUS::NO_INVASION;
+								}
+							}
+							// 短焦阈值
+							else if (camera_type == CAMERA_SHORT){
+								// std::cout << coord_expand_left[2][max_left_idx] << " " << coord_expand_right[2][max_right_idx] << std::endl;
+								if (dist_train_box < 220 && (coord_expand_left[2][max_left_idx] < 70 && coord_expand_right[2][max_right_idx] < 70)){
+									if (detection_box.xmin > right_cvpoint.x || detection_box.xmax < left_cvpoint.x){
+										box_invasion_result.invasion_status = INVASION_STATUS::NO_INVASION;
+									}
+									else{
+										box_invasion_result.invasion_status = INVASION_STATUS::YES_INVASION;
+										box_invasion_result.invasion_distance = dist_train_box;
+									}
+								}
+								else{
+									box_invasion_result.invasion_status = INVASION_STATUS::NO_INVASION;
+								}
+							}
+								
+						}
+						// not straight
+						else{
 							box_invasion_result.invasion_status = INVASION_STATUS::NO_INVASION;
 						}
-						else{
-							double dist_train_box = (y1+y2) / 2.0;
-							if (dist_train_box < 220){
-								box_invasion_result.invasion_status = INVASION_STATUS::YES_INVASION;
-								box_invasion_result.invasion_distance = dist_train_box;
-							}
-							else{
-								box_invasion_result.invasion_status = INVASION_STATUS::NO_INVASION;
-							}
-						}
+
 					}
 				}
 				// classname == traffic light
@@ -1299,7 +1343,7 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 					box_invasion_result.invasion_status = INVASION_STATUS::NO_INVASION;
 				}
 				else{
-					if (box_trans[0].size() == 2){
+					if (box_trans[0].size() == 3){
 						// (2) do real invasion detection with distance coords
 						// left point
 						int i=0;
@@ -1310,9 +1354,19 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 						double y2 = box_trans[2][i*2+1];
 						double x2 = box_trans[0][i*2+1];
 
-						box_invasion_result = __do_box_invasion_detect(
-							config, coord_expand_left, coord_expand_right, x1, y1, x2, y2
-						);
+						double dist_lane = \
+						(coord_expand_right[2][coord_expand_right[2].size()-1] < coord_expand_left[2][coord_expand_left[2].size()-1])?coord_expand_right[2][coord_expand_right[2].size()-1]:coord_expand_left[2][coord_expand_left[2].size()-1];
+						double dist_train_box = box_trans[2][0];
+
+						if (y1 <= dist_lane){
+							box_invasion_result = __do_box_invasion_detect(
+								config, coord_expand_left, coord_expand_right, x1, y1, x2, y2
+							);
+						}
+						else{
+							box_invasion_result.invasion_status = INVASION_STATUS::NO_INVASION;
+						}
+						
 					}
 				}
 				
@@ -1328,6 +1382,7 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 				const dpoints_t& coord_expand_right,
 				const cvpoints_t& left_expand_lane_cvpoints,
 				const cvpoints_t& right_expand_lane_cvpoints,
+				const std::vector<dpoints_t>& v_src_dist_lane_points,
 				const detection_boxs_t& detection_boxs,
 				const std::vector<cvpoints_t>& trains_cvpoints
 			)
@@ -1338,20 +1393,27 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 					const detection_box_t& detection_box = detection_boxs[i];
 
 					box_invasion_result_t box_invasion_result; 
-					if (is_case1_box(detection_box, config.case1_x_threshold, config.case1_y_threshold)){
-						box_invasion_result = do_case1_box_invasion_detect(
-							detection_box
-						);
-					} /*else if (is_train_box(detection_box)){
-						box_invasion_result = do_train_box_invasion_detect(
-							camera_type, config, left_expand_lane_cvpoints, right_expand_lane_cvpoints, trains_cvpoints[i]
-						);
-					} */
-					else { // other cases
-						box_invasion_result = do_box_invasion_detect(
-							camera_type, config, coord_expand_left, coord_expand_right, detection_box
-						);
-					}
+
+					// case1 box：目标物成像离镜头近，且挡住了轨道；由于轨道被遮挡，所以判断是否侵入轨道时，会判断为未侵界；
+					// if (is_case1_box(detection_box, config.case1_x_threshold, config.case1_y_threshold)){
+					// 	box_invasion_result = do_case1_box_invasion_detect(
+					// 		detection_box
+					// 	);
+					// } /*else if (is_train_box(detection_box)){
+					// 	box_invasion_result = do_train_box_invasion_detect(
+					// 		camera_type, config, left_expand_lane_cvpoints, right_expand_lane_cvpoints, trains_cvpoints[i]
+					// 	);
+					// } */
+					// else { // other cases
+					// 	box_invasion_result = do_box_invasion_detect(
+					// 		camera_type, config, coord_expand_left, coord_expand_right, detection_box
+					// 	);
+					// }
+
+					box_invasion_result = do_box_invasion_detect(
+						camera_type, config, coord_expand_left, coord_expand_right, left_expand_lane_cvpoints, right_expand_lane_cvpoints, v_src_dist_lane_points, detection_box
+					);
+
 					box_invasion_results.push_back(box_invasion_result);
 				}
 				return box_invasion_results;
@@ -1449,6 +1511,7 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 				// pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, 
 				std::vector<cv::Point3f> cloud,
 				InvasionData  invasion,
+				float distance_limit, 
 				cvpoints_t& input_l,
 				cvpoints_t& input_r,
 				std::vector<LidarBox>& obstacle_box,
@@ -1458,7 +1521,7 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 				// std::vector<lidar_invasion_cvbox>& cv_obstacle_box;
 
 				pcl::PointCloud<pcl::PointXYZ>::Ptr points(new pcl::PointCloud<pcl::PointXYZ>);
-				Eigen::Matrix4f rotation;
+				Eigen::Matrix4d rotation;
 				int top_y = 0;
 				// Mat t_mat(1, 1, CV_8UC1, Scalar::all(0));
 				std::string image_file = "";
@@ -1486,9 +1549,10 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 					cloud_pcl->points.push_back(pt);
 				}
 
-				points = LOD::getPointFrom2DAnd3D(cloud_pcl, LOD::getInvasionMap(input_l, input_r, top_y), top_y, invasion, rotation);
+				points = LOD::getPointFrom2DAnd3D(cloud_pcl, LOD::getInvasionMap(input_l, input_r, top_y), top_y, invasion, rotation, distance_limit);
+
 #ifdef SHOW_PCD
-				pcl::io::savePCDFileBinary("output.pcd", *points);
+				// pcl::io::savePCDFileBinary("output.pcd", *points);
 				pcl::visualization::CloudViewer viewer("Show");
 				viewer.showCloud(points);
 				// system("pause");
@@ -1819,6 +1883,8 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 				}
 				
 				// (6) draw left-right lane safe area  and corners
+				lane_safe_area_corner.valid = false;
+
 				if (config.b_draw_safe_area && id_left>=0 && id_right>=0){
 					cvpoints_t clipped_left_lane_cvpoints = clip_lane_by_nearest_box_point(
 						left_expand_lane_cvpoints, near_x, near_y
@@ -1853,6 +1919,7 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 					NumpyUtil::cv_add_weighted(safe_area_1, out, config.safe_area_alpha);
 
 				}
+
 				// (7) draw train cvpoints
 				if (config.b_draw_train_cvpoints){
 				 	for(int i=0; i<trains_cvpoints.size();i++){
@@ -1898,7 +1965,7 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 				box_invasion_results_t& box_invasion_results,
 				std::vector<int>& lidar_invasion_status,
 				lane_safe_area_corner_t& lane_safe_area_corner,
-				bool& is_open_long_camera,
+				bool& is_open_long_camera, // 是否开远焦
 				std::vector<lidar_invasion_cvbox>& cv_obstacle_box // lidar invasion object cv box
 			)
 			{
@@ -2113,6 +2180,13 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 					v_auto_range_dist_lane_points_new.push_back(tmp_ps);
 				}
 
+				// dpoints_t t_left = v_auto_range_dist_lane_points_new[0], t_right = v_auto_range_dist_lane_points_new[1];
+				// float t_dist = (t_left[2][t_left[2].size()-1] < t_right[2][t_right[2].size()-1]) ? \
+				// 					t_left[2][t_left[2].size()-1] : t_right[2][t_right[2].size()-1];
+					
+				// std::cout << "distance limit 0:" << t_dist << std::endl;
+				// std::cout << "left:" << t_left[2][t_left[2].size()-1] << " right:" << t_right[2][t_right[2].size()-1] << std::endl;
+
 				std::vector<cvpoints_t> v_left_right_expand_cvpoints;
 				for(int lane_id=0; lane_id < v_auto_range_dist_lane_points_new.size(); lane_id++){
 					const dpoints_t& one_lane_points = v_auto_range_dist_lane_points_new[lane_id]; 
@@ -2243,12 +2317,6 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 
 				cvpoint_t nearest_point; // nearest invasion box point
 
-				// fwc test
-				TABLE_TYPE table_type = TABLE_LONG_A;
-				if (camera_type == CAMERA_SHORT){
-					table_type = TABLE_SHORT_A;
-				}
-
 				std::vector<LidarBox> obstacle_box; // lidar invasion object 3d box
 				// std::vector<lidar_invasion_cvbox> cv_obstacle_box; // lidar invasion object cv box
 				
@@ -2266,6 +2334,7 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 						coord_expand_right, 
 						left_expand_lane_cvpoints, // for train class box
 						right_expand_lane_cvpoints,
+						v_src_dist_lane_points,
 						detection_boxs,
 						trains_cvpoints
 					);
@@ -2277,11 +2346,18 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 						invasion.coeff_right.push_back(v_left_right_polyfit_matk[1].at<double>(idx, 0));
 					}
 
+					float distance_limit;
+					distance_limit = (coord_expand_left[2][coord_expand_left[2].size()-1] < coord_expand_right[2][coord_expand_right[2].size()-1]) ? \
+									coord_expand_left[2][coord_expand_left[2].size()-1] : coord_expand_right[2][coord_expand_right[2].size()-1];
+					
+					std::cout << "distance limit:" << distance_limit << std::endl;
+					std::cout << "left:" << coord_expand_left[2][coord_expand_left[2].size()-1] << " right:" << coord_expand_right[2][coord_expand_right[2].size()-1] << std::endl;
+
 					// CAMERA_TYPE::CAMERA_LONG  1 
-					if (table_type != 1){
+					if (camera_type == CAMERA_SHORT){
 						if (config.use_lidar_pointcloud_smallobj_invasion_detect){
 							lidar_pointcloud_smallobj_invasion_detect(
-								cloud, invasion, left_expand_lane_cvpoints, right_expand_lane_cvpoints,
+								cloud, invasion, distance_limit, left_expand_lane_cvpoints, right_expand_lane_cvpoints,
 								obstacle_box, cv_obstacle_box
 							);
 
@@ -2333,8 +2409,27 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 					image_with_color_mask,
 					lane_safe_area_corner
 				);
+
+				if (lane_safe_area_corner.valid){
+					dpoint_t pt_left{(double)lane_safe_area_corner.left_upper.x, (double)lane_safe_area_corner.left_upper.y};
+					dpoints_t points_left{pt_left};
+					dpoints_t left_points_trans = image_points_to_distance_points(camera_type, config, points_left); 
+
+					dpoint_t pt_right{(double)lane_safe_area_corner.right_upper.x, (double)lane_safe_area_corner.right_upper.y};
+					dpoints_t points_right{pt_right};
+					dpoints_t right_points_trans = image_points_to_distance_points(camera_type, config, points_right);
+					std::string str_flag_dist;
+					std::stringstream ss_left, ss_right;
+					if (left_points_trans[0].size() && right_points_trans[0].size()){
+						ss_left << fixed << setprecision(2) << left_points_trans[2][0];
+						ss_right << fixed << setprecision(2) << right_points_trans[2][0];
+						str_flag_dist = "Dis:"+ss_left.str()+" "+ss_right.str();
+						cv::putText(image_with_color_mask, str_flag_dist, cv::Point(200, 100), cv::FONT_HERSHEY_TRIPLEX, 1.0, cv::Scalar(0, 0, 255));
+					}
+				}
+
 				// CAMERA_TYPE::CAMERA_LONG  1 
-				if (table_type != 1){
+				if (camera_type == CAMERA_SHORT){
 					// bool is_show_lidarbox = true;
 					if (config.use_lidar_pointcloud_smallobj_invasion_detect){
 						for (size_t i = 0; i < cv_obstacle_box.size(); i++)

@@ -97,6 +97,7 @@ private:
 
     std::string record_q_servicename_;
     std::string file_q_servicename_;
+    std::string  record_channelname_prefix_;
 };
 
 CYBER_REGISTER_COMPONENT(AdasRecPlayerComponent)

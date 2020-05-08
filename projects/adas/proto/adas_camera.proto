@@ -1,5 +1,5 @@
 syntax = "proto2";
 
-package aiwsys.projects.adas.proto;
+package watrix.projects.adas.proto;
 
 

@@ -3,21 +3,21 @@
   if_use_detect_model: true
   if_use_train_seg_model: false
   if_use_lane_seg_model: true
-  save_image_result: false
-
+  if_save_image_result: false
+  save_image_dir:"data/debug"
   # yolo config 
   yolo: {
     net: {
       net_count: 2
-      proto_filepath: "conf/autotrain_models/det/tong/v4/deploy.prototxt"
-      weight_filepath: "conf/autotrain_models/det/tong/v4/VOC0712Plus_refinedet_vgg16_512x512_ft_iter_160000.caffemodel"
+      proto_filepath: "production/conf/autotrain_models/det/tong/v6/deploy.prototxt"
+      weight_filepath: "production/conf/autotrain_models/det/tong/v6/det_512x512_c7.caffemodel"
     }
     mean: {
       b: 104
       g: 117
       r: 123
     }
-    label_filepath: "conf/autotrain_models/det/tong/v4/labelmap.names"
+    label_filepath: "production/conf/autotrain_models/det/tong/v6/labelmap.names"
     normalize_value: 1.0 #0.0039215
     confidence_threshold: 0.50
     resize_keep_flag: false
@@ -27,8 +27,8 @@
   trainseg {
      net: {
       net_count: 1
-      proto_filepath: "conf/autotrain_models/det/tong/v4/deploy.prototxt"
-      weight_filepath: "conf/autotrain_models/det/tong/v4/VOC0712Plus_refinedet_vgg16_512x512_ft_iter_160000.caffemodel"
+      proto_filepath: "production/conf/autotrain_models/det/tong/v6/deploy.prototxt"
+      weight_filepath: "production/conf/autotrain_models/det/tong/v6/det_512x512_c7.caffemodel"
     }
     mean: {
       b: 104.00698793
@@ -41,8 +41,8 @@
   laneseg {
      net: {
       net_count: 1
-      proto_filepath: "conf/autotrain_models/lanenet/v5/model.prototxt"
-      weight_filepath: "conf/autotrain_models/pt/v7_sequence/20191209_seg_pics.pt"
+      proto_filepath: "production/conf/autotrain_models/lanenet/v5/model.prototxt"
+      weight_filepath: "production/conf/autotrain_models/pt/v7_sequence/20191209_seg_pics.pt"
 
     }
     mean: {
@@ -97,7 +97,7 @@
       dpoints_11 : 0.999721862867384
       dpoints_12 : 0.416497000000000  
     }     
-    output_dir : "conf/train/sdk_seg/"
+    output_dir : "production/conf/train/sdk_seg/"
     b_save_temp_images : true # save temp image results
 
     b_draw_lane_surface : false  # draw lane surface
