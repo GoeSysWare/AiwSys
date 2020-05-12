@@ -598,116 +598,116 @@ namespace watrix
           }
         }
 
-        //这里对短焦的雷达区域进行障碍物，距离计算
-        int lidar_obj_distance = 0;
-        std::vector<int> lidar_point_status_t;
-        lidar_point_status_t = lidar_invasion_status0;
-        box_invasion_results_t short_box_invasion_status = v_box_invasion_results[0];
-        int short_lidar_safe = 0;
-        if ((lidar_point_status_t.size() > 0) && (lidar2img >= 0))
-        {
-          //v_trains_cvpoint
-          std::vector<int> v_train_invasion_status;
-          //count of train
-          int train_points_all_index = 0;
-          for (int ts = 0; ts < v_trains_cvpoint.size(); ts++)
-          {
-            std::vector<float> limit_width;
-            int train_invasion_tc = 0;
-            //points of train
-            for (int j = train_points_all_index; j < train_cvpoints.size(); j++)
-            {
-              if (lidar_point_status_t[j] == 1)
-              {
-                limit_width.push_back(train_cvpoints[j].x);
-                train_invasion_tc++;
-              }
-            }
-            if (train_invasion_tc > 3)
-            {
-              v_train_invasion_status.push_back(1);
-            }
-            else
-            {
-              v_train_invasion_status.push_back(0);
-            }
-          }
-          //change train status
-          detection_boxs_t detection_boxs = yolo_detection_boxs0_;
+        // //这里对短焦的雷达区域进行障碍物，距离计算
+        // int lidar_obj_distance = 0;
+        // std::vector<int> lidar_point_status_t;
+        // lidar_point_status_t = lidar_invasion_status0;
+        // box_invasion_results_t short_box_invasion_status = v_box_invasion_results[0];
+        // int short_lidar_safe = 0;
+        // if ((lidar_point_status_t.size() > 0) && (lidar2img >= 0))
+        // {
+        //   //v_trains_cvpoint
+        //   std::vector<int> v_train_invasion_status;
+        //   //count of train
+        //   int train_points_all_index = 0;
+        //   for (int ts = 0; ts < v_trains_cvpoint.size(); ts++)
+        //   {
+        //     std::vector<float> limit_width;
+        //     int train_invasion_tc = 0;
+        //     //points of train
+        //     for (int j = train_points_all_index; j < train_cvpoints.size(); j++)
+        //     {
+        //       if (lidar_point_status_t[j] == 1)
+        //       {
+        //         limit_width.push_back(train_cvpoints[j].x);
+        //         train_invasion_tc++;
+        //       }
+        //     }
+        //     if (train_invasion_tc > 3)
+        //     {
+        //       v_train_invasion_status.push_back(1);
+        //     }
+        //     else
+        //     {
+        //       v_train_invasion_status.push_back(0);
+        //     }
+        //   }
+        //   //change train status
+        //   detection_boxs_t detection_boxs = yolo_detection_boxs0_;
 
-          int train_index = 0;
-          for (int box = 0; box < detection_boxs.size(); box++)
-          {
-            std::string cname = detection_boxs[box].class_name;
-            if (std::strcmp(cname.c_str(), "train") == 0)
-            {
-              if (v_train_invasion_status[train_index])
-              {
-                short_box_invasion_status[box].invasion_status = 1;
-              }
-              else
-              {
-                short_box_invasion_status[box].invasion_status = 0;
-              }
-            }
-          }
-        }
-        //跟据最远安全距离进行，long,short的帧选择
-        //当目标在短焦镜头，同时在远焦镜出现，远焦镜头的最短安全距离是30，可能会大于近焦的安全距离
-        int select_cam = 0;
-        if (short_camera_open_status)
-        {
-          if ((0 <= short_safe_y) && (short_safe_y <= 40))
-          {
-            select_cam = 0;
-          }
-          else if (long_safe_y > short_safe_y)
-          {
-            select_cam = 1;
-          }
-        }
-        else
-        {
-          select_cam = 0;
-        }
+        //   int train_index = 0;
+        //   for (int box = 0; box < detection_boxs.size(); box++)
+        //   {
+        //     std::string cname = detection_boxs[box].class_name;
+        //     if (std::strcmp(cname.c_str(), "train") == 0)
+        //     {
+        //       if (v_train_invasion_status[train_index])
+        //       {
+        //         short_box_invasion_status[box].invasion_status = 1;
+        //       }
+        //       else
+        //       {
+        //         short_box_invasion_status[box].invasion_status = 0;
+        //       }
+        //     }
+        //   }
+        // }
+        // //跟据最远安全距离进行，long,short的帧选择
+        // //当目标在短焦镜头，同时在远焦镜出现，远焦镜头的最短安全距离是30，可能会大于近焦的安全距离
+        // int select_cam = 0;
+        // if (short_camera_open_status)
+        // {
+        //   if ((0 <= short_safe_y) && (short_safe_y <= 40))
+        //   {
+        //     select_cam = 0;
+        //   }
+        //   else if (long_safe_y > short_safe_y)
+        //   {
+        //     select_cam = 1;
+        //   }
+        // }
+        // else
+        // {
+        //   select_cam = 0;
+        // }
 
-        std::vector<int> lidar_point_status;
-        // 将雷达点画到图片上
-        lidar_point_status = lidar_invasion_status0;
-        //std::cout<<"------------------"<<lidar_point_status.size()<<std::endl;
-        cv::Mat short_mat;
+        // std::vector<int> lidar_point_status;
+        // // 将雷达点画到图片上
+        // lidar_point_status = lidar_invasion_status0;
+        // //std::cout<<"------------------"<<lidar_point_status.size()<<std::endl;
+        // cv::Mat short_mat;
 
-        if ((lidar_point_status.size() > 0) && (lidar2img >= 0))
-        {
-          short_mat = v_image_with_color_mask[0];
-          std::cout << train_cvpoints.size() << "  paint: " << std::endl;
-          for (int j = 0; j < train_cvpoints.size(); j++)
-          {
+        // if ((lidar_point_status.size() > 0) && (lidar2img >= 0))
+        // {
+        //   short_mat = v_image_with_color_mask[0];
+        //   std::cout << train_cvpoints.size() << "  paint: " << std::endl;
+        //   for (int j = 0; j < train_cvpoints.size(); j++)
+        //   {
 
-            uint pos_y = (uint)(train_cvpoints[j].y);
-            uint pos_x = (uint)(train_cvpoints[j].x);
-            //cout<<"----"<<pos_x<<"  "<<pos_y<<endl;
-            //PainPoint2Image(short_mat, pos_x, pos_y, GREEN_POINT);
+        //     uint pos_y = (uint)(train_cvpoints[j].y);
+        //     uint pos_x = (uint)(train_cvpoints[j].x);
+        //     //cout<<"----"<<pos_x<<"  "<<pos_y<<endl;
+        //     //PainPoint2Image(short_mat, pos_x, pos_y, GREEN_POINT);
 
-            if (lidar_point_status[j] == 1)
-            {
-              //从3D-2D再从新计算一边x,y
-              PainPoint2Image(short_mat, pos_x, pos_y, RED_POINT);
-            }
-            else if (lidar_point_status[j] == 0)
-            {
-              PainPoint2Image(short_mat, pos_x, pos_y, GREEN_POINT);
-            }
-            else if (lidar_point_status[j] == -1)
-            {
-              PainPoint2Image(short_mat, pos_x, pos_y, YELLOW_POINT);
-            }
-          }
-        }
-        else
-        {
-          short_mat = v_image_with_color_mask[0];
-        }
+        //     if (lidar_point_status[j] == 1)
+        //     {
+        //       //从3D-2D再从新计算一边x,y
+        //       PainPoint2Image(short_mat, pos_x, pos_y, RED_POINT);
+        //     }
+        //     else if (lidar_point_status[j] == 0)
+        //     {
+        //       PainPoint2Image(short_mat, pos_x, pos_y, GREEN_POINT);
+        //     }
+        //     else if (lidar_point_status[j] == -1)
+        //     {
+        //       PainPoint2Image(short_mat, pos_x, pos_y, YELLOW_POINT);
+        //     }
+        //   }
+        // }
+        // else
+        // {
+        //   short_mat = v_image_with_color_mask[0];
+        // }
 
         //侵界判断
         bool invasion_flag = false;

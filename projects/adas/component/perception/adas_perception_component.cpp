@@ -209,12 +209,6 @@ namespace watrix
 
       bool AdasPerceptionComponent::Init()
       {
-        // 根据配置获得内置的接口配置信息
-        //为了参数服务用上,这里必须重写node的name,
-        watrix::projects::adas::proto::InterfaceServiceConfig interface_config;
-        apollo::cyber::common::GetProtoFromFile(
-            apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(), FLAGS_adas_cfg_interface_file),
-            &interface_config);
 
         if (!InitConfig())
         {
@@ -534,7 +528,7 @@ namespace watrix
             node_->CreateWriter<watrix::projects::adas::proto::CameraImages>(debug_camera_channel_names_[1]);
 
         //参数服务,触发记录存档用
-        std::string node_name = interface_config.records_record_servicename();
+        std::string node_name = interface_config.records_parameter_servicename();
         param_node_ = apollo::cyber::CreateNode(node_name);
 
         param_server_ = std::make_shared<apollo::cyber::ParameterServer>(param_node_);
@@ -593,14 +587,14 @@ namespace watrix
                << " image ts: " + std::to_string(msg_timestamp);
 
         // timestamp should be almost monotonic
-        if (last_timestamp_ - msg_timestamp > ts_diff_)
+        if (last_camera_timestamp_ - msg_timestamp > ts_diff_)
         {
           AINFO << "Received an old message. Last ts is " << std::setprecision(19)
-                << last_timestamp_ << " current ts is " << msg_timestamp
-                << " last - current is " << last_timestamp_ - msg_timestamp;
+                << last_camera_timestamp_ << " current ts is " << msg_timestamp
+                << " last - current is " << last_camera_timestamp_ - msg_timestamp;
           return;
         }
-        last_timestamp_ = msg_timestamp;
+        last_camera_timestamp_ = msg_timestamp;
         ++seq_num_;
 
         //内部处理
@@ -670,14 +664,14 @@ namespace watrix
               << " lidar_name: " << lidar_name
               << " image ts: " + std::to_string(msg_timestamp);
 
-        if (last_timestamp_ - msg_timestamp > ts_diff_)
+        if (last_lidar_timestamp_ - msg_timestamp > ts_diff_)
         {
-          AINFO << "Received an old message. Last ts is " << std::setprecision(19)
-                << last_timestamp_ << " current ts is " << msg_timestamp
-                << " last - current is " << last_timestamp_ - msg_timestamp;
+          AINFO << "Received an old Lidar message. Last ts is " << std::setprecision(19)
+                << last_lidar_timestamp_ << " current ts is " << msg_timestamp
+                << " last - current is " << last_lidar_timestamp_ - msg_timestamp;
           return;
         }
-        last_timestamp_ = msg_timestamp;
+        last_lidar_timestamp_ = msg_timestamp;
         // ++seq_num_;
         //核心处理
         int effect_point = 0;

@@ -317,11 +317,11 @@ void AdasRecRecorderComponent::ShowProgress()
     {
 
         apollo::cyber::Parameter parameter;
-        param_client_->GetParameter("is_record", &parameter);
+        param_client_->GetParameter(record_parameter_name_, &parameter);
         if (parameter.AsBool())
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-            apollo::cyber::Parameter set_para("is_record", false);
+            apollo::cyber::Parameter set_para(record_parameter_name_, false);
             param_client_->SetParameter(set_para);
         }
         else

@@ -262,6 +262,12 @@ new_local_repository(
     # strip_prefix = "qpOASES-3.2.1",
     path = "../3rd/qpOASES-3.2.1",
 )
+# Proj.4
+new_local_repository(
+    name = "proj4",
+    build_file = "third_party/proj4.BUILD",
+    path = "../3rd/PROJ-4.9.3",
+)
 
 #########################################################################################
 # 人工智能框架和工具

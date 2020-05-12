@@ -158,8 +158,9 @@ private:
     std::mutex lidar_mutex_;
 
     uint32_t seq_num_;
+   double last_camera_timestamp_ = 0.0; 
 
-   double last_timestamp_ = 0.0; 
+   double last_lidar_timestamp_ = 0.0; 
    double timestamp_offset_ = 0.0;
    double ts_diff_ = 1.0;
 

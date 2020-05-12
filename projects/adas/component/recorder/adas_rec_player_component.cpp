@@ -166,7 +166,8 @@ void AdasRecPlayerComponent::EnumRecordFiles()
     for (auto &file : records_files_)
     {
         RecordFileReader file_reader;
-        if (!file_reader.Open(file))
+        
+        if (!file_reader.Open(apollo::cyber::common::GetAbsolutePath(record_save_dir_, file)))
         {
             AERROR << "open record file error. file: " << file;
             continue;
@@ -185,7 +186,7 @@ void AdasRecPlayerComponent::EnumRecordFiles()
         //赋值
         FileParam *fileparam = record_file_info_.add_files();
 
-        fileparam->set_file_name(file);
+        fileparam->set_file_name(apollo::cyber::common::GetAbsolutePath(record_save_dir_, file));
         fileparam->set_start_time(begin_time_str);
         fileparam->set_duration(duration_s);
         fileparam->set_is_completed(is_complete);
