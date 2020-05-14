@@ -70,6 +70,7 @@
 
 // autotrain
 // caffe api
+#include "projects/adas/algorithm/autotrain/yolo_darknet_api.h"  // caffe
 #include "projects/adas/algorithm/autotrain/yolo_api.h"  // caffe
 #include "projects/adas/algorithm/autotrain/trainseg_api.h" // caffe
 #include "projects/adas/algorithm/autotrain/laneseg_api.h" // caffe/pytorch backend

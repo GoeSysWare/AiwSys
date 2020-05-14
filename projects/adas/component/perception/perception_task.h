@@ -49,7 +49,7 @@ class PerceptionTask {
   PerceptionComponentPtr perception_;
   bool if_use_simulator_ = false;
   bool if_save_image_result_ = false;
-  std::string frame_id_;
+  uint32_t sequence_num_;
   std::string save_image_dir_;
   std::vector<cv::Mat> v_image_;
   std::vector<std::string> sim_image_files_;
@@ -72,7 +72,7 @@ channel_mat_t v_instance_mask0_;
 channel_mat_t v_instance_mask1_;
 
 
-
+void DoDarknetDetectGPU();
 void DoLaneSegSeqGPU();
 void DoYoloDetectGPU();
 void DoTrainSegGPU();

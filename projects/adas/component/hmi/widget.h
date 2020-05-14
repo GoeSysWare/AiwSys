@@ -76,10 +76,13 @@ private:
     RecordForm *form;
 public slots:
     void playRecordSlot(const QString &filename);
+    void DisplayInLabel(const QImage play_img, int index);
+
 private slots:
     void onStateChanged();
     void ChangeShow();
-
+signals:
+    void signalDisplayImage(const QImage  play_img, int index);
     /////////////////////////////////
     /////////////////////////////////
 private:
@@ -113,7 +116,6 @@ private:
 
     QPoint mouseMovePosition_;
     void DisplayWarning();
-    void DisplayInLabel(const cv::Mat &play_img, int index);
     void timerEvent(QTimerEvent *);
 
     void ShowRecordWidget();

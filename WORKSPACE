@@ -311,7 +311,12 @@ new_local_repository(
     build_file = "third_party/mkldnn.BUILD",
     path = "../3rd/mkl-dnn-0.14/build/install",
 )
-
+# darknet
+new_local_repository(
+    name = "darknet",
+    build_file = "third_party/darknet.BUILD",
+    path = "../3rd/darknet",
+)
 # # mklml
 # new_local_repository(
 #     name = "mklml",

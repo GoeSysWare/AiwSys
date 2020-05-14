@@ -6,22 +6,33 @@
   if_save_image_result: false
   save_image_dir:"data/debug"
   # yolo config 
-  yolo: {
-    net: {
-      net_count: 2
-      proto_filepath: "production/conf/autotrain_models/det/tong/v6/deploy.prototxt"
-      weight_filepath: "production/conf/autotrain_models/det/tong/v6/det_512x512_c7.caffemodel"
-    }
-    mean: {
-      b: 104
-      g: 117
-      r: 123
-    }
-    label_filepath: "production/conf/autotrain_models/det/tong/v6/labelmap.names"
-    normalize_value: 1.0 #0.0039215
-    confidence_threshold: 0.50
-    resize_keep_flag: false
-  }
+  #yolo: {
+   # net: {
+  #    net_count: 2
+    #  proto_filepath: "production/conf/autotrain_models/det/tong/v6/deploy.prototxt"
+    #  weight_filepath: "production/conf/autotrain_models/det/tong/v6/det_512x512_c7.caffemodel"
+  #  }
+ #   mean: {
+ #     b: 104
+  #    g: 117
+   #   r: 123
+  #  }
+   # label_filepath: "production/conf/autotrain_models/det/tong/v6/labelmap.names"
+  #  normalize_value: 1.0 #0.0039215
+  #  confidence_threshold: 0.50
+ #   resize_keep_flag: false
+ # }
+
+  # darknet config
+   darknet:
+   {
+     cfg_filepath:"production/conf/autotrain_models/darknet/v2/yolov4-custom_anchor_scratch.cfg"
+     weight_filepath:"production/conf/autotrain_models/darknet/v2/yolov4-custom_anchor_scratch_best.weights"
+     label_filepath:"production/conf/autotrain_models/darknet/v2/custom.names"
+     confidence_threshold:0.25
+    hier_thresh:0.5
+    iou_thresh:0.45
+   }
 
   # trainseg config 
   trainseg {

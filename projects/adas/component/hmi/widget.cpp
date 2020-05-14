@@ -57,6 +57,8 @@ Widget::Widget(QWidget *parent) : QWidget(parent),
     show_index_ = 0;
     //初始化信号槽
     initConnect();
+    //初始化定时器
+    startTimer(1000);
 }
 void Widget::initNetwork()
 {
@@ -146,6 +148,8 @@ void Widget::initNetwork()
 void Widget::initConnect()
 {
     connect(form, &RecordForm::selectedRocordSignal, this, &Widget::playRecordSlot);
+    connect(this, &Widget::signalDisplayImage, this,&Widget::DisplayInLabel);
+
 }
 //由于QLabel跟Qbutton不同，没有clicked信号，需要自己写事件机制
 bool Widget::eventFilter(QObject *obj, QEvent *event)
@@ -367,9 +371,9 @@ void Widget::YoloResaultDisplay(const std::shared_ptr<watrix::projects::adas::pr
     }
     if(screen_index == -1) return;
 
-    cv::Mat image_display_lane_;
-    cv::Mat image_display_seg_;
-    cv::Mat image_display_;
+    cv::Mat image_display_lane;
+    cv::Mat image_display_seg;
+    cv::Mat image_display;
 
     uint net_time = image_tools_.GetMillisec();
     uint source_image_height = sync_result->source_image().height();
@@ -377,11 +381,11 @@ void Widget::YoloResaultDisplay(const std::shared_ptr<watrix::projects::adas::pr
     uint source_image_step = sync_result->source_image().step();
 
     //root_image 初始化为一个黑色分辨率的底图
-    image_display_ = Mat::zeros(source_image_height, source_image_width, CV_8UC3);
+    image_display = Mat::zeros(source_image_height, source_image_width, CV_8UC3);
     if ((source_image_height > 0) && (source_image_width > 0))
     {
         long source_img_length = source_image_height * source_image_step;
-        memcpy(image_display_.data, (void *)sync_result->source_image().data().c_str(), source_img_length);
+        memcpy(image_display.data, (void *)sync_result->source_image().data().c_str(), source_img_length);
     }
 
     // AERROR << "ResaultDisplay.....get image id==" << screen_index;
@@ -395,13 +399,15 @@ void Widget::YoloResaultDisplay(const std::shared_ptr<watrix::projects::adas::pr
         long seg_img_length = seg_image_height *seg_image_step;
         Mat seg_binary_image = Mat(seg_image_height, seg_image_width, CV_8UC1);
         memcpy(seg_binary_image.data, (void *)sync_result->seg_binary_mask().data().c_str(), seg_img_length);
-        image_display_seg_ = Mat::zeros(seg_image_height, seg_image_width, CV_8UC3);
-        image_display_seg_ = ConvertTo3Channels(seg_binary_image); 
+        image_display_seg = Mat::zeros(seg_image_height, seg_image_width, CV_8UC3);
+        image_display_seg = ConvertTo3Channels(seg_binary_image); 
 
-        cv::addWeighted(image_display_seg_, 0.2, image_display_, 0.8, -1, image_display_);
+        cv::addWeighted(image_display_seg, 0.2, image_display, 0.8, -1, image_display);
     }
 
-    DisplayInLabel(image_display_, screen_index);
+    QImage img = image_tools_.cvMat2QImage(image_display);
+
+    emit signalDisplayImage(img,screen_index);
 
     watrix::projects::adas::proto::MaxSafeDistance max_safe_ditance_ = sync_result->max_safe_distance();
 
@@ -458,14 +464,41 @@ void Widget::RecordDisplay(const std::shared_ptr<apollo::drivers::Image> &record
                          (void *)record->data().c_str(), 
                         source_image_height * source_image_width * 3);
     } 
-    DisplayInLabel(image_display, screen_index); 
+
+    //将RGB图像转换为BGR
+    cv::cvtColor(image_display, image_display, CV_RGB2BGR); 
+
+    //图像要缩小
+    cv::resize(image_display, image_display, cv::Size(1280, 800));
+
+    //把时间放到回放的图像上
+    apollo::cyber::Time time_stamp(record->header().timestamp_sec());
+
+    std::string format_str = R"(
+      camera name:    %s
+      frame id:    %s
+      recorder time : %s )";
+
+        std::string display_text =
+            boost::str(boost::format(format_str.c_str()) 
+            % camera_names_[screen_index]
+             % record->header().frame_id()
+             %  time_stamp.ToString());
+
+    
+
+    cv::putText(image_display, display_text, cv::Point2i (10, 50),
+                      cv::FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(255, 255, 0), 2);
+
+    QImage img = image_tools_.cvMat2QImage(image_display);
+    emit signalDisplayImage(img,screen_index);
 }
 
-void Widget::DisplayInLabel(const cv::Mat &play_img, int index)
+void Widget::DisplayInLabel(const QImage play_img, int index)
 {
 
-    QImage img = image_tools_.cvMat2QImage(play_img);
-    QPixmap pixmap = QPixmap::fromImage(img);
+    // QImage img = image_tools_.cvMat2QImage(play_img);
+    QPixmap pixmap = QPixmap::fromImage(play_img);
     if (!pixmap.isNull())
     {
         if (show_index_ == 0)

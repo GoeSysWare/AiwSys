@@ -5,7 +5,7 @@
 
 // The directory which contains a group of related maps, such as base_map,
 // sim_map, routing_topo_grapth, etc.
-
+DECLARE_string(adas_cfg_algorithm_file);
 DECLARE_string(adas_cfg_interface_file);
 DECLARE_string(adas_debug_output_dir);
 

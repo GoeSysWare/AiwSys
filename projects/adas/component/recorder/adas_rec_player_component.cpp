@@ -155,7 +155,8 @@ void AdasRecPlayerComponent::EnumRecordFiles()
 
     records_files_ = std::move( apollo::cyber::common::ListSubPaths(record_save_dir_,DT_REG));
 
-
+    //文件名排序
+    std::sort(records_files_.begin(),records_files_.end());
     //这里需要加锁
     std::lock_guard<std::mutex> lock(enum_file_mutex_);
 

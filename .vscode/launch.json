@@ -125,8 +125,7 @@
             "program": "${workspaceFolder}/bazel-bin/cyber/mainboard",
             "args": [
                 "-d",
-                // "${workspaceFolder}/bazel-AiwSys/projects/adas/production/dag/adas.dag",
-                "${workspaceFolder}/bazel-AiwSys/modules/drivers/camera/dag/camera.dag",
+                "${workspaceFolder}/bazel-AiwSys/modules/monitor/dag/monitor.dag",
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

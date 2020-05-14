@@ -49,6 +49,29 @@ namespace watrix
         watrix::algorithm::YoloApi::Init(cfg);
       }
 
+      static void init_darknet_api(watrix::projects::adas::proto::DarkNetConfig config)
+      {
+
+        DarknetYoloConfig cfg;
+        // cfg.batchsize = 2;
+        cfg.cfg_filepath = apollo::cyber::common::GetAbsolutePath(
+            watrix::projects::adas::GetAdasWorkRoot(),
+            config.cfg_filepath());
+
+        cfg.weight_filepath = apollo::cyber::common::GetAbsolutePath(
+            watrix::projects::adas::GetAdasWorkRoot(),
+            config.weight_filepath());
+        cfg.label_filepath = apollo::cyber::common::GetAbsolutePath(
+            watrix::projects::adas::GetAdasWorkRoot(),
+            config.label_filepath());
+
+        cfg.confidence_threshold = config.confidence_threshold();
+        cfg.hier_thresh = config.hier_thresh();
+        cfg.iou_thresh = config.iou_thresh();
+
+        YoloDarknetApi::Init(cfg);
+      }
+
       void init_trainseg_api(watrix::projects::adas::proto::TrainSegConfig perception_config)
       {
 
@@ -170,7 +193,7 @@ namespace watrix
 
         const int size = 1920 * 1080 * 2;
         int *memblock = new int[size];
-        boost::filesystem::ifstream file(
+        std::ifstream file(
             apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(),
                                                    FLAGS_calibrator_cfg_distortTable),
             std::ios::in | std::ios::binary | std::ios::ate);
@@ -199,12 +222,31 @@ namespace watrix
         file.close();
       }
       AdasPerceptionComponent::AdasPerceptionComponent()
-          : seq_num_(0)
       {
       }
 
       AdasPerceptionComponent::~AdasPerceptionComponent()
       {
+        //是否用检测功能，是否采用yolo算法
+        if (adas_perception_param_.if_use_detect_model() && adas_perception_param_.has_yolo())
+        {
+          YoloApi::Free();
+        }
+        //检测时是否采用darknet算法
+        if (adas_perception_param_.if_use_detect_model() && adas_perception_param_.has_darknet())
+        {
+          YoloDarknetApi::Free();
+        }
+
+        //是否用列车分割功能
+        if (adas_perception_param_.if_use_train_seg_model() && adas_perception_param_.has_trainseg())
+        {
+        }
+        //是否用轨道分割功能
+        if (adas_perception_param_.if_use_lane_seg_model() && adas_perception_param_.has_laneseg())
+        {
+          LaneSegApi::free();
+        }
       }
 
       bool AdasPerceptionComponent::Init()
@@ -373,7 +415,10 @@ namespace watrix
         //是否保存图片
         if_save_image_result_ = adas_perception_param_.if_save_image_result();
         save_image_dir_ = adas_perception_param_.save_image_dir();
-        // 根据配置获得内置的接口配置信息
+        if_save_log_result_ = adas_perception_param_.if_save_log_result();
+
+
+        //取得全局参数设定
         watrix::projects::adas::proto::InterfaceServiceConfig interface_config;
         apollo::cyber::common::GetProtoFromFile(
             apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(), FLAGS_adas_cfg_interface_file),
@@ -444,27 +489,50 @@ namespace watrix
         images_.resize(FLAGS_adas_camera_size);
         sim_image_files_.resize(FLAGS_adas_camera_size);
 
+
+
+       //取得算法模块的配置参数设定
+        watrix::projects::adas::proto::AlgorithmConfig algorithm_config;
+        apollo::cyber::common::GetProtoFromFile(
+            apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(), FLAGS_adas_cfg_algorithm_file),
+            &algorithm_config);
+
+
+          result_check_file_ = "result-" + algorithm_config.sdk_version() + "-" + algorithm_config.lidar_version() + ".log";
+          result_log_file_ =  "log-" + algorithm_config.sdk_version() + "-" + algorithm_config.lidar_version() + ".log";
+          //放在存储的全路径上
+          result_check_file_ = apollo::cyber::common::GetAbsolutePath(save_image_dir_, result_check_file_);
+          result_log_file_ =  apollo::cyber::common::GetAbsolutePath(save_image_dir_, result_log_file_);
+
         return true;
       }
 
       bool AdasPerceptionComponent::InitAlgorithmPlugin()
       {
+        //lidar参数初始化
         load_lidar_map_parameter();
+        //如果配置文件不存在的，则不会被加载
 
-        if (adas_perception_param_.if_use_detect_model())
+        //是否用检测功能，是否采用yolo算法
+        if (adas_perception_param_.if_use_detect_model() && adas_perception_param_.has_yolo())
         {
           init_yolo_api(adas_perception_param_.yolo());
         }
+        //检测时是否采用darknet算法
+        if (adas_perception_param_.if_use_detect_model() && adas_perception_param_.has_darknet())
+        {
+          init_darknet_api(adas_perception_param_.darknet());
+        }
 
-        if (adas_perception_param_.if_use_train_seg_model())
+        //是否用列车分割功能
+        if (adas_perception_param_.if_use_train_seg_model() && adas_perception_param_.has_trainseg())
         {
           init_trainseg_api(adas_perception_param_.trainseg());
         }
-
-        if (adas_perception_param_.if_use_lane_seg_model())
+        //是否用轨道分割功能
+        if (adas_perception_param_.if_use_lane_seg_model() && adas_perception_param_.has_laneseg())
         {
           init_laneseg_api(adas_perception_param_.laneseg());
-
 
           if (v_image_lane_front_result_.size() == 0)
           {
@@ -580,11 +648,14 @@ namespace watrix
       {
         std::lock_guard<std::mutex> lock(camera_mutex_);
 
+        //测量时间是一个相对时间，由驱动决定
         const double msg_timestamp = message->measurement_time() + timestamp_offset_;
 
         AERROR << "OnReceiveImage(), "
-               << " camera_name: " << camera_name
-               << " image ts: " + std::to_string(msg_timestamp);
+               << " FrameID: " << message->header().frame_id()
+               << " Seq: " << message->header().sequence_num()
+               << " image ts: " + std::to_string(msg_timestamp)
+               << " ms";
 
         // timestamp should be almost monotonic
         if (last_camera_timestamp_ - msg_timestamp > ts_diff_)
@@ -595,8 +666,6 @@ namespace watrix
           return;
         }
         last_camera_timestamp_ = msg_timestamp;
-        ++seq_num_;
-
         //内部处理
         if (InternalProc(message, camera_name) != apollo::cyber::SUCC)
         {
@@ -611,8 +680,8 @@ namespace watrix
         //过滤长宽不对的img
         if (in_message->height() <= 0 || in_message->width() <= 0)
           return apollo::cyber::FAIL;
-
-        apollo::cyber::Time measure_time(in_message->measurement_time());
+        //时间采用发包时间，而不是measure_time，因为每种设备在measure_time里自定义测量时间
+        apollo::cyber::Time timestamp(in_message->header().timestamp_sec());
 
         for (auto i = 0; i < camera_names_.size(); i++)
         {
@@ -621,7 +690,7 @@ namespace watrix
           {
 
             //如果是仿真的，就需要 仿真文件信息,不是仿真则用采集时间作为文件名
-            sim_image_files_[i] = if_use_simulator_ ? in_message->header().module_name() : measure_time.ToString() + ".jpg";
+            sim_image_files_[i] = if_use_simulator_ ? in_message->frame_id() : timestamp.ToString() + ".jpg";
 
             int image_size = in_message->height() * in_message->step();
 
@@ -633,18 +702,20 @@ namespace watrix
 
             //填充本地cv::Mat
             images_[i] = tmp;
-            frame_id_ = in_message->header().frame_id();
           }
         }
         //暂时只有一路相机出发计算线程
         if (camera_names_[0] == camera_name)
           return apollo::cyber::SUCC;
+        //序列号
+        this->sequence_num_ = in_message->header().sequence_num();
 
         //进入线程池处理
         task_processor_->Enqueue(std::bind(&AdasPerceptionComponent::doPerceptionTask, this));
 
         return apollo::cyber::SUCC;
       }
+      //核心处理任务
       void AdasPerceptionComponent::doPerceptionTask()
       {
         std::shared_ptr<AdasPerceptionComponent> share_this =
@@ -658,11 +729,13 @@ namespace watrix
                                                         const std::string &lidar_name)
       {
         std::lock_guard<std::mutex> lock(camera_mutex_);
-        AERROR << "OnReceivePointCloud , Frame ID :" << in_message->header().frame_id();
+
         const double msg_timestamp = in_message->measurement_time() + timestamp_offset_;
-        AINFO << "Enter OnReceivePointCloud(), "
-              << " lidar_name: " << lidar_name
-              << " image ts: " + std::to_string(msg_timestamp);
+        AERROR << "OnReceivePointCloud(), "
+               << " FrameID: " << in_message->header().frame_id()
+               << " Seq: " << in_message->header().sequence_num()
+               << " image ts: " + std::to_string(msg_timestamp)
+               << " ms";
 
         if (last_lidar_timestamp_ - msg_timestamp > ts_diff_)
         {
@@ -672,7 +745,6 @@ namespace watrix
           return;
         }
         last_lidar_timestamp_ = msg_timestamp;
-        // ++seq_num_;
         //核心处理
         int effect_point = 0;
         FindContours_v2::OnPointCloud(

@@ -4,4 +4,4 @@
     #此配置文件可以不存在，也可以为空，
     #不设置时系统会采用InterfaceServiceConfig对应的默认值
     
-    perception_tasks_num:1
+    perception_tasks_num:4

@@ -211,7 +211,16 @@ namespace watrix {
 			float normalize_value; // 1/255.0
 			float confidence_threshold; // 0.4 for filter out box
 		};
-
+		struct SHARED_EXPORT DarknetYoloConfig {
+			// int batchsize;
+			std::string cfg_filepath;
+			std::string weight_filepath;
+			std::string label_filepath;
+			// cv::Size input_size;
+			float confidence_threshold; // 置信度阈值 0.25
+			float hier_thresh; // 0.5
+			float iou_thresh; // iou阈值 0.5 
+		};
 		struct SHARED_EXPORT LaneKeypoint{
 			cvpoint_t top;
 			cvpoint_t bottom;

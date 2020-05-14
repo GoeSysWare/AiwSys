@@ -12,6 +12,7 @@ cc_library(
         "sensor_api.cpp",
          "trainseg_api.cpp",  
         "yolo_api.cpp",
+        "yolo_darknet_api.cpp",
         "internal/caffe/caffe_laneseg_api_impl.cpp",
         "internal/caffe/laneseg_net.cpp",
         "internal/caffe/trainseg_api_impl.cpp",
@@ -28,6 +29,7 @@ cc_library(
         "sensor_api.h",
          "trainseg_api.h",  
         "yolo_api.h",
+        "yolo_darknet_api.h",
         "internal/caffe/caffe_laneseg_api_impl.h",
         "internal/caffe/laneseg_net.h",
         "internal/caffe/trainseg_api_impl.h",
@@ -46,7 +48,8 @@ cc_library(
              "@vtk",
             "@caffe",  
              "@glog",
-        "//external:gflags",   
+             "@darknet",             
+            "//external:gflags",   
 
     ],
 )

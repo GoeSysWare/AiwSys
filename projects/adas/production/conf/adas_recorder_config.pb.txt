@@ -9,7 +9,7 @@
     #####################################
     #后面的配置一般不用设定，高级模式采用
     #[可选]录像模式
-    #records_save_model:1
-    #records_file_max_size:1024
-    #records_file_interval:120
-    #records_file_num:20
+    records_save_model:2
+    records_file_max_size:512
+    records_file_interval:120
+    records_file_num:10

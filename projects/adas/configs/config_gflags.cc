@@ -16,9 +16,17 @@
 
 #include "projects/adas/configs/config_gflags.h"
 
+
+
 DEFINE_string(adas_cfg_interface_file,
 "production/conf/adas_interface.pb.txt",
 "ADAS系统内置参数配置文件，如果无此文件，系统自动采用默认值");
+
+DEFINE_string(adas_cfg_algorithm_file,
+"production/conf/adas_algorithm.pb.txt",
+"算法模块级的参数配置文件");
+
+
 
 DEFINE_string(adas_debug_output_dir,
 "data/debug/",

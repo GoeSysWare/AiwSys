@@ -23,6 +23,14 @@ message YoloConfig {
     optional float confidence_threshold = 5;
     optional bool resize_keep_flag = 6;
   }
+  message DarkNetConfig {
+		optional string cfg_filepath =1;
+		optional string weight_filepath =2;
+		optional string label_filepath =3 ;
+    optional float confidence_threshold = 4;
+    optional float hier_thresh = 5;
+    optional float iou_thresh = 6;
+  }
 
 
 
@@ -134,11 +142,16 @@ message PerceptionConfig
   optional bool if_save_image_result = 4;
 
   optional YoloConfig yolo = 5;
-  optional TrainSegConfig trainseg = 6;
-  optional LaneSegConfig laneseg = 7;
-  optional LaneInvasionParameter laneinvasion = 8;
+  optional DarkNetConfig darknet= 6;
+  optional TrainSegConfig trainseg = 7;
+  optional LaneSegConfig laneseg = 8;
+  optional LaneInvasionParameter laneinvasion =9;
   //是否采用启动仿真器的仿真模式
-  optional bool if_use_simulator = 9[default = false];  
-  optional string save_image_dir =10 ;  
+  optional bool if_use_simulator = 10[default = false];  
+  //存档images的路径
+  optional string save_image_dir =11;  
+  //是否对侵界的结果记录到文件
+  optional bool if_save_log_result= 12[default = false];  
+
 
 }

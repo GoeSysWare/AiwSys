@@ -123,22 +123,37 @@ private:
 
     //这是要传递到task中的参数
 public:
+    //是否仿真
     bool if_use_simulator_ = false;
+    //是否保存图片结果
     bool if_save_image_result_ = false;
+    //是否保存侵界检测后的log结果
+    bool if_save_log_result_ = false;
+
+    //保存图片的路径
      std::string save_image_dir_;
+     //感知模块的配置
      watrix::projects::adas::proto::PerceptionConfig   adas_perception_param_;
+     //算法模块里需要的侵界检测配置
     LaneInvasionConfig lane_invasion_config_;
+
     std::vector<cv::Mat> v_image_lane_front_result_;
     //接收缓存
     std::vector<cv::Mat> images_;
     //仿真模式时的仿真文件名
     std::vector<std::string> sim_image_files_;
 
+    //侵界检测结果记录的文件名
+    std::string result_check_file_;
+    std::string result_log_file_;
+
+    //全局的序列号
+     uint32_t sequence_num_;
+
 	 apollo::drivers::PointCloud lidar2image_paint_;
 	 apollo::drivers::PointCloud lidar_safe_area_;
 	std::vector<cv::Point3f> lidar_cloud_buf_;
       std::shared_ptr<apollo::cyber::Node> param_node_ = nullptr;
-    std::string frame_id_;
 
     //参数服务
     std::shared_ptr<apollo::cyber::ParameterServer> param_server_ = nullptr;
@@ -157,7 +172,6 @@ private:
     std::mutex camera_mutex_;
     std::mutex lidar_mutex_;
 
-    uint32_t seq_num_;
    double last_camera_timestamp_ = 0.0; 
 
    double last_lidar_timestamp_ = 0.0; 

@@ -259,7 +259,7 @@ namespace watrix
         this->sim_image_files_.assign(perception_->sim_image_files_.begin(), perception_->sim_image_files_.end());
 
         this->parameter_name_ = perception_->record_para_name_;
-        this->frame_id_ = perception_->frame_id_;
+        this->sequence_num_ = perception_->sequence_num_;
       }
       PerceptionTask::~PerceptionTask()
       {
@@ -270,17 +270,22 @@ namespace watrix
 
         watrix::projects::adas::Timer timer;
         //Yolo检测物体
-        if (perception_->adas_perception_param_.if_use_detect_model())
+        if (perception_->adas_perception_param_.if_use_detect_model() && perception_->adas_perception_param_.has_yolo())
         {
           DoYoloDetectGPU();
         }
+        //darknet检测物体
+        if (perception_->adas_perception_param_.if_use_detect_model() && perception_->adas_perception_param_.has_darknet())
+        {
+          DoDarknetDetectGPU();
+        }
         //轨道分割
-        if (perception_->adas_perception_param_.if_use_lane_seg_model())
+        if (perception_->adas_perception_param_.if_use_lane_seg_model() && perception_->adas_perception_param_.has_laneseg())
         {
           DoLaneSegSeqGPU();
         }
         //车体分割
-        if (perception_->adas_perception_param_.if_use_train_seg_model())
+        if (perception_->adas_perception_param_.if_use_train_seg_model() && perception_->adas_perception_param_.has_trainseg())
         {
           DoTrainSegGPU();
         }
@@ -291,7 +296,7 @@ namespace watrix
         }
 
         AERROR << "[ thread : " << std::this_thread::get_id() << "] PerceptionTask::Excute " << static_cast<double>(timer.Toc()) * 0.001 << "ms"
-               << " frame id :" << frame_id_
+               << " sequence_num :" << sequence_num_
                << "  file:" << sim_image_files_[0];
 
         taskd_excuted_num_.fetch_add(1);
@@ -373,6 +378,84 @@ namespace watrix
         // 	}
         // }
         AERROR << "[ thread : " << std::this_thread::get_id() << "] 3. DoLaneSegSeqGPU Exited";
+      }
+
+      void PerceptionTask::DoDarknetDetectGPU()
+      {
+        // AERROR <<"[ thread : "<<std::this_thread::get_id() <<"] 1. DoYoloDetectGPU Enter";
+
+        yolo_detection_boxs0_.clear();
+        yolo_detection_boxs1_.clear();
+
+        std::vector<detection_boxs_t> v_output;
+
+        bool success = YoloDarknetApi::Detect(v_image_, v_output); // darknet
+
+        for (int j = 0; j < v_output.size(); j++)
+        {
+          if (j == 0)
+          {
+            yolo_detection_boxs0_ = v_output[j];
+            // set dist x and y
+            for (int i = 0; i < yolo_detection_boxs0_.size(); ++i)
+            {
+              detection_box_t &box = yolo_detection_boxs0_[i];
+              int cx = (box.xmin + box.xmax) / 2;
+              int cy = box.ymax;
+              box.valid_dist = MonocularDistanceApi::get_distance(TABLE_SHORT_A, cy, cx, box.dist_x, box.dist_y);
+              if (box.valid_dist)
+              {
+                yolo_detection_boxs0_[i].dist_x = std::atof(GetFloatRound(box.dist_x, 2).c_str());
+                yolo_detection_boxs0_[i].dist_y = std::atof(GetFloatRound(box.dist_y, 2).c_str());
+              }
+            }
+          }
+          else
+          {
+            yolo_detection_boxs1_ = v_output[j];
+            // set dist x and y
+            for (int i = 0; i < yolo_detection_boxs1_.size(); ++i)
+            {
+              detection_box_t &box = yolo_detection_boxs1_[i];
+              int cx = (box.xmin + box.xmax) / 2;
+              int cy = box.ymax;
+              box.valid_dist = MonocularDistanceApi::get_distance(TABLE_LONG_A, cy, cx, box.dist_x, box.dist_y);
+              if (box.valid_dist)
+              {
+                yolo_detection_boxs1_[i].dist_x = std::atof(GetFloatRound(box.dist_x, 2).c_str());
+                yolo_detection_boxs1_[i].dist_y = std::atof(GetFloatRound(box.dist_y, 2).c_str());
+              }
+            }
+          }
+          //如果保存结果
+          detection_boxs_t detection_boxs = v_output[j];
+          if (perception_->adas_perception_param_.if_save_image_result())
+          {
+
+            std::string result_folder = apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(),
+                                                                               perception_->adas_perception_param_.save_image_dir()) +
+                                        "/yolo_results/";
+            boost::filesystem::create_directories(result_folder);
+            cv::Mat image_with_boxs;
+            std::string image_with_box_path;
+            std::string image_filename = boost::filesystem::path(sim_image_files_[0]).stem().string();
+            if (j == 0)
+            {
+              here_draw_detection_boxs(v_image_[j], yolo_detection_boxs0_, 5, image_with_boxs);
+              image_with_box_path = result_folder + image_filename + "_0_boxs.jpg";
+            }
+            else
+            {
+              here_draw_detection_boxs(v_image_[j], yolo_detection_boxs1_, 5, image_with_boxs);
+              image_with_box_path = result_folder + image_filename + "_1_boxs.jpg";
+            }
+            AINFO << "DoDarknetDetectGPU save file: " << image_with_box_path;
+            cv::imwrite(image_with_box_path, image_with_boxs);
+            //	cv::imwrite(image_with_box_path, v_image_[j]);
+          }
+        }
+
+        //  AERROR <<"[ thread : "<<std::this_thread::get_id() <<"] 1. DoYoloDetectGPU Exited";
       }
 
       void PerceptionTask::DoYoloDetectGPU()
@@ -729,7 +812,7 @@ namespace watrix
             break;
           }
         }
-        //侵界时需要存视频
+        //侵界时需要存视频,参数服务的"is_record"参数设定为true
         if (invasion_flag)
         {
           apollo::cyber::Parameter parameter;
@@ -740,6 +823,58 @@ namespace watrix
             perception_->param_server_->SetParameter(record_parameter);
           }
         }
+        //侵界时是否需要记录结果log文件
+        if (perception_->adas_perception_param_.if_save_log_result() )
+        {
+            boost::filesystem::path log_file(perception_-> result_log_file_);
+            std::fstream log_fstream;
+            if (!log_fstream.is_open())
+            {
+              log_fstream.open(log_file.string(), std::ios_base::out | std::ios_base::app);
+            }
+            boost::filesystem::path result_file(perception_-> result_check_file_);
+            std::fstream result_file_fstream;
+            if (!result_file_fstream.is_open())
+            {
+              result_file_fstream.open(result_file.string(), std::ios_base::out | std::ios_base::app);
+            }
+
+            //侵界结果存log
+            if (invasion_flag)
+            {
+              log_fstream << this->sim_image_files_[0] << "," << this->sim_image_files_[1]  << ","<< "invasion" << std::endl;
+              log_fstream.flush();
+            }
+            else
+            {
+              log_fstream << this->sim_image_files_[0] << "," << this->sim_image_files_[1]  << ","<< "no_invasion" << std::endl;
+              log_fstream.flush();
+            }
+        //侵界Boxs的详细情况存log
+            if (short_cv_obstacle_box.size())
+            {
+              result_file_fstream << this->sim_image_files_[0] << ",short,";
+              for (int box_id = 0; box_id < short_cv_obstacle_box.size(); box_id++)
+              {
+                result_file_fstream << ",[" << short_cv_obstacle_box[box_id].xmin << " " << short_cv_obstacle_box[box_id].xmax << " " << short_cv_obstacle_box[box_id].ymin << " " << short_cv_obstacle_box[box_id].ymax << " " << short_cv_obstacle_box[box_id].dist << "]";
+              }
+              result_file_fstream << std::endl;
+              log_fstream.flush();
+            }
+            if (long_cv_obstacle_box.size())
+            {
+              result_file_fstream << this->sim_image_files_[1] << ",long,";
+              for (int box_id = 0; box_id < long_cv_obstacle_box.size(); box_id++)
+              {
+                result_file_fstream << ",[" << long_cv_obstacle_box[box_id].xmin << " " << long_cv_obstacle_box[box_id].xmax << " " << long_cv_obstacle_box[box_id].ymin << " " << long_cv_obstacle_box[box_id].ymax << " " << long_cv_obstacle_box[box_id].dist << "]";
+              }
+              result_file_fstream << std::endl;
+              log_fstream.flush();
+            }
+
+        }
+
+
 
         if (perception_->adas_perception_param_.if_save_image_result())
         {
