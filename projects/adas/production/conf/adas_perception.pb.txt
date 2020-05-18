@@ -1,10 +1,31 @@
-    #ADAS 感知模块参数的配置
-  if_use_simulator:true
+    ###################################################################
+    # ADAS 感知模块参数的配置
+    # 注: 所有的路径支持相对路径和绝对路径，如果是相对路径，则在环境变量${ADAS_PATH}下
+    # 2. yolo 和 darknet ，采用未注释的算法，优先采用yolo算法
+    ###################################################################
+
+  ##############################
+  #   运行模式
+  # "online"  在线正常运行模式
+  # "sim"  离线仿真模式
+  # "online_acq" 在线采集模式(仅仅运行dectect后保存数据)
+  ############################### 
+  model_type:"sim"
+
+  # 是否启用算法检测
   if_use_detect_model: true
+  # 是否启用机车分割
   if_use_train_seg_model: false
+  # 是否启用轨道分割
   if_use_lane_seg_model: true
+  # 所有模式下，设定是否存存档照片
   if_save_image_result: false
+  # 所有模式下，设定是否保存检测结果为log文件
+  if_save_log_result: false
+  #  所有模式下，设定存档照片和log文件的路径
   save_image_dir:"data/debug"
+
+
   # yolo config 
   #yolo: {
    # net: {
@@ -173,5 +194,5 @@
 		case1_y_threshold :  15.0
 		use_lane_status : true
 		use_lidar_pointcloud_smallobj_invasion_detect : true
-        save_image_result: false 
+    save_image_result: false 
   }

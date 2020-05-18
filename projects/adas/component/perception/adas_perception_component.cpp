@@ -233,7 +233,7 @@ namespace watrix
           YoloApi::Free();
         }
         //检测时是否采用darknet算法
-        if (adas_perception_param_.if_use_detect_model() && adas_perception_param_.has_darknet())
+        if (!adas_perception_param_.has_yolo() && adas_perception_param_.if_use_detect_model() && adas_perception_param_.has_darknet() )
         {
           YoloDarknetApi::Free();
         }
@@ -408,10 +408,31 @@ namespace watrix
         lane_invasion_config_.use_lane_status = adas_perception_param_.laneinvasion().use_lane_status();
         lane_invasion_config_.use_lidar_pointcloud_smallobj_invasion_detect = adas_perception_param_.laneinvasion().use_lidar_pointcloud_smallobj_invasion_detect();
 
-        //是否采用仿真模式，很重要的一个参数
+        //得到运行模式，很重要的一个参数
         ///////////!!!!!!!!
-        if_use_simulator_ = adas_perception_param_.if_use_simulator();
-        ///////////!!!!!!!!
+        //  ONLINE 或者 0; //正常在线运行
+        // SIM 或者 1;//离线仿真运行
+        // ONLINE_ACQ 或者 2; //在线采集运行
+        std::string  type = adas_perception_param_.model_type();
+        //配置文件里不区分大小写
+        type = boost::algorithm::to_lower_copy(type);
+
+        if(type == "online" || type == "0")
+        {
+            model_type_ =   watrix::projects::adas::proto::ONLINE;
+        }else if(type == "sim" || type == "1")
+        {
+            model_type_ =   watrix::projects::adas::proto::SIM;
+        }else if(type == "online_acq" || type == "2")
+        {
+              model_type_ =   watrix::projects::adas::proto::ONLINE_ACQ;
+        }
+        else
+        {
+                AERROR << "UNKNOWN  Perception Model Type: " << type << " Please Use:  online  || sim || online_acq";
+                return false;
+        }
+          ///////////!!!!!!!!
         //是否保存图片
         if_save_image_result_ = adas_perception_param_.if_save_image_result();
         save_image_dir_ = adas_perception_param_.save_image_dir();
@@ -518,8 +539,8 @@ namespace watrix
         {
           init_yolo_api(adas_perception_param_.yolo());
         }
-        //检测时是否采用darknet算法
-        if (adas_perception_param_.if_use_detect_model() && adas_perception_param_.has_darknet())
+        //检测时是否采用darknet算法,如果有yolo，优先用yolo，屏蔽darknet
+        if (!adas_perception_param_.has_yolo() && adas_perception_param_.if_use_detect_model() && adas_perception_param_.has_darknet() )
         {
           init_darknet_api(adas_perception_param_.darknet());
         }
@@ -690,7 +711,7 @@ namespace watrix
           {
 
             //如果是仿真的，就需要 仿真文件信息,不是仿真则用采集时间作为文件名
-            sim_image_files_[i] = if_use_simulator_ ? in_message->frame_id() : timestamp.ToString() + ".jpg";
+            sim_image_files_[i] = (model_type_ == SIM ) ?  in_message->frame_id() : timestamp.ToString() + ".jpg";
 
             int image_size = in_message->height() * in_message->step();
 

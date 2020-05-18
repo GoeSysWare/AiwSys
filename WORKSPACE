@@ -191,7 +191,7 @@ new_local_repository(
 new_local_repository(
     name = "poco",
     build_file = "third_party/poco.BUILD",
-    path = "../3rd/poco-1.9.4"
+    path = "../3rd/poco-1.9.4/build/install"
 )
 # Curl-CPP
 new_local_repository(

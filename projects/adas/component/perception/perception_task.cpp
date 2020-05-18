@@ -5,6 +5,8 @@
 #include "projects/adas/component/common/timer.h"
 #include "projects/adas/component/perception/FindContours_v2.h"
 
+#include <caffe/util/bbox_util.hpp>
+
 #define RED_POINT Vec3b(0, 0, 255)
 #define YELLOW_POINT Vec3b(0, 255, 255)
 #define GREEN_POINT Vec3b(0, 255, 0)
@@ -104,6 +106,97 @@ namespace watrix
         }
       }
 
+      static detection_boxs_t oldBoxs[2];
+      //存原图，且过滤信号灯，过滤静止画面
+      static bool here_draw_detection_boxs_ey(
+          const cv::Mat &image,
+          int camera_id,
+          detection_boxs_t boxs,
+          const unsigned int thickness,
+          cv::Mat &image_with_boxs)
+      {
+        image_with_boxs = image.clone();
+        std::vector<detection_box_t>::iterator iter;
+        for (iter = boxs.begin(); iter != boxs.end();)
+        {
+          if (std::strcmp(iter->class_name.c_str(), "traffic light") == 0)
+          {
+            boxs.erase(iter);
+          }
+          else
+          {
+            iter++;
+          }
+        }
+
+        //没有检测到东西，不存
+        if (boxs.size() == 0 || oldBoxs[camera_id].size() == 0)
+        {
+          oldBoxs[camera_id] = boxs;
+          return false;
+        }
+        //过滤信号灯
+        for (size_t i = 0; i < boxs.size(); i++)
+        {
+        }
+
+        //上一帧跟当前帧的box个数不同
+        if (oldBoxs[camera_id].size() != boxs.size())
+        {
+          oldBoxs[camera_id] = boxs;
+          return true;
+        }
+        //如果相同，则判断overlap
+        else
+        {
+          std::vector<caffe::NormalizedBBox> old(oldBoxs[camera_id].size());
+          std::vector<caffe::NormalizedBBox> cur(boxs.size());
+          float xmax_max = 0;
+          int xmax_index = 0;
+          float old_xmax_max = 0;
+          int old_xmax_index = 0;
+          //找出最大的框
+          for (auto i = 0; i < old.size(); i++)
+          {
+
+            old[i].set_xmin(oldBoxs[camera_id][i].xmin);
+            old[i].set_ymin(oldBoxs[camera_id][i].ymin);
+            old[i].set_xmax(oldBoxs[camera_id][i].xmax);
+            old[i].set_ymax(oldBoxs[camera_id][i].ymax);
+            if (old_xmax_max < abs((old[i].xmax() - old[i].xmin()) * (old[i].ymax() - old[i].ymin())))
+            {
+              old_xmax_max = abs((old[i].xmax() - old[i].xmin()) * (old[i].ymax() - old[i].ymin()));
+              old_xmax_index = i;
+            }
+          }
+
+          for (auto i = 0; i < cur.size(); i++)
+          {
+
+            cur[i].set_xmin(boxs[i].xmin);
+            cur[i].set_ymin(boxs[i].ymin);
+            cur[i].set_xmax(boxs[i].xmax);
+            cur[i].set_ymax(boxs[i].ymax);
+
+            if (xmax_max < abs((cur[i].xmax() - cur[i].xmin()) * (cur[i].ymax() - cur[i].ymin())))
+            {
+              xmax_max = abs((cur[i].xmax() - cur[i].xmin()) * (cur[i].ymax() - cur[i].ymin()));
+              xmax_index = i;
+            }
+          }
+          //如果两帧中坐标最大的那个框，前后没有变化，不存
+          float ret = JaccardOverlap(old[old_xmax_index], cur[xmax_index]);
+          if (ret > 0.9)
+          {
+            oldBoxs[camera_id] = boxs;
+            return false;
+          }
+        }
+
+        //全部是交通灯 或者 没检测到东西
+        oldBoxs[camera_id] = boxs;
+        return false;
+      }
       static void FillDetectBox(const cv::Mat &input_mat, detection_boxs_t &detection_boxs, box_invasion_results_t box_invasion_cell, watrix::projects::adas::proto::DetectionBoxs *pb_mutable_detection_boxs)
       {
         for (int i = 0; i < detection_boxs.size(); ++i)
@@ -252,7 +345,7 @@ namespace watrix
         this->lidar_safe_area_ = perception_->lidar_safe_area_;
         this->lidar2image_paint_ = perception_->lidar2image_paint_;
         this->lane_invasion_config_ = perception_->lane_invasion_config_;
-        this->if_use_simulator_ = perception_->if_use_simulator_;
+        this->model_type_ = perception_->model_type_;
         this->if_save_image_result_ = perception_->if_save_image_result_;
         this->save_image_dir_ = perception_->save_image_dir_;
 
@@ -263,6 +356,7 @@ namespace watrix
       }
       PerceptionTask::~PerceptionTask()
       {
+        
       }
 
       void PerceptionTask::Excute()
@@ -275,7 +369,7 @@ namespace watrix
           DoYoloDetectGPU();
         }
         //darknet检测物体
-        if (perception_->adas_perception_param_.if_use_detect_model() && perception_->adas_perception_param_.has_darknet())
+        if (!perception_->adas_perception_param_.has_yolo() && perception_->adas_perception_param_.if_use_detect_model() && perception_->adas_perception_param_.has_darknet())
         {
           DoDarknetDetectGPU();
         }
@@ -391,11 +485,11 @@ namespace watrix
 
         bool success = YoloDarknetApi::Detect(v_image_, v_output); // darknet
 
-        for (int j = 0; j < v_output.size(); j++)
+        for (int camera_index = 0; camera_index < v_output.size(); camera_index++)
         {
-          if (j == 0)
+          if (camera_index == 0)
           {
-            yolo_detection_boxs0_ = v_output[j];
+            yolo_detection_boxs0_ = v_output[camera_index];
             // set dist x and y
             for (int i = 0; i < yolo_detection_boxs0_.size(); ++i)
             {
@@ -412,7 +506,7 @@ namespace watrix
           }
           else
           {
-            yolo_detection_boxs1_ = v_output[j];
+            yolo_detection_boxs1_ = v_output[camera_index];
             // set dist x and y
             for (int i = 0; i < yolo_detection_boxs1_.size(); ++i)
             {
@@ -428,34 +522,40 @@ namespace watrix
             }
           }
           //如果保存结果
-          detection_boxs_t detection_boxs = v_output[j];
+          detection_boxs_t detection_boxs = v_output[camera_index];
           if (perception_->adas_perception_param_.if_save_image_result())
           {
 
             std::string result_folder = apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(),
                                                                                perception_->adas_perception_param_.save_image_dir()) +
-                                        "/yolo_results/";
+                                        "/darknet_results/";
             boost::filesystem::create_directories(result_folder);
             cv::Mat image_with_boxs;
             std::string image_with_box_path;
             std::string image_filename = boost::filesystem::path(sim_image_files_[0]).stem().string();
-            if (j == 0)
+            bool dection_is_save;
+            //模式不同存的图片效果和方式不同
+            if (model_type_ == ONLINE || model_type_ == SIM)
             {
-              here_draw_detection_boxs(v_image_[j], yolo_detection_boxs0_, 5, image_with_boxs);
-              image_with_box_path = result_folder + image_filename + "_0_boxs.jpg";
+              //一直都允许存
+              dection_is_save = true;
+              here_draw_detection_boxs(v_image_[camera_index], yolo_detection_boxs0_, 5, image_with_boxs);
             }
             else
             {
-              here_draw_detection_boxs(v_image_[j], yolo_detection_boxs1_, 5, image_with_boxs);
-              image_with_box_path = result_folder + image_filename + "_1_boxs.jpg";
+              //看过滤效果存
+              dection_is_save = here_draw_detection_boxs_ey(v_image_[camera_index], camera_index,yolo_detection_boxs0_, 5, image_with_boxs);
             }
-            AINFO << "DoDarknetDetectGPU save file: " << image_with_box_path;
-            cv::imwrite(image_with_box_path, image_with_boxs);
-            //	cv::imwrite(image_with_box_path, v_image_[j]);
+
+            if (dection_is_save)
+            {
+              image_with_box_path = result_folder + image_filename + "_" + std::to_string(camera_index) + "_boxs.jpg";
+
+              AINFO << "DoDarknetDetectGPU save file: " << image_with_box_path;
+              cv::imwrite(image_with_box_path, image_with_boxs);
+            }
           }
         }
-
-        //  AERROR <<"[ thread : "<<std::this_thread::get_id() <<"] 1. DoYoloDetectGPU Exited";
       }
 
       void PerceptionTask::DoYoloDetectGPU()
@@ -472,11 +572,11 @@ namespace watrix
             v_image_,
             v_output);
 
-        for (int j = 0; j < v_output.size(); j++)
+        for (int camera_index = 0; camera_index < v_output.size(); camera_index++)
         {
-          if (j == 0)
+          if (camera_index == 0)
           {
-            yolo_detection_boxs0_ = v_output[j];
+            yolo_detection_boxs0_ = v_output[camera_index];
             // set dist x and y
             for (int i = 0; i < yolo_detection_boxs0_.size(); ++i)
             {
@@ -493,7 +593,7 @@ namespace watrix
           }
           else
           {
-            yolo_detection_boxs1_ = v_output[j];
+            yolo_detection_boxs1_ = v_output[camera_index];
             // set dist x and y
             for (int i = 0; i < yolo_detection_boxs1_.size(); ++i)
             {
@@ -508,8 +608,8 @@ namespace watrix
               }
             }
           }
-          //如果保存结果
-          detection_boxs_t detection_boxs = v_output[j];
+                //如果保存结果
+          detection_boxs_t detection_boxs = v_output[camera_index];
           if (perception_->adas_perception_param_.if_save_image_result())
           {
 
@@ -520,23 +620,29 @@ namespace watrix
             cv::Mat image_with_boxs;
             std::string image_with_box_path;
             std::string image_filename = boost::filesystem::path(sim_image_files_[0]).stem().string();
-            if (j == 0)
+            bool dection_is_save;
+            //模式不同存的图片效果和方式不同
+            if (model_type_ == ONLINE || model_type_ == SIM)
             {
-              here_draw_detection_boxs(v_image_[j], yolo_detection_boxs0_, 5, image_with_boxs);
-              image_with_box_path = result_folder + image_filename + "_0_boxs.jpg";
+              //一直都允许存
+              dection_is_save = true;
+              here_draw_detection_boxs(v_image_[camera_index], yolo_detection_boxs0_, 5, image_with_boxs);
             }
             else
             {
-              here_draw_detection_boxs(v_image_[j], yolo_detection_boxs1_, 5, image_with_boxs);
-              image_with_box_path = result_folder + image_filename + "_1_boxs.jpg";
+              //看过滤效果存
+              dection_is_save = here_draw_detection_boxs_ey(v_image_[camera_index], camera_index,yolo_detection_boxs0_, 5, image_with_boxs);
             }
-            AINFO << "DoYoloDetectGPU save file: " << image_with_box_path;
-            cv::imwrite(image_with_box_path, image_with_boxs);
-            //	cv::imwrite(image_with_box_path, v_image_[j]);
+
+            if (dection_is_save)
+            {
+              image_with_box_path = result_folder + image_filename + "_" + std::to_string(camera_index) + "_boxs.jpg";
+
+              AINFO << "DoDarknetDetectGPU save file: " << image_with_box_path;
+              cv::imwrite(image_with_box_path, image_with_boxs);
+            }
           }
         }
-
-        //  AERROR <<"[ thread : "<<std::this_thread::get_id() <<"] 1. DoYoloDetectGPU Exited";
       }
       void PerceptionTask::DoTrainSegGPU()
       {
@@ -824,57 +930,56 @@ namespace watrix
           }
         }
         //侵界时是否需要记录结果log文件
-        if (perception_->adas_perception_param_.if_save_log_result() )
+        if (perception_->adas_perception_param_.if_save_log_result())
         {
-            boost::filesystem::path log_file(perception_-> result_log_file_);
-            std::fstream log_fstream;
-            if (!log_fstream.is_open())
-            {
-              log_fstream.open(log_file.string(), std::ios_base::out | std::ios_base::app);
-            }
-            boost::filesystem::path result_file(perception_-> result_check_file_);
-            std::fstream result_file_fstream;
-            if (!result_file_fstream.is_open())
-            {
-              result_file_fstream.open(result_file.string(), std::ios_base::out | std::ios_base::app);
-            }
+          boost::filesystem::path log_file(perception_->result_log_file_);
+          std::fstream log_fstream;
+          if (!log_fstream.is_open())
+          {
+            log_fstream.open(log_file.string(), std::ios_base::out | std::ios_base::app);
+          }
+          boost::filesystem::path result_file(perception_->result_check_file_);
+          std::fstream result_file_fstream;
+          if (!result_file_fstream.is_open())
+          {
+            result_file_fstream.open(result_file.string(), std::ios_base::out | std::ios_base::app);
+          }
 
-            //侵界结果存log
-            if (invasion_flag)
+          //侵界结果存log
+          if (invasion_flag)
+          {
+            log_fstream << this->sim_image_files_[0] << "," << this->sim_image_files_[1] << ","
+                        << "invasion" << std::endl;
+            log_fstream.flush();
+          }
+          else
+          {
+            log_fstream << this->sim_image_files_[0] << "," << this->sim_image_files_[1] << ","
+                        << "no_invasion" << std::endl;
+            log_fstream.flush();
+          }
+          //侵界Boxs的详细情况存log
+          if (short_cv_obstacle_box.size())
+          {
+            result_file_fstream << this->sim_image_files_[0] << ",short,";
+            for (int box_id = 0; box_id < short_cv_obstacle_box.size(); box_id++)
             {
-              log_fstream << this->sim_image_files_[0] << "," << this->sim_image_files_[1]  << ","<< "invasion" << std::endl;
-              log_fstream.flush();
+              result_file_fstream << ",[" << short_cv_obstacle_box[box_id].xmin << " " << short_cv_obstacle_box[box_id].xmax << " " << short_cv_obstacle_box[box_id].ymin << " " << short_cv_obstacle_box[box_id].ymax << " " << short_cv_obstacle_box[box_id].dist << "]";
             }
-            else
+            result_file_fstream << std::endl;
+            log_fstream.flush();
+          }
+          if (long_cv_obstacle_box.size())
+          {
+            result_file_fstream << this->sim_image_files_[1] << ",long,";
+            for (int box_id = 0; box_id < long_cv_obstacle_box.size(); box_id++)
             {
-              log_fstream << this->sim_image_files_[0] << "," << this->sim_image_files_[1]  << ","<< "no_invasion" << std::endl;
-              log_fstream.flush();
+              result_file_fstream << ",[" << long_cv_obstacle_box[box_id].xmin << " " << long_cv_obstacle_box[box_id].xmax << " " << long_cv_obstacle_box[box_id].ymin << " " << long_cv_obstacle_box[box_id].ymax << " " << long_cv_obstacle_box[box_id].dist << "]";
             }
-        //侵界Boxs的详细情况存log
-            if (short_cv_obstacle_box.size())
-            {
-              result_file_fstream << this->sim_image_files_[0] << ",short,";
-              for (int box_id = 0; box_id < short_cv_obstacle_box.size(); box_id++)
-              {
-                result_file_fstream << ",[" << short_cv_obstacle_box[box_id].xmin << " " << short_cv_obstacle_box[box_id].xmax << " " << short_cv_obstacle_box[box_id].ymin << " " << short_cv_obstacle_box[box_id].ymax << " " << short_cv_obstacle_box[box_id].dist << "]";
-              }
-              result_file_fstream << std::endl;
-              log_fstream.flush();
-            }
-            if (long_cv_obstacle_box.size())
-            {
-              result_file_fstream << this->sim_image_files_[1] << ",long,";
-              for (int box_id = 0; box_id < long_cv_obstacle_box.size(); box_id++)
-              {
-                result_file_fstream << ",[" << long_cv_obstacle_box[box_id].xmin << " " << long_cv_obstacle_box[box_id].xmax << " " << long_cv_obstacle_box[box_id].ymin << " " << long_cv_obstacle_box[box_id].ymax << " " << long_cv_obstacle_box[box_id].dist << "]";
-              }
-              result_file_fstream << std::endl;
-              log_fstream.flush();
-            }
-
+            result_file_fstream << std::endl;
+            log_fstream.flush();
+          }
         }
-
-
 
         if (perception_->adas_perception_param_.if_save_image_result())
         {

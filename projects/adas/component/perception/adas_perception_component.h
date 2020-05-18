@@ -123,8 +123,8 @@ private:
 
     //这是要传递到task中的参数
 public:
-    //是否仿真
-    bool if_use_simulator_ = false;
+    //运行模式 
+    watrix::projects::adas::proto::ModelType model_type_;
     //是否保存图片结果
     bool if_save_image_result_ = false;
     //是否保存侵界检测后的log结果

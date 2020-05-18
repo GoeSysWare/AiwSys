@@ -28,6 +28,37 @@
 **test**	Builds and runs the specified test targets.  
 **version**	Prints version information for bazel.  
 
+
+常用命令
+ $bazel help
+                           
+  用法：bazel <command> <options> ...
+
+  可用命令：
+    analyze-profile      分析构建配置文件数据。
+    aquery              对分析后的操作图执行查询。
+    build                构建指定的目标。
+
+    canonicalize-flags   Canonicalize Bazel flags。
+    clean                删除输出文件，并可选择停止服务器。
+
+    cquery               执行分析后依赖图查询。
+
+    dump                 转储Bazel服务器进程的内部状态。
+
+    help                 打印命令或索引的帮助。
+    info                 显示有关bazel服务器的运行时信息。
+
+    fetch                获取目标的所有外部依赖项。
+    mobile-install       在移动设备上安装应用程序。
+
+    query                执行依赖关系图查询。
+
+    run                  运行指定的目标。
+    shutdown             停止Bazel服务器。
+    test                 构建并运行指定的测试目标。
+    version              打印Bazel的版本信息。
+    
 ## 参数解释
     --output_filter   这个是对编译的警告进行过滤，regex过滤
     

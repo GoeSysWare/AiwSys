@@ -5,7 +5,7 @@ namespace watrix {
 	namespace algorithm {
 
         DarknetYoloConfig YoloDarknetApi::config_;
-        network* YoloDarknetApi::net_dk; // darknet 模型文件
+        network* YoloDarknetApi::net_dk; // darknet 模锟斤拷锟侥硷拷
 
         int YoloDarknetApi::class_count_; // 
         std::vector<std::string> YoloDarknetApi::class_labels_; // class labels: person,car,...
@@ -168,7 +168,7 @@ namespace watrix {
                     
                     network_predict_ptr(net_dk, input);// net infer
                     int nboxes = 0;
-                    int letter_box = 0; // 0为直接resize; 1为保持比例resize
+                    int letter_box = 0; // 0为直锟斤拷resize; 1为锟斤拷锟街憋拷锟斤拷resize
                     detection *dets = get_network_boxes(net_dk, ori_img_w, ori_img_h, config_.confidence_threshold, config_.hier_thresh, 0, 1, &nboxes, letter_box);
 
                     do_nms_sort(dets, nboxes, class_count_, config_.iou_thresh);
@@ -177,6 +177,7 @@ namespace watrix {
                     DealWithDetection(dets, nboxes, v_image[i], output);
 
                     v_output.push_back(output);
+                    if(input) free(input);
 
                     free_detections(dets, nboxes);
                 }

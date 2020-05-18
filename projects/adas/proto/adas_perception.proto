@@ -3,6 +3,13 @@ syntax = "proto2";
 package watrix.projects.adas.proto;
 
 
+enum ModelType
+{
+  ONLINE = 1; //正常在线运行
+  SIM = 2;//离线仿真运行
+  ONLINE_ACQ= 3; //在线采集运行
+}
+
 message CaffeNetConfig {
     optional int32 net_count = 1;
     optional string proto_filepath = 2;
@@ -147,7 +154,7 @@ message PerceptionConfig
   optional LaneSegConfig laneseg = 8;
   optional LaneInvasionParameter laneinvasion =9;
   //是否采用启动仿真器的仿真模式
-  optional bool if_use_simulator = 10[default = false];  
+  optional  string  model_type = 10[default = "online"]; 
   //存档images的路径
   optional string save_image_dir =11;  
   //是否对侵界的结果记录到文件

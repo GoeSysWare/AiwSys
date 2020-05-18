@@ -2,90 +2,44 @@
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
     "version": "2.0.0",
-    "tasks": [ 
+    "tasks": [
         {
-           "label": "Bazel Build Cyber",
-           "type": "shell",
-           "command": "bazel",
-           "args": [
-               "build",
-               "//cyber/...",
-               "--compilation_mode=dbg",
-               "--cpu=k8"
-           ],
-           "problemMatcher": [
-               "$gcc",
-           ],
-           "group": "build"
-       },
-       {
-        "label": "Bazel Build Monitor",
-        "type": "shell",
-        "command": "bazel",
-        "args": [
-            "build",
-            "//modules/monitor/...",
-            "--cpu=k8"
-        ],
-        "problemMatcher": [
-            "$gcc",
-        ],
-        "group": "build"
-    },
-       {
-        "label": "Bazel Build App",
-        "type": "shell",
-        "command": "bazel",
-        "args": [
-            "build",
-            "//modules/app/...",
-            "--cpu=k8"
-        ],
-        "problemMatcher": [
-            "$gcc",
-        ],
-        "group": "build"
-       },
-       {
-        "label": "Bazel Build Test",
-        "type": "shell",
-        "command": "bazel",
-        "args": [
-            "build",
-            "//modules/test/test_torch/...",
-        ],
-        "problemMatcher": [
-            "$gcc",
-        ],
-        "group": "build"
-       },
-       {
-        "label": "Bazel Build Projects",
-        "type": "shell",
-        "command": "bazel",
-        "args": [
-            "build",
-            "//projects/adas/component/...",
-            // "--sandbox_debug",
-        ],
-        "problemMatcher": [
-            "$gcc",
-        ],
-        "group": "build"
-       },
-       {
-           "label": "Bazel Clear ",
-           "type": "shell",
-           "command": "bazel",
-           "args": [
-               "clean",
-               "--expunge",
-           ],
-           "problemMatcher": [
-               "$gcc",
-           ],
-           "group": "build"
-       },
-
+            "label": "Bazel Build Cyber",
+            "type": "shell",
+            "command": "bazel",
+            "args": [
+                "build",
+                "//cyber/...",            ],
+            "problemMatcher": [
+                "$gcc",
+            ],
+            "group": "build"
+        },
+        {
+            "label": "Bazel Build Projects",
+            "type": "shell",
+            "command": "bazel",
+            "args": [
+                "build",
+                "//projects/adas/component/...",
+            ],
+            "problemMatcher": [
+                "$gcc",
+            ],
+            "group": "build"
+        },
+        {
+            "label": "Bazel Clear ",
+            "type": "shell",
+            "command": "bazel",
+            "args": [
+                "clean",
+                "--expunge",
+            ],
+            "problemMatcher": [
+                "$gcc",
+            ],
+            "group": "build"
+        },
     ]
 }

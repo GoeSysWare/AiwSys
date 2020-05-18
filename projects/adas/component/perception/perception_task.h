@@ -47,7 +47,7 @@ class PerceptionTask {
 
  private:
   PerceptionComponentPtr perception_;
-  bool if_use_simulator_ = false;
+  watrix::projects::adas::proto::ModelType model_type_;
   bool if_save_image_result_ = false;
   uint32_t sequence_num_;
   std::string save_image_dir_;
