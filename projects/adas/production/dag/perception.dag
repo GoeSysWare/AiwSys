@@ -1,6 +1,6 @@
 
 module_config {
-    module_library : "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-bin/projects/adas/component/perception/libadas_perception_component.so"
+    module_library :"/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-bin/projects/adas/component/recorder/libadas_recorder_component.so"
     components {
     class_name : "AdasPerceptionComponent"
     config {

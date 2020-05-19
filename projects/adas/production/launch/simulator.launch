@@ -1,7 +1,7 @@
 <cyber>
     <module>
-        <name>timer</name>
-        <dag_conf>/apollo/cyber/examples/timer_component_example/timer.dag</dag_conf>
-        <process_name>timer</process_name>
+        <name>simulator</name>
+        <dag_conf>/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/projects/adas/production/dag/simulator.dag</dag_conf>
+        <process_name>adas_simulator</process_name>
     </module>
 </cyber>

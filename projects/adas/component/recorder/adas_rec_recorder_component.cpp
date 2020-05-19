@@ -3,7 +3,7 @@
 
 
 #include <boost/algorithm/string.hpp>
-
+#include <boost/filesystem.hpp>
 
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/component/component.h"
@@ -44,6 +44,9 @@ bool AdasRecRecorderComponent::InitConfig()
     //组成存档文件名 = 路径+ 前缀 + 当前时间+ .record+ 序号
     output_ = record_dir + "/" + config_.records_filename_suffix() + "-" +
               apollo::cyber::common::UnixSecondsToString(time(nullptr), "%Y%m%d%H%M%S") + ".record";
+
+    //没有目录则创建目录
+    boost::filesystem::create_directories(record_dir);
 
 
     //每次启动时,是否清空原有的历史记录

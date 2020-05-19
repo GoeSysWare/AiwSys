@@ -13,10 +13,8 @@ cc_binary(
     linkopts = [
         "-pthread",
          "-L/usr/lib/x86_64-linux-gnu",
-        # "-lboost_filesystem",
-        # "-lboost_atomic",
+         "-lboost_filesystem",
          "-lboost_system",
-        # "-lboost_date_time",
     ],
 )
 

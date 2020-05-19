@@ -29,14 +29,14 @@ import traceback
 
 import xml.etree.ElementTree as ET
 
-g_binary_name = '/home/watrix18/workspace/AiwSys/bazel-bin/cyber/mainboard'
+
 g_pwd = os.getcwd()
 g_script_name = os.path.basename(sys.argv[0]).split(".")[0]
 g_process_pid = os.getpid()
 g_process_name = g_script_name + "_" + str(g_process_pid)
 
 cyber_path = os.getenv('CYBER_PATH')
-
+g_binary_name = "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-bin/cyber/mainboard"
 """
 colorful logging
 """

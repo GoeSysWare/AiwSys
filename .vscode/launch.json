@@ -210,7 +210,7 @@
             "program": "${workspaceFolder}/bazel-bin/cyber/mainboard",
             "args": [
                 "-d",
-                "${workspaceFolder}/projects/adas/production/dag/perception.dag",
+                "${workspaceFolder}/projects/adas/production/dag/recorder.dag",
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
