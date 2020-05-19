@@ -1,1 +1,0 @@
-﻿#include "algorithm_type.h"

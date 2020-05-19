@@ -60,8 +60,6 @@ build --compilation_mode=dbg
 
 build --incompatible_disable_deprecated_attr_params=false
 
-
-
 build --nokeep_state_after_build
 # Specify protobuf cc toolchain
 build --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"

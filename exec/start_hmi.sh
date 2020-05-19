@@ -1,11 +1,14 @@
 ###############################################
 #独立启动HMI
 ###############################################
-export  CYBER_PATH=/home/watrix18/workspace/AiwSys/exec/cyber
+export  CYBER_PATH=/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/cyber
 # 程序日志目录
-export  GLOG_log_dir=/home/watrix18/workspace/adas_data/logs
+export  GLOG_log_dir=/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/adas_data/logs
 #ADAS 配置目录
-export ADAS_PATH=/home/watrix18/workspace/AiwSys/exec/projects/adas
+export ADAS_PATH=/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/projects/adas
+#设置工作目录变量
+ADAS_WORK_PATH=/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys
 
+echo "work path : ${ADAS_WORK_PATH}"
 #启动运行HMI
-/home/watrix18/workspace/AiwSys/bazel-bin/projects/adas/component/hmi/perception_hmi
+eval ${ADAS_WORK_PATH}/bazel-bin/projects/adas/component/hmi/perception_hmi &
