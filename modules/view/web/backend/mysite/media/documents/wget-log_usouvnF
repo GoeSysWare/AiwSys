@@ -1,13 +1,0 @@
---2019-10-14 11:11:41--  http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_418.87.00_linux.run
-正在解析主机 developer.download.nvidia.com (developer.download.nvidia.com)... 128.1.83.58, 128.1.83.19, 128.1.83.20, ...
-正在连接 developer.download.nvidia.com (developer.download.nvidia.com)|128.1.83.58|:80... 已连接。
-已发出 HTTP 请求，正在等待回应... 301 Moved Permanently
-位置：https://developer.download.nvidia.cn/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_418.87.00_linux.run [跟随至新的 URL]
---2019-10-14 11:11:42--  https://developer.download.nvidia.cn/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_418.87.00_linux.run
-正在解析主机 developer.download.nvidia.cn (developer.download.nvidia.cn)... 58.222.55.6
-正在连接 developer.download.nvidia.cn (developer.download.nvidia.cn)|58.222.55.6|:443... 已连接。
-已发出 HTTP 请求，正在等待回应... 200 OK
-长度： 2572375299 (2.4G) [application/octet-stream]
-正在保存至: “cuda_10.1.243_418.87.00_linux.run”
-
-ux.run                8%[>                   ] 202.03M  2.18MB/s    剩余 27m 39sx.run                 8%[>                   ] 202.61M  2.21MB/s    剩余 27m 39s

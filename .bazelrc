@@ -73,7 +73,7 @@ build --copt="-Werror=return-type"
 #build --copt="-Werror=reorder"
 
 build --copt="-Werror=unused-but-set-variable"
-build --copt="-Werror=switch"
+#build --copt="-Werror=switch"
 
 build --copt="-Wfloat-conversion"
 build --copt="-Wunknown-pragmas"
@@ -81,7 +81,7 @@ build --copt="-Wunknown-pragmas"
 build --copt="-Wno-sign-compare"
 build --copt="-Wno-unused-variable"
 build --copt="-Wno-unused-but-set-variable"
-
+build --copt="-Wno-switch"
 
 # Strict check on type conversion.
 # build --per_file_copt=^modules/.*\.cc,^cyber/.*\.cc@-Werror=conversion, -Wsign-conversion

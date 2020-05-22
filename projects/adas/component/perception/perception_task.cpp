@@ -1043,24 +1043,24 @@ namespace watrix
         watrix::projects::adas::proto::DetectionBoxs *pb_mutable_detection_boxs_1 = sendData_1->mutable_detection_boxs();
         watrix::projects::adas::proto::MaxSafeDistance *max_safe_distance_1 = sendData_1->mutable_max_safe_distance();
         //resize to hdmi need screen
-        cv::Mat out_mat_0;
-        cv::Mat out_mat_1;
+        // cv::Mat out_mat_0;
+        // cv::Mat out_mat_1;
 
         FillDetectBox(v_image_with_color_mask[0], yolo_detection_boxs0_, v_box_invasion_results[0], pb_mutable_detection_boxs_0);
         max_safe_distance_0->set_image_distance(short_safe_y);
-        cv::resize(v_image_with_color_mask[0], out_mat_0, cv::Size(1280, 800));
+        // cv::resize(v_image_with_color_mask[0], out_mat_0, cv::Size(1280, 800));
 
         //mat image
         FillDetectBox(v_image_with_color_mask[1], yolo_detection_boxs1_, v_box_invasion_results[1], pb_mutable_detection_boxs_1);
         max_safe_distance_1->set_image_distance(long_safe_y);
         //tmp_mat = v_image_with_color_mask[select_cam];
-        cv::resize(v_image_with_color_mask[1], out_mat_1, cv::Size(1280, 800));
+        // cv::resize(v_image_with_color_mask[1], out_mat_1, cv::Size(1280, 800));
 
         //准备发送给客户端
-        MakeCvImageToProtoMsg(out_mat_0, source_image_0);
+        MakeCvImageToProtoMsg(v_image_with_color_mask[0], source_image_0);
         perception_->camera_out_writers_[perception_->camera_names_[0]]->Write(sendData_0);
 
-        MakeCvImageToProtoMsg(out_mat_1, source_image_1);
+        MakeCvImageToProtoMsg(v_image_with_color_mask[1], source_image_1);
         perception_->camera_out_writers_[perception_->camera_names_[1]]->Write(sendData_1);
       }
 

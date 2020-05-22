@@ -2,6 +2,44 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+cc_binary(
+    name = "test_usb_cam",
+    srcs = ["test_cam.cpp"],
+    deps = [
+        ":usb_camera_lib",
+    ],
+    linkopts = [
+        "-lswscale",
+        "-lavformat",
+        "-lavcodec",
+        "-latomic",
+       "-lavutil",
+    ],
+)
+
+
+
+cc_library(
+    name = "usb_camera_lib",
+    srcs = ["usb_cam.cpp"],
+    hdrs = ["usb_cam.h"],
+    deps = [
+
+    ],
+)
+
+
+cc_binary(
+    name = "test_async",
+    srcs = [
+        "test_async.cpp",
+    ],
+    linkopts = [
+        "-lpthread",
+    ],
+    deps = [
+    ],
+)
 
 
 cc_binary(

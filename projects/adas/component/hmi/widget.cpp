@@ -58,8 +58,9 @@ Widget::Widget(QWidget *parent) : QWidget(parent),
     //初始化信号槽
     initConnect();
     //初始化定时器
-    startTimer(1000);
+    timer_id_ = startTimer(1000);
 }
+
 void Widget::initNetwork()
 {
     // 根据配置获得内置的记录的通道名
@@ -293,6 +294,8 @@ void Widget::onStateChanged()
 
 Widget::~Widget()
 {
+    killTimer(timer_id_);
+    delete form;
     delete ui;
 }
 

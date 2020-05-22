@@ -10,5 +10,8 @@ export ADAS_PATH=/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.githu
 ADAS_WORK_PATH=/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys
 
 echo "work path : ${ADAS_WORK_PATH}"
-#启动运行HMI
-eval ${ADAS_WORK_PATH}/bazel-bin/projects/adas/component/hmi/perception_hmi &
+
+
+# 启动HMI功能
+
+eval python3 cyber_launch start ${ADAS_WORK_PATH}/projects/adas/production/launch/hmi.launch &

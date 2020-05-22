@@ -14,7 +14,7 @@ module_config {
         name : "camera_front_6mm_compress"
        config_file_path : "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-AiwSys/modules/drivers/camera/conf/camera_front_6mm.pb.txt"
         readers {
-          channel: "/apollo/sensor/camera/front_6mm/image"
+          channel: "adas/camera/front_6mm/image"
           pending_queue_size: 10
        }
      }
@@ -32,7 +32,7 @@ module_config {
         name : "camera_front_12mm_compress"
         config_file_path : "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-AiwSys/modules/drivers/camera/conf/camera_front_12mm.pb.txt"
         readers {
-          channel: "/apollo/sensor/camera/front_12mm/image"
+          channel: "adas/camera/front_6mm/image"
           pending_queue_size: 10
         }
       }

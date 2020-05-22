@@ -22,5 +22,6 @@ eval python3 cyber_launch start ${ADAS_WORK_PATH}/projects/adas/production/launc
 # 启动回放/录像功能
 # 记得配置exec/projects/adas/production/conf/adas_recorder_config.pb.txt
 eval python3 cyber_launch start ${ADAS_WORK_PATH}/projects/adas/production/launch/recorder.launch &
-#启动运行HMI
-eval ${ADAS_WORK_PATH}/bazel-bin/projects/adas/component/hmi/perception_hmi &
+
+# 启动HMI功能
+eval python3 cyber_launch start ${ADAS_WORK_PATH}/projects/adas/production/launch/hmi.launch &

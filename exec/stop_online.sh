@@ -32,8 +32,8 @@ sleep 1
 #停止前配置好 modules/drivers/camera/conf/camera_front_6mm.pb.txt
 eval python3 cyber_launch stop ${ADAS_WORK_PATH}/modules/drivers/camera/launch/camera.launch &
 sleep 1
-#停止运行HMI
-eval kill -9 $(ps -ef |grep perception_hmi)
+# 启动HMI功能
+eval python3 cyber_launch stop ${ADAS_WORK_PATH}/projects/adas/production/launch/hmi.launch &
 
 
 

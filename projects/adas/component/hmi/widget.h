@@ -123,7 +123,7 @@ private:
     void HideRecordWidget();
 
     int warning_time_ = 0;
-
+    int timer_id_;
     cv::Mat ConvertTo3Channels(const cv::Mat &binImg);
     void YoloResaultDisplay(const std::shared_ptr<watrix::projects::adas::proto::SendResult> &sync_result,const string &channel_name);
 

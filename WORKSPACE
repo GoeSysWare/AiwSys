@@ -207,6 +207,14 @@ new_local_repository(
     build_file = "third_party/yaml_cpp.BUILD",
     path = "../3rd/yaml-cpp-0.6.3/",
 )
+
+# CivetWeb (web server)
+new_local_repository(
+    name = "civetweb",
+    build_file = "third_party/civetweb.BUILD",
+    path = "../3rd/civetweb-1.11",
+)
+
 #########################################################################################
 # 图像处理、点云功能库
 #########################################################################################

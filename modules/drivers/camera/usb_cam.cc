@@ -364,6 +364,7 @@ bool UsbCam::init_device(void) {
   fmt.fmt.pix.height = config_->height();
   fmt.fmt.pix.pixelformat = pixel_format_;
   fmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
+  fmt.fmt.pix.priv = 1;
 
   if (-1 == xioctl(fd_, VIDIOC_S_FMT, &fmt)) {
     AERROR << "VIDIOC_S_FMT";
@@ -865,12 +866,12 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
           AWARN << warning_str;
         }
       }
-      if (len < raw_image->width * raw_image->height) {
-        AERROR << "Wrong Buffer Len: " << len
-               << ", dev: " << config_->camera_dev();
-      } else {
+      // if (len < raw_image->width * raw_image->height) {
+      //   AERROR << "Wrong Buffer Len: " << len
+      //          << ", dev: " << config_->camera_dev();
+      // } else {
         process_image(buffers_[buf.index].start, len, raw_image);
-      }
+      // }
 
       if (-1 == xioctl(fd_, VIDIOC_QBUF, &buf)) {
         AERROR << "VIDIOC_QBUF";

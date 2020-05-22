@@ -22,5 +22,5 @@ eval python3 cyber_launch start ${ADAS_WORK_PATH}/modules/drivers/camera/launch/
 #启动前配置好exec/projects/adas/production/conf/adas_perception_config.pb.txt
 eval python3 cyber_launch start ${ADAS_WORK_PATH}/projects/adas/production/launch/perception.launch &
 
-#启动运行HMI
-eval ${ADAS_WORK_PATH}/bazel-bin/projects/adas/component/hmi/perception_hmi &
+# 启动HMI功能
+eval python3 cyber_launch start ${ADAS_WORK_PATH}/projects/adas/production/launch/hmi.launch &
