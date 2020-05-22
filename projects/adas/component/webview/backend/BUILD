@@ -11,12 +11,12 @@ cc_library(
     hdrs = [
         "dreamview.h",
     ],
-    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
+    copts = ['-DMODULE_NAME=\\"ADAS_WEB\\"'],
     deps = [
         "//modules/common/status",
-        "//modules/webview/backend/common:dreamview_gflags",
-        "//modules/webview/backend/handlers:image_handler",
-        "//modules/webview/backend/handlers:websocket_handler",
+        "//projects/adas/component/webview/backend/common:dreamview_gflags",
+        "//projects/adas/component/webview/backend/handlers:image_handler",
+        "//projects/adas/component/webview/backend/handlers:websocket_handler",
         "@civetweb//:civetweb++",
     ],
 )

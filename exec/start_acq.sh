@@ -23,4 +23,4 @@ eval python3 cyber_launch start ${ADAS_WORK_PATH}/modules/drivers/camera/launch/
 eval python3 cyber_launch start ${ADAS_WORK_PATH}/projects/adas/production/launch/perception.launch &
 
 # 启动HMI功能
-eval python3 cyber_launch start ${ADAS_WORK_PATH}/projects/adas/production/launch/hmi.launch &
+# eval python3 cyber_launch start ${ADAS_WORK_PATH}/projects/adas/production/launch/hmi.launch &

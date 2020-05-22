@@ -22,7 +22,7 @@ eval python3 cyber_launch stop ${ADAS_WORK_PATH}/modules/drivers/camera/launch/c
 eval python3 cyber_launch stop ${ADAS_WORK_PATH}/projects/adas/production/launch/perception.launch &
 
 #停止运行HMI
-eval python3 cyber_launch stop ${ADAS_WORK_PATH}/projects/adas/production/launch/hmi.launch &
+# eval python3 cyber_launch stop ${ADAS_WORK_PATH}/projects/adas/production/launch/hmi.launch &
 
 
 

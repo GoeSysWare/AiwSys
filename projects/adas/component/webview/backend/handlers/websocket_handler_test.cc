@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/dreamview/backend/handlers/websocket_handler.h"
+#include "projects/adas/component/webview/backend/handlers/websocket_handler.h"
 
 #include "cyber/common/log.h"
 #include "gmock/gmock.h"

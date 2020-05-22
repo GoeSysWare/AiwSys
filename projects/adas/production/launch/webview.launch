@@ -4,7 +4,7 @@
         <dag_conf></dag_conf>
         <type>binary</type>
         <process_name>
-          /media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-bin/modules/webview/webview
+          /media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-bin/projects/adas/component/webview/webview
         </process_name>
         <exception_handler>respawn</exception_handler>
     </module>

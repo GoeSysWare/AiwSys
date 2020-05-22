@@ -13,4 +13,4 @@ echo "work path : ${ADAS_WORK_PATH}"
 
 
 # 启动WebView功能
-eval python3 cyber_launch start ${ADAS_WORK_PATH}/modules/webview/production/webview.launch &
+eval python3 cyber_launch start ${ADAS_WORK_PATH}/projects/adas/production/launch/webview.launch  &

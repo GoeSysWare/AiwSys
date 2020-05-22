@@ -13,7 +13,7 @@ cc_binary(
         ":frontend",
     ],
     deps = [
-        "//modules/webview/backend",
+        "//projects/adas/component/webview/backend",
         "@opencv",
     ],
 )

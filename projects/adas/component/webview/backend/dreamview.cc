@@ -14,13 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/webview/backend/dreamview.h"
+#include "projects/adas/component/webview/backend/dreamview.h"
 
 #include <vector>
 
 #include "cyber/common/file.h"
 #include "modules/common/time/time.h"
-#include "modules/webview/backend/common/dreamview_gflags.h"
+#include "projects/adas/component/webview/backend/common/dreamview_gflags.h"
 
 namespace apollo {
 namespace dreamview {

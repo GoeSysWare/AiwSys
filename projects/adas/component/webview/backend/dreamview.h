@@ -22,8 +22,8 @@
 #include "CivetServer.h"
 #include "cyber/cyber.h"
 #include "modules/common/status/status.h"
-#include "modules/webview/backend/handlers/image_handler.h"
-#include "modules/webview/backend/handlers/websocket_handler.h"
+#include "projects/adas/component/webview/backend/handlers/image_handler.h"
+#include "projects/adas/component/webview/backend/handlers/websocket_handler.h"
 
 /**
  * @namespace apollo::dreamview

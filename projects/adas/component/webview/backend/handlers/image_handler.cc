@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/webview/backend/handlers/image_handler.h"
+#include "projects/adas/component/webview/backend/handlers/image_handler.h"
 
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"

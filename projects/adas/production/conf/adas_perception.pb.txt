@@ -47,9 +47,9 @@
   # darknet config
    darknet:
    {
-     cfg_filepath:"production/conf/autotrain_models/darknet/v2/yolov4-custom_anchor_scratch.cfg"
-     weight_filepath:"production/conf/autotrain_models/darknet/v2/yolov4-custom_anchor_scratch_best.weights"
-     label_filepath:"production/conf/autotrain_models/darknet/v2/custom.names"
+     cfg_filepath:"production/conf/autotrain_models/darknet/v3/custom.cfg"
+     weight_filepath:"production/conf/autotrain_models/darknet/v3/custom_63855.weights"
+     label_filepath:"production/conf/autotrain_models/darknet/v3/custom.names"
      confidence_threshold:0.25
     hier_thresh:0.5
     iou_thresh:0.45

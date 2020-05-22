@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/webview/backend/common/dreamview_gflags.h"
+#include "projects/adas/component/webview/backend/common/dreamview_gflags.h"
 
 DEFINE_string(dreamview_module_name, "dreamview", "dreamview module name");
 

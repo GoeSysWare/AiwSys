@@ -36,15 +36,15 @@ sleep 1
 
 # 停止仿真测试
 eval python3 cyber_launch stop ${ADAS_WORK_PATH}/projects/adas/production/launch/simulator.launch &
-
+sleep 1
 
 # 启动WebView功能
-eval python3 cyber_launch stop ${ADAS_WORK_PATH}/modules/webview/production/webview.launch &
+# eval python3 cyber_launch stop ${ADAS_WORK_PATH}/projects/adas/production/launch/webview.launch  &
 sleep 1
 
 # 停止HMI功能
 eval python3 cyber_launch stop ${ADAS_WORK_PATH}/projects/adas/production/launch/hmi.launch &
-
+sleep 1
 
 
 

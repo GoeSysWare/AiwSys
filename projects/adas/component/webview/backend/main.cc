@@ -16,7 +16,7 @@
 
 #include "cyber/common/global_data.h"
 #include "cyber/init.h"
-#include "modules/webview/backend/dreamview.h"
+#include "projects/adas/component/webview/backend/dreamview.h"
 
 int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
