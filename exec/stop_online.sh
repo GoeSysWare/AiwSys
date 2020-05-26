@@ -23,9 +23,12 @@ sleep 1
 eval python3 cyber_launch stop ${ADAS_WORK_PATH}/projects/adas/production/launch/perception.launch &
 sleep 5
 
-sleep 1
+
 # 停止雷达
-eval python3 cyber_launch stop ${ADAS_WORK_PATH}/modules/drivers/velodyne/launch/velodyne.launch &
+# eval python3 cyber_launch stop ${ADAS_WORK_PATH}/modules/drivers/velodyne/launch/velodyne.launch &
+# sleep 1
+# 停止Innovision雷达
+eval python3 cyber_launch stop ${ADAS_WORK_PATH}/modules/drivers/innovision/launch/innovision.launch &
 sleep 1
 
 # 停止照相机

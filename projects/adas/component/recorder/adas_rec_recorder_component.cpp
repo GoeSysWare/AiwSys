@@ -332,7 +332,6 @@ void AdasRecRecorderComponent::ShowProgress()
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
-    std::cout << std::endl;
 }
 
 } // namespace adas

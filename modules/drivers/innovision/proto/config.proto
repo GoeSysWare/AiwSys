@@ -1,0 +1,34 @@
+syntax = "proto2";
+
+package apollo.drivers.innovision.proto;
+import "modules/drivers/innovision/proto/inno_lidar.proto";
+
+
+  message Config {
+    optional string frame_id = 1;
+    optional string scan_channel = 2;
+    optional double rpm = 3 [default = 600.0];
+    optional Model model = 4[default = INV300];
+    optional Mode mode = 5[default = REV_E];
+    optional string pcap = 6;
+    optional int32 prefix_angle = 7;
+    optional string firing_data_ip = 8;
+    optional int32 firing_data_port = 9;
+    optional int32 positioning_data_port = 10;
+    optional bool use_sensor_sync = 11;
+    optional double max_range = 12;
+    optional double min_range = 13;
+    optional double max_angle = 14;
+    optional double min_angle = 15;
+    optional double view_direction = 16;
+    optional double view_width = 17;
+    optional bool calibration_online = 18;
+    optional string calibration_file = 19;
+    optional bool organized = 20;
+    optional string convert_channel_name = 21;
+    optional int32 npackets = 22;
+    optional bool use_gps_time = 23;
+    optional bool use_poll_sync = 25;
+    optional bool is_main_frame = 26;
+  }
+  

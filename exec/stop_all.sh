@@ -26,11 +26,12 @@ sleep 5
 
 sleep 1
 # 停止雷达
-eval python3 cyber_launch stop ${ADAS_WORK_PATH}/modules/drivers/velodyne/launch/velodyne.launch &
+# eval python3 cyber_launch stop ${ADAS_WORK_PATH}/modules/drivers/velodyne/launch/velodyne.launch &
+# sleep 1
+# 停止Innovision雷达
+eval python3 cyber_launch stop ${ADAS_WORK_PATH}/modules/drivers/innovision/launch/innovision.launch &
 sleep 1
-
 # 停止照相机
-#停止前配置好 modules/drivers/camera/conf/camera_front_6mm.pb.txt
 eval python3 cyber_launch stop ${ADAS_WORK_PATH}/modules/drivers/camera/launch/camera.launch &
 sleep 1
 

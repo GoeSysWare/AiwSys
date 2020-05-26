@@ -4,6 +4,7 @@ package apollo.drivers.velodyne;
 
 import "modules/drivers/velodyne/proto/velodyne.proto";
 
+
 message Config {
   optional string frame_id = 1;
   optional string scan_channel = 2;

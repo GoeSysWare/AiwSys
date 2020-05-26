@@ -17,9 +17,15 @@ echo "work path : ${ADAS_WORK_PATH}"
 #启动前配置好/home/watrix18/workspace/AiwSys/exec/modules/drivers/camera/conf/camera_front_6mm.pb.txt
 eval python3 cyber_launch start ${ADAS_WORK_PATH}/modules/drivers/camera/launch/camera.launch &
 sleep 1
-# 启动雷达
-eval python3 cyber_launch start ${ADAS_WORK_PATH}/modules/drivers/velodyne/launch/velodyne.launch &
+
+# 启动velodyne雷达
+#eval python3 cyber_launch start ${ADAS_WORK_PATH}/modules/drivers/velodyne/launch/velodyne.launch &
+# sleep 1
+
+# 启动Innovision雷达
+eval python3 cyber_launch start ${ADAS_WORK_PATH}/modules/drivers/innovision/launch/innovision.launch &
 sleep 1
+
 # 启动感知功能
 #启动前配置好exec/projects/adas/production/conf/adas_perception_config.pb.txt
 eval python3 cyber_launch start ${ADAS_WORK_PATH}/projects/adas/production/launch/perception.launch &

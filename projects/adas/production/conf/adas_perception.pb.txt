@@ -10,20 +10,20 @@
   # "sim"  离线仿真模式
   # "online_acq" 在线采集模式(仅仅运行dectect后保存数据)
   ############################### 
-  model_type:"online"
+  model_type:"online_acq"
 
   # 是否启用算法检测
   if_use_detect_model: true
   # 是否启用机车分割
   if_use_train_seg_model: false
   # 是否启用轨道分割
-  if_use_lane_seg_model: true
+  if_use_lane_seg_model: false
   # 所有模式下，设定是否存存档照片
-  if_save_image_result: false
+  if_save_image_result: true
   # 所有模式下，设定是否保存检测结果为log文件
   if_save_log_result: false
   #  所有模式下，设定存档照片和log文件的路径
-  save_image_dir:"data/debug"
+  save_image_dir:"/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/data"
 
 
   # yolo config 

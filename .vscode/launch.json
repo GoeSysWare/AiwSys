@@ -167,9 +167,7 @@
             "program": "${workspaceFolder}/bazel-bin/cyber/mainboard",
             "args": [
                 "-d",
-                // "${workspaceFolder}/bazel-AiwSys/projects/adas/production/dag/adas.dag",
-                // "${workspaceFolder}/bazel-AiwSys/modules/drivers/gnss/dag/gnss.dag",
-                "${workspaceFolder}/bazel-AiwSys/modules/drivers/camera/dag/camera_no_compress.dag",
+                "${workspaceFolder}/modules/drivers/innovision/dag/innovision.dag",
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

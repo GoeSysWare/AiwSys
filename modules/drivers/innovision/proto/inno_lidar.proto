@@ -1,0 +1,19 @@
+
+syntax = "proto2";
+
+package apollo.drivers.innovision.proto;
+
+// innovision 公司的Lidar 内部配置，目前保留
+// Lidar的类型，目前型号未知，自定义一个
+enum Model {
+    UNKOWN = 1;
+    INV300 = 2;
+  }
+
+  // Lidar的工作模式，目前未开放，可以后续再设置
+  enum Mode {
+    REV_E = 1;
+    E =2;
+    OTHER = 3;
+  }
+  

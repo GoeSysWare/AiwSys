@@ -12,5 +12,7 @@ ADAS_WORK_PATH=/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/
 
 echo "work path : ${ADAS_WORK_PATH}"
 
-# 启动雷达
-eval python3 cyber_launch start ${ADAS_WORK_PATH}/modules/drivers/velodyne/launch/velodyne.launch &
+# 启动velodyne雷达
+# eval python3 cyber_launch start ${ADAS_WORK_PATH}/modules/drivers/velodyne/launch/velodyne.launch &
+# 启动Innovision雷达
+eval python3 cyber_launch start ${ADAS_WORK_PATH}/modules/drivers/innovision/launch/innovision.launch &

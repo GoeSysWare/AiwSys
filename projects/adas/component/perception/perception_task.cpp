@@ -528,7 +528,8 @@ namespace watrix
 
             std::string result_folder = apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(),
                                                                                perception_->adas_perception_param_.save_image_dir()) +
-                                        "/darknet_results/";
+                                        "/darknet_results/"+ 
+                                        apollo::cyber::common::UnixSecondsToString(time(nullptr), "%Y%m%d%H%M%S") + "/";
             boost::filesystem::create_directories(result_folder);
             cv::Mat image_with_boxs;
             std::string image_with_box_path;
@@ -615,7 +616,8 @@ namespace watrix
 
             std::string result_folder = apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(),
                                                                                perception_->adas_perception_param_.save_image_dir()) +
-                                        "/yolo_results/";
+                                        "/yolo_results/"+ 
+                                        apollo::cyber::common::UnixSecondsToString(time(nullptr), "%Y%m%d%H%M%S") + "/";
             boost::filesystem::create_directories(result_folder);
             cv::Mat image_with_boxs;
             std::string image_with_box_path;
@@ -986,7 +988,8 @@ namespace watrix
 
           std::string result_folder = apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(),
                                                                              perception_->adas_perception_param_.save_image_dir()) +
-                                      "/perception_results/";
+                                      "/perception_results/"+ 
+                                        apollo::cyber::common::UnixSecondsToString(time(nullptr), "%Y%m%d%H%M%S") + "/";
           boost::filesystem::create_directories(result_folder);
 
           cv::Mat combine;
