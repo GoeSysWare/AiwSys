@@ -34,6 +34,7 @@
 #include "util/imagetools.h"
 
 #include "cyber/cyber.h"
+#include "cyber/common/global_data.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 // protobuf message to publish and subscribe
 
@@ -52,6 +53,7 @@
 using namespace watrix::projects::adas::proto;
 using namespace watrix::util;
 using apollo::cyber::Node;
+using apollo::cyber::common::GlobalData;
 
 namespace Ui
 {

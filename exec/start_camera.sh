@@ -1,19 +1,12 @@
 ###############################################
 #独立启动相机、lidar
 ###############################################
-export  CYBER_PATH=/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/cyber
-# 程序日志目录
-export  GLOG_log_dir=/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/adas_data/logs
-#ADAS 配置目录
-export ADAS_PATH=/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/projects/adas
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+cd "${DIR}/.."
 
-
-#设置工作变量
-ADAS_WORK_PATH=/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys
-
-echo "work path : ${ADAS_WORK_PATH}"
+source "${DIR}/adas_base.sh"
 
 # 启动照相机
-eval python3 cyber_launch start ${ADAS_WORK_PATH}/modules/drivers/camera/launch/camera.launch &
+eval python3 ${ADAS_WORK_PATH}/cyber_launch start ${ADAS_WORK_PATH}/modules/drivers/camera/launch/camera.launch &
 

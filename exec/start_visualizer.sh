@@ -1,14 +1,12 @@
 ###############################################
-#独立启动HMI
+#独立启动可视化调试工具
 ###############################################
-export  CYBER_PATH=/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/cyber
-# 程序日志目录
-export  GLOG_log_dir=/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/adas_data/logs
-#ADAS 配置目录
-export ADAS_PATH=/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/projects/adas
-#设置工作目录变量
-ADAS_WORK_PATH=/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-echo "work path : ${ADAS_WORK_PATH}"
+cd "${DIR}/.."
+
+source "${DIR}/adas_base.sh"
+
+
 #启动运行HMI
-eval ${ADAS_WORK_PATH}/bazel-bin/modules/tools/visualizer/cyber_visualizer &
+eval ${ADAS_WORK_BIN}/modules/tools/visualizer/cyber_visualizer &

@@ -1,0 +1,18 @@
+frame_id: "innovision_ladar"
+scan_channel: ""
+rpm: 600.0
+model: INV300
+mode: REV_E
+firing_data_ip:"172.168.1.10"
+firing_data_port: 8001
+use_sensor_sync: false
+max_range: 200
+min_range: 0.4
+use_gps_time: false
+calibration_online: true
+calibration_file: "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys//exec/modules/drivers/innovision/conf/14211019_31_cali_public.yaml"
+
+organized: false
+convert_channel_name: "/adas/sensor/pointcloud2"
+use_poll_sync: true
+is_main_frame: true

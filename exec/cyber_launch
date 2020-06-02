@@ -36,7 +36,8 @@ g_process_pid = os.getpid()
 g_process_name = g_script_name + "_" + str(g_process_pid)
 
 cyber_path = os.getenv('CYBER_PATH')
-g_binary_name = "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/bazel-bin/cyber/mainboard"
+adas_bin_path = os.getenv('ADAS_WORK_BIN')
+g_binary_name = adas_bin_path + "/cyber/mainboard"
 """
 colorful logging
 """

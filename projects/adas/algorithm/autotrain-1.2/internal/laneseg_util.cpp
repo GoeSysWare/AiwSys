@@ -1486,6 +1486,7 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 					cloud_pcl->points.push_back(pt);
 				}
 
+	
 				points = LOD::getPointFrom2DAnd3D(cloud_pcl, LOD::getInvasionMap(input_l, input_r, top_y), top_y, invasion, rotation);
 #ifdef SHOW_PCD
 				pcl::io::savePCDFileBinary("output.pcd", *points);

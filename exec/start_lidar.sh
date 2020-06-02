@@ -1,18 +1,14 @@
 ###############################################
 #独立启动lidar
 ###############################################
-export  CYBER_PATH=/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/cyber
-# 程序日志目录
-export  GLOG_log_dir=/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/adas_data/logs
-#ADAS 配置目录
-export ADAS_PATH=/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys/projects/adas
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-#设置工作目录变量
-ADAS_WORK_PATH=/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys
+cd "${DIR}/.."
 
-echo "work path : ${ADAS_WORK_PATH}"
-
+source "${DIR}/adas_base.sh"
 # 启动velodyne雷达
-# eval python3 cyber_launch start ${ADAS_WORK_PATH}/modules/drivers/velodyne/launch/velodyne.launch &
+#eval python3 ${ADAS_WORK_PATH}/cyber_launch start ${ADAS_WORK_PATH}/modules/drivers/velodyne/launch/velodyne.launch &
+
+
 # 启动Innovision雷达
-eval python3 cyber_launch start ${ADAS_WORK_PATH}/modules/drivers/innovision/launch/innovision.launch &
+eval python3 ${ADAS_WORK_PATH}/cyber_launch start ${ADAS_WORK_PATH}/modules/drivers/innovision/launch/innovision.launch &

@@ -1,0 +1,8 @@
+
+<cyber>
+    <module>
+        <name>simulator</name>
+        <dag_conf>/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys//exec/projects/adas/production/dag/simulator.dag</dag_conf>
+        <process_name>simulator</process_name>
+    </module>
+</cyber>

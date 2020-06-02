@@ -49,7 +49,7 @@ namespace watrix
         watrix::algorithm::YoloApi::Init(cfg);
       }
 
-      static void init_darknet_api(watrix::projects::adas::proto::DarkNetConfig config)
+      static  YoloDarknetApi *  init_darknet_api(watrix::projects::adas::proto::DarkNetConfig config)
       {
 
         DarknetYoloConfig cfg;
@@ -69,7 +69,9 @@ namespace watrix
         cfg.hier_thresh = config.hier_thresh();
         cfg.iou_thresh = config.iou_thresh();
 
-        YoloDarknetApi::Init(cfg);
+        YoloDarknetApi*  darknet_ptr= new YoloDarknetApi(cfg);
+
+        return darknet_ptr;
       }
 
       void init_trainseg_api(watrix::projects::adas::proto::TrainSegConfig perception_config)
@@ -232,11 +234,11 @@ namespace watrix
         {
           YoloApi::Free();
         }
-        //检测时是否采用darknet算法
-        if (!adas_perception_param_.has_yolo() && adas_perception_param_.if_use_detect_model() && adas_perception_param_.has_darknet() )
-        {
-          YoloDarknetApi::Free();
-        }
+        // //检测时是否采用darknet算法
+        // if (!adas_perception_param_.has_yolo() && adas_perception_param_.if_use_detect_model() && adas_perception_param_.has_darknet() )
+        // {
+        //   YoloDarknetApi::Free();
+        // }
 
         //是否用列车分割功能
         if (adas_perception_param_.if_use_train_seg_model() && adas_perception_param_.has_trainseg())
@@ -260,8 +262,17 @@ namespace watrix
 
         //初始化线程池
         task_processor_.reset(new watrix::projects::adas::ThreadPool(perception_tasks_num_,
-                                                                     []() { //caffe初始化,一个线程初始化一次
+                                                                     [this]() -> void* { 
+                                                                       //caffe初始化,一个线程初始化一次
                                                                        watrix::algorithm::CaffeApi::set_mode(true, 0, 1234);
+                                                                       YoloDarknetApi * darknet_ptr =0;
+                                                                        //检测时是否采用darknet算法,如果有yolo，优先用yolo，屏蔽darknet
+                                                                                
+                                                                      if (!this->adas_perception_param_.has_yolo() && this->adas_perception_param_.if_use_detect_model() && this->adas_perception_param_.has_darknet() )
+                                                                      {
+                                                                        darknet_ptr =init_darknet_api(this->adas_perception_param_.darknet());
+                                                                      }
+                                                                      return darknet_ptr;
                                                                      }));
 
         //初始化算法SDK
@@ -540,10 +551,10 @@ namespace watrix
           init_yolo_api(adas_perception_param_.yolo());
         }
         //检测时是否采用darknet算法,如果有yolo，优先用yolo，屏蔽darknet
-        if (!adas_perception_param_.has_yolo() && adas_perception_param_.if_use_detect_model() && adas_perception_param_.has_darknet() )
-        {
-          init_darknet_api(adas_perception_param_.darknet());
-        }
+        // if (!adas_perception_param_.has_yolo() && adas_perception_param_.if_use_detect_model() && adas_perception_param_.has_darknet() )
+        // {
+        //   init_darknet_api(adas_perception_param_.darknet());
+        // }
 
         //是否用列车分割功能
         if (adas_perception_param_.if_use_train_seg_model() && adas_perception_param_.has_trainseg())
@@ -711,7 +722,7 @@ namespace watrix
           {
 
             //如果是仿真的，就需要 仿真文件信息,不是仿真则用采集时间作为文件名
-            sim_image_files_[i] = (model_type_ == SIM ) ?  in_message->frame_id() : timestamp.ToString() + ".jpg";
+            sim_image_files_[i] = (model_type_ == SIM ) ?  in_message->frame_id() : timestamp.ToString("%Y-%m-%d-%H-%M-%S") + ".jpg";
 
             int image_size = in_message->height() * in_message->step();
 
@@ -737,19 +748,26 @@ namespace watrix
         return apollo::cyber::SUCC;
       }
       //核心处理任务
-      void AdasPerceptionComponent::doPerceptionTask()
+      void AdasPerceptionComponent::doPerceptionTask( )
       {
         std::shared_ptr<AdasPerceptionComponent> share_this =
             std::dynamic_pointer_cast<AdasPerceptionComponent>(shared_from_this());
         //新建PerceptionTask 任务
-        std::shared_ptr<PerceptionTask> task = make_shared<PerceptionTask>(share_this);
+
+
+        YoloDarknetApi* darknet_ptr = static_cast<YoloDarknetApi*>(this->task_processor_->ptr_map_[std::this_thread::get_id()]);
+
+      
+        std::shared_ptr<PerceptionTask> task = make_shared<PerceptionTask>(share_this,darknet_ptr);
+
         task->Excute();
+
       }
 
       void AdasPerceptionComponent::OnReceivePointCloud(const std::shared_ptr<apollo::drivers::PointCloud> &in_message,
                                                         const std::string &lidar_name)
       {
-        std::lock_guard<std::mutex> lock(camera_mutex_);
+         std::lock_guard<std::mutex> lock(lidar_mutex_);
 
         const double msg_timestamp = in_message->measurement_time() + timestamp_offset_;
         AERROR << "OnReceivePointCloud(), "

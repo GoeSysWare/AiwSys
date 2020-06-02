@@ -335,15 +335,25 @@ namespace watrix
 
       std::atomic<uint64_t> PerceptionTask::taskd_excuted_num_ = {0};
 
-      PerceptionTask::PerceptionTask(PerceptionComponentPtr p) : perception_(p)
+      PerceptionTask::PerceptionTask(PerceptionComponentPtr p,YoloDarknetApi* darknet ) : perception_(p),darknet_ptr_(darknet)
       {
+        // this->v_image_ = perception_->images_;
+        
+        perception_->camera_mutex_.lock();
+        // for (auto i = 0; i < perception_->images_.size(); i++)
+        //   this->v_image_[i] = perception_->images_[i].clone();
         this->v_image_ = perception_->images_;
-        for (auto i = 0; i < perception_->images_.size(); i++)
-          this->v_image_[i] = perception_->images_[i].clone();
         this->v_image_lane_front_result_ = perception_->v_image_lane_front_result_;
+        perception_->camera_mutex_.unlock();
+
+       perception_->lidar_mutex_.lock();
         this->lidar_cloud_buf_ = perception_->lidar_cloud_buf_;
         this->lidar_safe_area_ = perception_->lidar_safe_area_;
         this->lidar2image_paint_ = perception_->lidar2image_paint_;
+        perception_->lidar_mutex_.unlock();
+
+
+
         this->lane_invasion_config_ = perception_->lane_invasion_config_;
         this->model_type_ = perception_->model_type_;
         this->if_save_image_result_ = perception_->if_save_image_result_;
@@ -373,11 +383,14 @@ namespace watrix
         {
           DoDarknetDetectGPU();
         }
+          AERROR << "[ thread : " << std::this_thread::get_id() << "] PerceptionTask::Detect " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
         //轨道分割
         if (perception_->adas_perception_param_.if_use_lane_seg_model() && perception_->adas_perception_param_.has_laneseg())
         {
           DoLaneSegSeqGPU();
         }
+        AERROR << "[ thread : " << std::this_thread::get_id() << "] PerceptionTask::LaneSeg " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
+
         //车体分割
         if (perception_->adas_perception_param_.if_use_train_seg_model() && perception_->adas_perception_param_.has_trainseg())
         {
@@ -389,9 +402,10 @@ namespace watrix
           SyncPerceptionResult();
         }
 
-        AERROR << "[ thread : " << std::this_thread::get_id() << "] PerceptionTask::Excute " << static_cast<double>(timer.Toc()) * 0.001 << "ms"
+        AERROR << "[ thread : " << std::this_thread::get_id() << "] PerceptionTask::Perception " << static_cast<double>(timer.Toc()) * 0.001 << "ms"
                << " sequence_num :" << sequence_num_
-               << "  file:" << sim_image_files_[0];
+               << "  file:" << sim_image_files_[0]
+               << " now:" << apollo::cyber::Time::Now().ToString("%Y-%m-%d-%H-%M-%S");
 
         taskd_excuted_num_.fetch_add(1);
       }
@@ -476,6 +490,12 @@ namespace watrix
 
       void PerceptionTask::DoDarknetDetectGPU()
       {
+        if(darknet_ptr_ == 0) 
+        {
+                  AERROR << "DoDarknetDetectGPU  Darket Failed" ;
+                  return ;
+
+        }
         // AERROR <<"[ thread : "<<std::this_thread::get_id() <<"] 1. DoYoloDetectGPU Enter";
 
         yolo_detection_boxs0_.clear();
@@ -483,7 +503,7 @@ namespace watrix
 
         std::vector<detection_boxs_t> v_output;
 
-        bool success = YoloDarknetApi::Detect(v_image_, v_output); // darknet
+        bool success = darknet_ptr_->Detect(v_image_, v_output); // darknet
 
         for (int camera_index = 0; camera_index < v_output.size(); camera_index++)
         {
@@ -529,7 +549,7 @@ namespace watrix
             std::string result_folder = apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(),
                                                                                perception_->adas_perception_param_.save_image_dir()) +
                                         "/darknet_results/"+ 
-                                        apollo::cyber::common::UnixSecondsToString(time(nullptr), "%Y%m%d%H%M%S") + "/";
+                                        apollo::cyber::common::UnixSecondsToString(time(nullptr), "%Y%m%d%H") + "/";
             boost::filesystem::create_directories(result_folder);
             cv::Mat image_with_boxs;
             std::string image_with_box_path;
@@ -617,7 +637,7 @@ namespace watrix
             std::string result_folder = apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(),
                                                                                perception_->adas_perception_param_.save_image_dir()) +
                                         "/yolo_results/"+ 
-                                        apollo::cyber::common::UnixSecondsToString(time(nullptr), "%Y%m%d%H%M%S") + "/";
+                                        apollo::cyber::common::UnixSecondsToString(time(nullptr), "%Y%m%d%H") + "/";
             boost::filesystem::create_directories(result_folder);
             cv::Mat image_with_boxs;
             std::string image_with_box_path;
@@ -989,7 +1009,7 @@ namespace watrix
           std::string result_folder = apollo::cyber::common::GetAbsolutePath(watrix::projects::adas::GetAdasWorkRoot(),
                                                                              perception_->adas_perception_param_.save_image_dir()) +
                                       "/perception_results/"+ 
-                                        apollo::cyber::common::UnixSecondsToString(time(nullptr), "%Y%m%d%H%M%S") + "/";
+                                        apollo::cyber::common::UnixSecondsToString(time(nullptr), "%Y%m%d%H") + "/";
           boost::filesystem::create_directories(result_folder);
 
           cv::Mat combine;

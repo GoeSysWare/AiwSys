@@ -209,26 +209,26 @@
             "program": "${workspaceFolder}/bazel-bin/cyber/mainboard",
             "args": [
                 "-d",
-                "${workspaceFolder}/projects/adas/production/dag/perception.dag",
+                "${workspaceFolder}/exec/projects/adas/production/dag/perception.dag",
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [
                 {
                     "name": "CYBER_PATH",
-                    "value": "${workspaceFolder}/cyber",
+                    "value": "${workspaceFolder}/exec/cyber",
                 },
                 {
                     "name": "GLOG_log_dir",
-                    "value": "${workspaceFolder}/logs"
+                    "value": "${workspaceFolder}/exec/logs"
                 },
                 {
                     "name": "CYBER_DOMAIN_ID",
                     "value": "80"
                 },
                 {
-                    "name": "ADAS_PATH",
-                    "value": "${workspaceFolder}/projects/adas/"
+                    "name": "ADAS_CONFIG_PATH",
+                    "value": "${workspaceFolder}/exec/projects/adas/"
                 },
                 {
                     "name": "CYBER_IP",

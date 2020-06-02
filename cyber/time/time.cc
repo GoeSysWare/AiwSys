@@ -85,7 +85,8 @@ bool Time::IsZero() const { return nanoseconds_ == 0; }
 
 uint64_t Time::ToNanosecond() const { return nanoseconds_; }
 
-std::string Time::ToString() const {
+
+std::string Time::ToString(const std::string& format_str) const {
   auto nano = std::chrono::nanoseconds(nanoseconds_);
   system_clock::time_point tp(nano);
   auto time = system_clock::to_time_t(tp);
@@ -96,15 +97,16 @@ std::string Time::ToString() const {
   }
   std::stringstream ss;
 #if __GNUC__ >= 5
-  ss << std::put_time(ret, "%F %T");
+  ss << std::put_time(ret, format_str.c_str());
   ss << "." << nanoseconds_ % 1000000000UL;
 #else
   char date_time[128];
-  strftime(date_time, sizeof(date_time), "%F %T", ret);
+  strftime(date_time, sizeof(date_time), format_str.c_str(), ret);
   ss << std::string(date_time) << "." << nanoseconds_ % 1000000000UL;
 #endif
   return ss.str();
 }
+
 
 void Time::SleepUntil(const Time& time) {
   auto nano = std::chrono::nanoseconds(time.ToNanosecond());

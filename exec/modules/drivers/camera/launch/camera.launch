@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>camera</name>
+        <dag_conf>/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys//exec/modules/drivers/camera/dag/camera_no_compress.dag</dag_conf>
+        <process_name>usb_cam</process_name>
+    </module>
+</cyber>

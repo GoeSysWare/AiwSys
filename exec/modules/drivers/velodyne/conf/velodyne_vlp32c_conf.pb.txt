@@ -1,0 +1,17 @@
+frame_id: "velodyne32"
+scan_channel: "/adas/sensor/velodyne32/VelodyneScan"
+rpm: 600.0
+model: VLP32C
+mode: STRONGEST
+firing_data_port: 2368
+use_sensor_sync: false
+max_range: 200
+min_range: 0.4
+use_gps_time: false
+calibration_online: false
+calibration_file: "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys//bazel-AiwSys/modules/drivers/velodyne/params/VLP32C_calibration_example.yaml"
+
+organized: false
+convert_channel_name: "/adas/sensor/pointcloud2"
+use_poll_sync: true
+is_main_frame: true

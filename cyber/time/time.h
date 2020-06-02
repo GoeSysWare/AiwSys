@@ -69,12 +69,13 @@ class Time {
    */
   uint64_t ToNanosecond() const;
 
+
   /**
    * @brief convert time to a string.
    *
    * @return return a string.
    */
-  std::string ToString() const;
+  std::string ToString(const std::string& format_str = "%F %T") const;
 
   /**
    * @brief determine if time is 0

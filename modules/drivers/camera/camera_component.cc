@@ -20,6 +20,9 @@ namespace apollo {
 namespace drivers {
 namespace camera {
 
+ std::atomic<uint64_t> CameraComponent::procs_num_ = {0};
+
+
 bool CameraComponent::Init() {
   camera_config_ = std::make_shared<Config>();
   if (!apollo::cyber::common::GetProtoFromFile(config_file_path_,
@@ -102,10 +105,12 @@ void CameraComponent::run() {
     auto pb_image = pb_image_buffer_.at(index_++);
     pb_image->mutable_header()->set_timestamp_sec(
         cyber::Time::Now().ToSecond());
+    pb_image->mutable_header()->set_sequence_num(CameraComponent::procs_num_.load());
     pb_image->set_measurement_time(image_time.ToSecond());
     pb_image->set_data(raw_image_->image, raw_image_->image_size);
     writer_->Write(pb_image);
-
+    AERROR << "camera:"<< camera_config_->camera_dev()<< " write   sequence_num:" << CameraComponent::procs_num_.load() << " Time: " << cyber::Time::Now().ToString();
+    procs_num_.fetch_add(1);
     cyber::SleepFor(std::chrono::microseconds(spin_rate_));
   }
 }

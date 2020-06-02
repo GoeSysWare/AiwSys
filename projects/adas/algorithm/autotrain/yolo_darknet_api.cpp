@@ -4,31 +4,31 @@
 namespace watrix {
 	namespace algorithm {
 
-        DarknetYoloConfig YoloDarknetApi::config_;
-        network* YoloDarknetApi::net_dk; // darknet ģ���ļ�
 
-        int YoloDarknetApi::class_count_; // 
-        std::vector<std::string> YoloDarknetApi::class_labels_; // class labels: person,car,...
-        int YoloDarknetApi::batchsize;
-        int YoloDarknetApi::CHANNELS; // 3
-        int YoloDarknetApi::INPUT_H; // 416
-        int YoloDarknetApi::INPUT_W; // 416
+        // int YoloDarknetApi::class_count_; // 
+        // std::vector<std::string> YoloDarknetApi::class_labels_; // class labels: person,car,...
+        // int YoloDarknetApi::batchsize;
+        // int YoloDarknetApi::CHANNELS; // 3
+        // int YoloDarknetApi::INPUT_H; // 416
+        // int YoloDarknetApi::INPUT_W; // 416
 
 		void YoloDarknetApi::Init(const DarknetYoloConfig& config)
 		{
+
             config_ = config;
             SetClassLabels(config_.label_filepath);
             batchsize = 1;
             net_dk = load_network_custom((char*)config_.cfg_filepath.c_str(), (char*)config_.weight_filepath.c_str(), 0, batchsize);
             CHANNELS = 3;
-            INPUT_H = net_dk->h;
+            INPUT_H = net_dk->h; 
             INPUT_W = net_dk->w;
             // INPUT_H = config_.input_size.height;
             // INPUT_W = config_.input_size.width;
 		}
 
-		void YoloDarknetApi::Free()
+		void YoloDarknetApi::Free( )
 		{
+            if(net_dk)
             free_network(*net_dk);
 		}
         
@@ -168,7 +168,7 @@ namespace watrix {
                     
                     network_predict_ptr(net_dk, input);// net infer
                     int nboxes = 0;
-                    int letter_box = 0; // 0Ϊֱ��resize; 1Ϊ���ֱ���resize
+                    int letter_box = 0; 
                     detection *dets = get_network_boxes(net_dk, ori_img_w, ori_img_h, config_.confidence_threshold, config_.hier_thresh, 0, 1, &nboxes, letter_box);
 
                     do_nms_sort(dets, nboxes, class_count_, config_.iou_thresh);

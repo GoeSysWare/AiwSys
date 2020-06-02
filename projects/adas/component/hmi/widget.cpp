@@ -100,8 +100,8 @@ void Widget::initNetwork()
         AERROR << "Now HMI Component only support " << FLAGS_adas_camera_size << " cameras output";
         return ;
     }
-
-    reader_node_ = apollo::cyber::CreateNode("adas_perception_hmi");
+    //节点名这么设计，可以支持多HMI运行
+    reader_node_ = apollo::cyber::CreateNode(GlobalData::Instance()->HostName()+ std::to_string(GlobalData::Instance()->ProcessId()) );
 
     //接收算法处理后的result数据
     typedef std::shared_ptr<watrix::projects::adas::proto::SendResult> ImageResultType;

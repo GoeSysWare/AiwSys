@@ -38,6 +38,8 @@ namespace watrix {
 	namespace algorithm {
 		namespace internal {
 
+
+
 			cv::Size lanesegutil::ORIGIN_SIZE(1920,1080);
 			// cv::Size lanesegutil::UPPER_SIZE(1920,568);
 			// cv::Size lanesegutil::CLIP_SIZE(1920,512);
@@ -1548,9 +1550,7 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 					pt.z = cloud[index].z;
 					cloud_pcl->points.push_back(pt);
 				}
-
 				points = LOD::getPointFrom2DAnd3D(cloud_pcl, LOD::getInvasionMap(input_l, input_r, top_y), top_y, invasion, rotation, distance_limit);
-
 #ifdef SHOW_PCD
 				// pcl::io::savePCDFileBinary("output.pcd", *points);
 				pcl::visualization::CloudViewer viewer("Show");

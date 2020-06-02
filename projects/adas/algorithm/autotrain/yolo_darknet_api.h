@@ -12,32 +12,33 @@ namespace watrix {
 		class SHARED_EXPORT YoloDarknetApi
 		{
 			public:
-				static void Init(const DarknetYoloConfig& config);
-				static void Free();
+				YoloDarknetApi(const DarknetYoloConfig& config){Init(config); }
+				~YoloDarknetApi(){Free(); }				
+				 void Init(const DarknetYoloConfig& config);
+				 void Free();
 
-                static void SetClassLabels(const std::string& filepath);
+                 void SetClassLabels(const std::string& filepath);
 
-                static void img2buffer(cv::Mat img, float* data);
+                 void img2buffer(cv::Mat img, float* data);
                 
-                static image Mat2Image(cv::Mat mat);
+                 image Mat2Image(cv::Mat mat);
 
-                static void DealWithDetection(detection *dets, int nboxes, cv::Mat img, detection_boxs_t& output);
+                 void DealWithDetection(detection *dets, int nboxes, cv::Mat img, detection_boxs_t& output);
 
-				static bool Detect(
+				 bool Detect(
 					const std::vector<cv::Mat>& v_image,
 					std::vector<detection_boxs_t>& v_output
 				);
 
             public:
-                static DarknetYoloConfig config_;
-                static network *net_dk; // 
-
-				static int class_count_; // 
-				static std::vector<std::string> class_labels_; // class labels: person,car,...
-                static int batchsize;
-                static int CHANNELS; // 3
-                static int INPUT_H; // 416
-                static int INPUT_W; // 416
+           		network* net_dk; // darknet ģ���ļ�
+                 DarknetYoloConfig config_;
+				 int class_count_; // 
+				 std::vector<std::string> class_labels_; // class labels: person,car,...
+                 int batchsize;
+                 int CHANNELS; // 3
+                 int INPUT_H; // 416
+                 int INPUT_W; // 416
 		};
 	}
 }// end namespace

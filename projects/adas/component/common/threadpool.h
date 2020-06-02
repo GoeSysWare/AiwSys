@@ -26,19 +26,20 @@ namespace watrix
             {
             public:
                 explicit ThreadPool(std::size_t thread_num, std::size_t max_task_num = 30);
-                explicit ThreadPool(std::size_t thread_num, std::function<void()> init_func, std::size_t max_task_num = 30);
+                explicit ThreadPool(std::size_t thread_num, std::function<void*()> init_func, std::size_t max_task_num = 30);
 
                 template <typename F, typename... Args>
                 auto Enqueue(F &&f, Args &&... args)
                     -> std::future<typename std::result_of<F(Args...)>::type>;
 
                 ~ThreadPool();
-
+                std::map<std::thread::id,void *> ptr_map_;
             private:
                 std::vector<std::thread> workers_;
                 BoundedQueue<std::function<void()>> task_queue_;
                 std::atomic_bool stop_;
-                std::function<void()> init_func_;
+                std::function<void*()> init_func_;
+                std::mutex init_mutex_;
             };
 
             inline ThreadPool::ThreadPool(std::size_t thread_num, std::size_t max_task_num)
@@ -63,7 +64,7 @@ namespace watrix
                 }
             }
 
-            inline ThreadPool::ThreadPool(std::size_t thread_num, std::function<void()> init_func, std::size_t max_task_num)
+            inline ThreadPool::ThreadPool(std::size_t thread_num, std::function<void*()> init_func, std::size_t max_task_num)
                 : stop_(false)
             {
                 init_func_ = init_func;
@@ -71,10 +72,14 @@ namespace watrix
                 {
                     throw std::runtime_error("Task queue init failed.");
                 }
+
                 for (size_t i = 0; i < thread_num; ++i)
                 {
-                    workers_.emplace_back([this] {
-                        init_func_();
+                    workers_.emplace_back([this,i] {
+                        // init_mutex_.lock();
+                        this->ptr_map_[std::this_thread::get_id()] = this->init_func_();
+                        // init_mutex_.unlock();
+
                         while (!stop_)
                         {
                             std::function<void()> task;
@@ -120,6 +125,12 @@ namespace watrix
                 {
                     worker.join();
                 }
+                for(auto & ptr :ptr_map_ )
+                {
+                    delete ptr.second;
+                }
+                ptr_map_.clear();
+
             }
 
         } // namespace adas

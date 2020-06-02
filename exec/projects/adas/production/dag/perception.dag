@@ -1,0 +1,12 @@
+
+module_config {
+    module_library : "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys//bazel-bin/projects/adas/component/perception/libadas_perception_component.so"
+    components {
+    class_name : "AdasPerceptionComponent"
+    config {
+        name : "adas_percetion_node"
+        config_file_path : "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys//exec/projects/adas/production/conf/adas_perception.pb.txt"
+        flag_file_path: "/media/shuimujie/C14D581BDA18EBFA/10.Projects/01.Linux/02.github/AiwSys//exec/projects/adas/production/conf/common.flag"
+    }
+  }
+}

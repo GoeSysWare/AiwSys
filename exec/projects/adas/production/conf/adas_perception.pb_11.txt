@@ -1,0 +1,197 @@
+ ###################################################################
+    # ADAS 感知模块参数的配置
+    # 注: 所有的路径支持相对路径和绝对路径，如果是相对路径，则在环境变量${ADAS_PATH}下
+    # 2. yolo 和 darknet ，采用未注释的算法，优先采用yolo算法
+    ###################################################################
+
+  ##############################
+  #   运行模式
+  # "online"  在线正常运行模式
+  # "sim"  离线仿真模式
+  # "online_acq" 在线采集模式(仅仅运行dectect后保存数据)
+  ############################### 
+  model_type:"online"
+
+  # 是否启用算法检测
+  if_use_detect_model: true
+  # 是否启用机车分割
+  if_use_train_seg_model: false
+  # 是否启用轨道分割
+  if_use_lane_seg_model: true
+  # 所有模式下，设定是否存存档照片
+  if_save_image_result: false
+  # 所有模式下，设定是否保存检测结果为log文件
+  if_save_log_result: false
+  #  所有模式下，设定存档照片和log文件的路径
+  save_image_dir:"/media/watrix18/0520/data/images"
+
+ # yolo config 
+  #yolo: {
+   # net: {
+  #    net_count: 2
+    #  proto_filepath: "production/conf/autotrain_models/det/tong/v6/deploy.prototxt"
+    #  weight_filepath: "production/conf/autotrain_models/det/tong/v6/det_512x512_c7.caffemodel"
+  #  }
+ #   mean: {
+ #     b: 104
+  #    g: 117
+   #   r: 123
+  #  }
+   # label_filepath: "production/conf/autotrain_models/det/tong/v6/labelmap.names"
+  #  normalize_value: 1.0 #0.0039215
+  #  confidence_threshold: 0.50
+ #   resize_keep_flag: false
+ # }
+
+  # darknet config
+   darknet:
+   {
+     cfg_filepath:"production/conf/autotrain_models/darknet/v2/yolov4-custom_anchor_scratch.cfg"
+     weight_filepath:"production/conf/autotrain_models/darknet/v2/yolov4-custom_anchor_scratch_best.weights"
+     label_filepath:"production/conf/autotrain_models/darknet/v2/custom.names"
+     confidence_threshold:0.25
+    hier_thresh:0.5
+    iou_thresh:0.45
+   }
+  # trainseg config 
+  trainseg {
+     net: {
+      net_count: 1
+      proto_filepath: "production/conf/autotrain_models/det/tong/v6/deploy.prototxt"
+      weight_filepath: "production/conf/autotrain_models/det/tong/v6/det_512x512_c7.caffemodel"
+    }
+    mean: {
+      b: 104.00698793
+      g: 116.66876762
+      r: 122.67891434
+    }
+  }
+
+  # laneseg config 
+  laneseg {
+     net: {
+      net_count: 1
+      proto_filepath: "production/conf/autotrain_models/lanenet/v5/model.prototxt"
+      weight_filepath: "production/conf/autotrain_models/pt/v7_sequence/20191209_seg_pics.pt"
+
+    }
+    mean: {
+      b: 103.939
+      g: 116.779
+      r: 123.68
+    }    
+    feature_dim : 8
+  }
+#feature_dim  for v1,v2,v3, use 8 for v4, use 16
+  laneinvasion:{
+    tr33 : {
+      dpoints_1 : 0.000454941989844663
+      dpoints_2 : 1.84395450492748e-05	
+      dpoints_3 : -0.446669926140494
+      dpoints_4 : 7.05709220832447e-06	
+      dpoints_5 : -0.000167377794898800	
+      dpoints_6 : 1.09624848239701
+      dpoints_7 : 5.19714743486694e-07	
+      dpoints_8 : 0.000224887814694170	
+      dpoints_9 : -0.138644209831810
+      dpoints_10 :  0
+      dpoints_11 :  0
+      dpoints_12 :  0       
+    }
+
+    tr34_short_b : {
+      dpoints_1 :  2135.98031962914
+      dpoints_2 :  -5.82868139447831
+      dpoints_3 : 925.197569073908	
+      dpoints_4 : -178.092074637671
+      dpoints_5 :  0.941230071567759
+      dpoints_6 :  2128.06523187459
+      dpoints_7 :  595.781816622433
+      dpoints_8 :  4119.60691151419
+      dpoints_9 :  0.00278007794453616
+      dpoints_10 : -0.00702808189100095
+      dpoints_11 : 0.999971438207890
+      dpoints_12 : -0.177222370307515
+    } 
+
+    tr34_long_b: {
+      dpoints_1 :  9123.64536526445
+      dpoints_2 :  -16.8681602057028
+      dpoints_3 :  964.530386190007
+      dpoints_4 :  -681.517163540173
+      dpoints_5 :  -11.0488615518624
+      dpoints_6 :  9123.03850035439
+      dpoints_7 :  608.300320492224	
+      dpoints_8 :  19173.2211571647
+      dpoints_9 :  -0.0128618945004936
+      dpoints_10 : -0.0237116251022232
+      dpoints_11 : 0.999636099040481
+      dpoints_12 : -0.235428299798073  
+    }     
+    output_dir : "production/conf/train/sdk_seg/"
+    b_save_temp_images : true # save temp image results
+
+    b_draw_lane_surface : false  # draw lane surface
+    b_draw_boxs : false  # draw detection boxs    
+    b_draw_left_right_lane : true  # draw left right lane
+    b_draw_other_lane : true  # draw other lane    
+    b_draw_left_right_fitted_lane : true  # draw left/right fitted lane
+    b_draw_other_fitted_lane : true  # draw other fitted lane
+
+    b_draw_expand_left_right_lane : true  # draw expand left right lane
+    b_draw_lane_keypoint : false  # draw left/right lane top/bottom keypoints   
+    b_draw_safe_area : true  # draw safe area
+    b_draw_safe_area_corner : false  # draw 4 corner
+
+    b_draw_train_cvpoints : true  # draw train-class cvpoints
+    b_draw_stats : true  # draw stats 
+
+		safe_area_y_step : 1  # y step for drawing safe area  >:1
+		safe_area_alpha : 0.5  # overlay aplpa
+
+		use_tr34 :  true
+
+		z_height : 1 
+
+		# cluster grid related params
+		grid_size : 8  # default 8
+		min_grid_count_in_cluster : 10  # if grid_count <:10 then filter out this cluster
+
+		# cluster algorithm params
+		# config.cluster_type : MLPACK_MEANSHIFT  #   # (1 USER_MEANSHIFT,2 MLPACK_MEANSHIFT, 3 MLPACK_DBSCAN)
+		cluster_type : 2
+		user_meanshift_kernel_bandwidth : 0.52 
+		user_meanshift_cluster_epsilon : 1.5
+				
+		mlpack_meanshift_radius : 1.5
+		mlpack_meanshift_max_iterations  : 1000  # max iterations
+		mlpack_meanshift_bandwidth : 0.52   #  0.50, 0.51, 0.52, ...0.6
+
+		mlpack_dbscan_cluster_epsilon : 0.7  # not same
+		mlpack_dbscan_min_pts  : 3  # cluster at least >:3 pts
+
+		 # filter out lane noise params
+		filter_out_lane_noise : true  # filter out lane noise
+		min_area_threshold : 500  # min area for filter lane noise
+		min_lane_pts : 10         # at least >:10 points for one lane
+
+		# polyfit lane 
+		polyfit_order : 5  # by default 4  value range : 1,2,...9
+		reverse_xy : true 
+		x_range_min : 0
+		x_range_max : 1920
+		y_range_min : 440  # 512,568   640,440
+		y_range_max : 1080 
+
+		# standard limit params (m)
+		railway_standard_width : 1.435
+		railway_half_width : 0.7175
+		railway_limit_width : 1.500
+		railway_delta_width : 0.7825 
+
+		case1_x_threshold : 1.500
+		case1_y_threshold :  15.0
+		use_lane_status : true
+		use_lidar_pointcloud_smallobj_invasion_detect : true
+        save_image_result: false 
+  }

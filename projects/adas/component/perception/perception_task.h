@@ -37,8 +37,8 @@ class PerceptionTask {
  public:
 
   using PerceptionComponentPtr = std::shared_ptr<AdasPerceptionComponent>;
-
-  PerceptionTask(PerceptionComponentPtr p);
+  // using YoloDarknetApiPtr = std::shared_ptr<YoloDarknetApi>;
+  PerceptionTask(PerceptionComponentPtr p,YoloDarknetApi* darknet);
   virtual ~PerceptionTask();
 
   void Excute();
@@ -59,7 +59,7 @@ class PerceptionTask {
 	std::vector<cv::Point3f> lidar_cloud_buf_;
   watrix::algorithm::LaneInvasionConfig lane_invasion_config_;
   std::string parameter_name_;
-
+  YoloDarknetApi*  darknet_ptr_;
 //算法需要的参数
 private:
 

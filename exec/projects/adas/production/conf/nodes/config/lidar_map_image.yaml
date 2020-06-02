@@ -1,0 +1,25 @@
+%YAML:1.0
+calibration_time: "05/31/19 14:00:00"
+lidar_a_matrix: !!opencv-matrix #相机内参
+   rows: 3
+   cols: 4
+   dt: d
+   data: [ 2047.835036975324, 0, 960, 0,
+           0, 2088.973405583949, 540, 0,
+           0, 0, 1 ,0]
+
+lidar_r_matrix: !!opencv-matrix #旋转矩阵
+   rows: 3
+   cols: 3
+   dt: d
+   data: [1,     0,  0,
+          0,     1,  0, 
+          0,     0,  1]
+
+lidar_t_matrix: !!opencv-matrix #平移矩阵
+   rows: 3
+   cols: 1
+   dt: d 
+   data: [ -0.029, #left right
+           0.89,  # up down
+           0]    #front rear 

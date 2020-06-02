@@ -57,6 +57,8 @@ class CameraComponent : public Component<> {
   const int32_t MAX_IMAGE_SIZE = 20 * 1024 * 1024;
   std::future<void> async_result_;
   std::atomic<bool> running_ = {false};
+  //同步计数 每个周期发出去的同一值
+  static std::atomic<uint64_t> procs_num_;
 };
 
 CYBER_REGISTER_COMPONENT(CameraComponent)

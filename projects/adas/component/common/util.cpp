@@ -8,7 +8,7 @@ namespace adas
 {
 std::string GetAdasWorkRoot()
 {
-    std::string work_root = apollo::cyber::common::GetEnv("ADAS_PATH");
+    std::string work_root = apollo::cyber::common::GetEnv("ADAS_CONFIG_PATH");
 
     if (work_root.empty())
     {
@@ -44,6 +44,9 @@ std::string  str_pad(unsigned int n)
 			ss << std::setw(6) << std::setfill('0')<< n;
 			return ss.str();
 }
+
+
+
 
 } // namespace adas
 } // namespace projects

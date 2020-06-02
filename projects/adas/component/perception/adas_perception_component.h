@@ -164,13 +164,14 @@ public:
     OutputWriters camera_out_writers_;
     //调试发送器
     DebugWriters camera_debug_writers_;
+    std::mutex camera_mutex_;
+    std::mutex lidar_mutex_;
 private:
     //处理线程池
     std::shared_ptr< watrix::projects::adas::ThreadPool> task_processor_;
     //线程池的线程个数
     int  perception_tasks_num_;
-    std::mutex camera_mutex_;
-    std::mutex lidar_mutex_;
+
 
    double last_camera_timestamp_ = 0.0; 
 
