@@ -87,6 +87,19 @@ namespace watrix {
 				cv::Mat& image_with_boxs
 			);
 
+			static void draw_detection_boxs(
+				cv::Mat& image_with_boxs,
+				const detection_boxs_t& boxs,
+				const box_invasion_results_t& box_invasion_results,
+				const unsigned int thickness
+			);
+
+			static void draw_lidar_boxs(
+				cv::Mat& image_with_boxs,
+				const std::vector<lidar_invasion_cvbox> cv_obstacle_box,
+				const unsigned int thickness
+			);
+
 			static void draw_mosun_result(
 				const MosunResult& mosun_result,
 				cv::Mat& image_with_result
@@ -126,6 +139,21 @@ namespace watrix {
 
 			static void draw_lane_line(
 				cv::Mat& out, const cvpoints_t& one_lane_cvpoints, cv::Scalar color
+			);
+
+			static cv::Mat draw_lane_safe_area(
+				const cv::Mat& image_,
+				const cvpoints_t& left_lane_cvpoints,
+				const cvpoints_t& right_lane_cvpoints
+			);
+
+			static void show_lane(
+				cv::Mat& image,
+				const cvpoints_t& left_lane,
+				const cvpoints_t& right_lane,
+				const cvpoint_t& touch_point,
+				const bool& is_clip_lane,
+				const bool& is_draw_safe_area
 			);
 		};
 

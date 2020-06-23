@@ -38,7 +38,8 @@
 */
 #pragma once
 #include "projects/adas/algorithm/algorithm_shared_export.h" // SHARED_EXPORT
-#include "projects/adas/algorithm/algorithm_type.h" //caffe_net_file_t,  Mat, Keypoint, box_t, detection_boxs_t
+#include "projects/adas/algorithm/algorithm_type.h" //caffe_net_file_t,  Mat, Keypoint, box_t, refinedet_boxs_t
+
 
 namespace watrix {
 	namespace algorithm {
@@ -47,6 +48,16 @@ namespace watrix {
 			public:
 				Polyfiter(
 					const std::vector<cvpoint_t>& src_points_, 
+					int n = 4,
+					bool reverse_xy_ = true, /* reverse xy depends on data points*/
+					int x_range_min = 0,
+					int x_range_max = 1980,
+					int y_range_min = 568, // 512,568;   640,440
+					int y_range_max = 1080
+				);
+
+				Polyfiter(
+					const std::vector<dpoint_t>& src_d_points_, 
 					int n = 4,
 					bool reverse_xy_ = true, /* reverse xy depends on data points*/
 					int x_range_min = 0,

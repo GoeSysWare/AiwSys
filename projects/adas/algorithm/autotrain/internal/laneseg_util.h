@@ -41,7 +41,6 @@
 #include "projects/adas/algorithm/algorithm_type.h" //caffe_net_file_t,  Mat, Keypoint, box_t, detection_boxs_t
 
 
-
 namespace watrix {
 	namespace algorithm {
 		namespace internal {
@@ -321,9 +320,9 @@ namespace watrix {
 	#pragma region lidar pointcloud small objects invasion detect
 				static void lidar_pointcloud_smallobj_invasion_detect(
 					// pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, 
-					std::vector<cv::Point3f> cloud, 
+					const std::vector<cv::Point3f>& cloud, 
 					InvasionData  invasion,
-					float distance_limit, 
+					float distance_limit,
 					cvpoints_t& input_l,
 					cvpoints_t& input_r,
 					std::vector<LidarBox>& obstacle_box,
@@ -346,6 +345,7 @@ namespace watrix {
 				
 				static cvpoint_t get_nearest_invasion_box_point(
 					const detection_boxs_t& detection_boxs,
+					const std::vector<lidar_invasion_cvbox>& cv_obstacle_box, // lidar invasion object cv box
 					const box_invasion_results_t& box_invasion_results
 				);
 
@@ -401,7 +401,7 @@ namespace watrix {
 					const cvpoints_t& left_expand_lane_cvpoints,
 					const cvpoints_t& right_expand_lane_cvpoints,
 					const detection_boxs_t& detection_boxs,
-					const box_invasion_results_t& box_invasion_results, 
+					const box_invasion_results_t& box_invasion_results,
 					const std::vector<cvpoints_t>& trains_cvpoints,
 					cv::Mat& out,
 					lane_safe_area_corner_t& lane_safe_area_corner
@@ -424,7 +424,7 @@ namespace watrix {
 					const std::vector<cvpoints_t>& trains_cvpoints,
 					const cvpoints_t& lidar_cvpoints,
 					// const pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, // lidar pointscloud
-					const std::vector<cv::Point3f> cloud, // lidar pointscloud
+					const std::vector<cv::Point3f>& cloud, // lidar pointscloud
 					const LaneInvasionConfig& config,
 					cv::Mat& image_with_color_mask,
 					int& lane_count,
@@ -433,8 +433,11 @@ namespace watrix {
 					box_invasion_results_t& box_invasion_results,
 					std::vector<int>& lidar_invasion_status,
 					lane_safe_area_corner_t& lane_safe_area_corner,
-					bool& is_open_long_camera, // �Ƿ�Զ��
-					std::vector<lidar_invasion_cvbox>& cv_obstacle_box // lidar invasion object cv box
+					bool& is_open_long_camera,
+					std::vector<lidar_invasion_cvbox>& cv_obstacle_box, // lidar invasion object cv box
+					cvpoint_t& touch_point, // 侵界障碍物和轨道的接触点
+					cvpoints_t& left_fitted_lane_cvpoints, // 拟合后的左轨道图像坐标点列
+					cvpoints_t& right_fitted_lane_cvpoints // 拟合后的右轨道图像坐标点列
 				);
 	#pragma endregion
 

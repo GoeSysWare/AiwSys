@@ -365,8 +365,8 @@ namespace watrix {
 				int ORIGIN_WIDTH = lanesegutil::ORIGIN_SIZE.width; // (1920,1080)  1920
 				int ORIGIN_HEIGHT = lanesegutil::ORIGIN_SIZE.height; // (1920,1080)  1080
 				//pt_simple v1
-				// int CLIP_HEIGHT = lanesegutil::CLIP_SIZE.height; // 512 --->640
-				int HEIGHT = lanesegutil::PT_SIMPLE_INPUT_SIZE.height; // 272
+				int CLIP_HEIGHT = lanesegutil::CLIP_SIZE.height; // 640
+				int HEIGHT = lanesegutil::PT_SIMPLE_INPUT_SIZE.height; // 160
 				int WIDTH = lanesegutil::PT_SIMPLE_INPUT_SIZE.width; // 480
 				
 				int batch_count = v_image_cur.size();
@@ -381,9 +381,9 @@ namespace watrix {
 					cv::Mat image = v_image_cur[i];
 
 					// clip 568*1920 
-					cv::cvtColor(image, image, cv::COLOR_BGR2RGB); // hwc
+					// cv::cvtColor(image, image, cv::COLOR_BGR2RGB); // hwc
 					// 568*1920 ===>128*480
-					cv::cvtColor(image,image, cv::COLOR_BGR2RGB); // bgr--->rgb
+					// cv::cvtColor(image, image, cv::COLOR_BGR2RGB); // bgr--->rgb
 					//image = image(cv::Range(1080-CLIP_HEIGHT, 1080),cv::Range(0,1920));
 
 					//pt_simple v1
@@ -391,6 +391,10 @@ namespace watrix {
 
 					//pt_simple v2
 					// image = image(cv::Range(440, 1080),cv::Range(0,ORIGIN_WIDTH));
+
+					//pt_simple v8_sequence
+					image = image(cv::Range(ORIGIN_HEIGHT-CLIP_HEIGHT, ORIGIN_HEIGHT),cv::Range(0,ORIGIN_WIDTH));
+
 					cv::resize(image, image, cv::Size(WIDTH, HEIGHT));
 
 					memcpy(batch_image.data+i*image_size, (char*)image.data, image_size);
@@ -555,9 +559,9 @@ namespace watrix {
 								result_img_bp.at<uchar>(h,w) = 1;
 							}
 							
-							if (i == 1 && h < 171){
-								result_img_bp.at<uchar>(h,w) = 0;
-							}
+							// if (i == 1 && h < 150){
+							// 	result_img_bp.at<uchar>(h,w) = 0;
+							// }
 							
 					
 						}
@@ -568,7 +572,6 @@ namespace watrix {
 					const std::string outputFileName = "./result_left_right_img"+std::to_string(i)+".png";
 					cv::imwrite(outputFileName, result_left_right_img);
 #endif
-
 
 
 #pragma region my softmax argmax
@@ -640,7 +643,6 @@ namespace watrix {
 					cv::Mat stats; // N*5  表示每个连通区域的外接矩形和面积 [x,y,w,h, area]   CV_32S = 4
 					cv::Mat centroids; // N*2  (x,y)                                     CV_32S = 4
 					int num_components; // 连通区域number
-
 					
 					num_components = connectedComponentsWithStats(result_img_bp, labels, stats, centroids, 4, CV_32S);
 
@@ -726,7 +728,6 @@ namespace watrix {
 						const std::string outputFileName1 = "./result_left_right_img_new"+std::to_string(i)+".png";
 						cv::imwrite(outputFileName1, result_left_right_img_new);
 #endif
-
 
 
 					channel_mat_t output_instance_seg;

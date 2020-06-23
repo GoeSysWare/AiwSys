@@ -18,7 +18,7 @@
 #include "record_widget.h"
 #include "projects/adas/component/hmi/ui_widget.h"
 #include "algorithm/monocular_distance_api.h"
-
+#include "projects/adas/algorithm/core/util/display_util.h"
 
 #define MIN_SCALED_WIDTH (320 - 6)
 #define MIN_SCALED_HEIGHT (200 - 6) //(150-6)
@@ -106,14 +106,14 @@ void Widget::initNetwork()
     //接收算法处理后的result数据
     typedef std::shared_ptr<watrix::projects::adas::proto::SendResult> ImageResultType;
     std::function<void(const ImageResultType &)> camera_6mm_callback =
-        std::bind(&Widget::YoloResaultDisplay, this, std::placeholders::_1,camera_names_[0]);
+        std::bind(&Widget::YoloResultDisplay, this, std::placeholders::_1,camera_names_[0]);
 
     front_6mm_result_reader_ = reader_node_->CreateReader(     
         input_camera_channel_names_[0],
         camera_6mm_callback);
 
     std::function<void(const ImageResultType &)> camera_12mm_callback =
-        std::bind(&Widget::YoloResaultDisplay, this, std::placeholders::_1,camera_names_[1]);
+        std::bind(&Widget::YoloResultDisplay, this, std::placeholders::_1,camera_names_[1]);
 
     front_12mm_result_reader_ = reader_node_->CreateReader(
         input_camera_channel_names_[1],
@@ -355,7 +355,7 @@ void Widget::timerEvent(QTimerEvent *t)
     ui->label_time->setText(str);
 }
 
-void Widget::YoloResaultDisplay(const std::shared_ptr<watrix::projects::adas::proto::SendResult> &sync_result,const string &channel_name)
+void Widget::YoloResultDisplay(const std::shared_ptr<watrix::projects::adas::proto::SendResult> &sync_result,const string &channel_name)
 {
 
     std::lock_guard<std::mutex> lock(mutex_);
@@ -377,6 +377,35 @@ void Widget::YoloResaultDisplay(const std::shared_ptr<watrix::projects::adas::pr
     cv::Mat image_display_lane;
     cv::Mat image_display_seg;
     cv::Mat image_display;
+
+    //安全线
+	watrix::algorithm::cvpoint_t touch_point;
+    //左轨道点
+	watrix::algorithm::cvpoints_t left_fitted_lane_cvpoints;
+    //右轨道点
+	watrix::algorithm::cvpoints_t right_fitted_lane_cvpoints;
+
+    touch_point.x = sync_result->perception_result().touch_point().x();
+    touch_point.y = sync_result->perception_result().touch_point().y();
+  
+    left_fitted_lane_cvpoints.resize(sync_result->perception_result().left_fitted_lane_cvpoints_size());
+    right_fitted_lane_cvpoints.resize(sync_result->perception_result().right_fitted_lane_cvpoints_size());
+   //长焦的左轨道线
+    for(auto  i =0; i<  sync_result->perception_result().left_fitted_lane_cvpoints_size();i++ )
+    {
+        auto pb_point_left = sync_result->perception_result().left_fitted_lane_cvpoints(i);
+        left_fitted_lane_cvpoints[i].x = pb_point_left.x();
+        left_fitted_lane_cvpoints[i].y = pb_point_left.y();
+    }
+    for(auto  i =0; i<  sync_result->perception_result().right_fitted_lane_cvpoints_size();i++ )
+    {
+        auto pb_point_right = sync_result->perception_result().right_fitted_lane_cvpoints(i);
+        right_fitted_lane_cvpoints[i].x = pb_point_right.x();
+        right_fitted_lane_cvpoints[i].y = pb_point_right.y();
+    }
+
+  
+
 
     uint net_time = image_tools_.GetMillisec();
     uint source_image_height = sync_result->source_image().height();
@@ -407,6 +436,14 @@ void Widget::YoloResaultDisplay(const std::shared_ptr<watrix::projects::adas::pr
 
         cv::addWeighted(image_display_seg, 0.2, image_display, 0.8, -1, image_display);
     }
+
+      DisplayUtil::show_lane(image_display, 
+      left_fitted_lane_cvpoints, 
+      right_fitted_lane_cvpoints,
+	  touch_point, 
+      true, 
+      true);
+
 
     QImage img = image_tools_.cvMat2QImage(image_display);
 

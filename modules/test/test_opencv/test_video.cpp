@@ -3,6 +3,7 @@
 #include <opencv2/highgui/highgui.hpp>
 int main(int argc, char *argv[])
 {
+    int len = sizeof(cv::Point3f);
     cv::VideoCapture capture(0);
     if (!capture.isOpened())
     {

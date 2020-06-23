@@ -10,6 +10,7 @@ cc_binary(
     ],
     linkopts = [
         "-lpthread",
+        "-ldl",
         "-L/usr/lib/x86_64-linux-gnu", 
        "-lboost_filesystem",
         "-lboost_atomic",
@@ -22,7 +23,7 @@ cc_binary(
     deps = [
         ":perception_hmi_lib",
         "@glog",
-        "@opencv",
+  
     ],
 )
 
@@ -41,7 +42,7 @@ qt_cc_library(
     ],
     hdr = glob([
         "*.h",
-           "**/*.h",
+        "**/*.h",
     ]),
     includes = [
         ".",
@@ -58,12 +59,11 @@ qt_cc_library(
         "//cyber/common:log",
         "//modules/drivers/proto:sensor_proto",
         "@qt//:qt_gui",
-        "@qt//:qt_media",
+        # "@qt//:qt_media",
         "//projects/adas/proto:adas_config_proto",
         "//projects/adas/configs:config_gflags",
         "//projects/adas/component/common",
-       
-
+        "//projects/adas/algorithm:algorithm_sdk",
     ],
 )
 

@@ -1,8 +1,9 @@
 #include"ObjectAndTrainDetection.h"
-
+#include <chrono>
 using namespace std;
 namespace watrix {
 	namespace algorithm {
+
 		std::unordered_map<int, std::pair<int, int>> LOD::getInvasionMap(std::vector<cv::Point2i> input_l, std::vector<cv::Point2i> input_r, int& top_y) {
 
 			for (int i = 0;i < input_l.size();) {
@@ -21,7 +22,7 @@ namespace watrix {
 				else
 					++i;
 			}
-
+			
 			std::unordered_map<int, std::pair<int, int>> invasionP;
 			std::vector<InvasionData2D> input;
 			for (int i = 0; i < PIC_HEIGHT; ++i) {
@@ -96,27 +97,26 @@ namespace watrix {
 			return invasionP;
 		}
 
-		pcl::PointCloud<pcl::PointXYZ>::Ptr LOD::getPointFrom2DAnd3D(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, std::unordered_map<int, std::pair<int, int>> invasionP,
+		pcl::PointCloud<pcl::PointXYZ>::Ptr LOD::getPointFrom2DAnd3D(const std::vector<cv::Point3f>& cloud_cv, std::unordered_map<int, std::pair<int, int>> invasionP,
 			int top_y, InvasionData invasion, Eigen::Matrix4d& rotation, float distance_limit) {
 
 			pcl::PointCloud<pcl::PointXYZ>::Ptr output(new pcl::PointCloud<pcl::PointXYZ>);
-			pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_standard(new pcl::PointCloud<pcl::PointXYZ>);
 			pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_change_standard(new pcl::PointCloud<pcl::PointXYZ>);
 			pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_change(new pcl::PointCloud<pcl::PointXYZ>);
 
 			int min_y = top_y;
 
-			cv::Mat cameraMatrix(3, 3, CV_32F);//������ڲξ���
+			cv::Mat cameraMatrix(3, 3, CV_32F);//������ڲξ���?
 			std::vector<float> distCoeff;//����������
 			cv::Mat rvec(3, 3, CV_64F), tvec(3, 1, CV_64F);//�任����
 
-			distCoeff.push_back(-0.2283);
-			distCoeff.push_back(0.1710);
-			distCoeff.push_back(-0.0013);
-			distCoeff.push_back(-8.2250e-06);
-			distCoeff.push_back(0);
+			distCoeff.push_back(-0.2759f);
+			distCoeff.push_back(0.4355f);
+			distCoeff.push_back(0.0010f);
+			distCoeff.push_back(-1.2753e-04f);
+			distCoeff.push_back(0.0f);
 
-			float tempMatrix[3][3] = { { 2.1334e+03, 0, 931.1503 }, { 0, 2.1322e+03, 580.8112 }, { 0, 0, 1.0 } };
+			float tempMatrix[3][3] = { { 2.1159e+03f, 0.0f, 974.2096f }, { 0.0f, 2.1175e+03f, 619.7170f }, { 0.0f, 0.0f, 1.0f } };
 
 			for (int i = 0; i < 3; ++i) {
 				for (int j = 0; j < 3; ++j) {
@@ -133,16 +133,16 @@ namespace watrix {
 					rvec.at<double>(i, j) = tempRvec[i][j];
 			cv::Rodrigues(rvec, rvec);
 
-			double tempTvec[3] = { 0.0,0.80,0.177 };
+			double tempTvec[3] = { 0.0,0.92,0.137 };
 
 			for (int i = 0; i < 3; ++i)
 				tvec.at<double>(i, 0) = tempTvec[i];
 
 			Eigen::Matrix4d rotation1, rotation2, rotation3;
 
-			rotation1 << 0.999832, 0.000000, -0.015292, 0.000000,
-				0.000905, 1.000000, -0.000008, 0.000000,
-				0.015292, 0.000008, 0.999833, 0.000000,
+			rotation1 << 0.999829, 0.000000, -0.012079, 0.000000,
+				0.010205, 0.999944, -0.000053, 0.000000,
+				0.012079, -0.000053, 0.999935, 0.000000,
 				0.000000, 0.000000, 0.000000, 1.000000;
 
 			rotation2 << 1, 0, 0, 0,
@@ -151,38 +151,108 @@ namespace watrix {
 				0, 0, 0, 1;
 
 			rotation3 << 1, 0, 0, 0,
-				0, cos(0.15 * CV_PI / 180), -sin(0.15 * CV_PI / 180), 0.000000,
-				0, sin(0.15 * CV_PI / 180), cos(0.15 * CV_PI / 180), 0.000000,
+				0, cos(-0.15 * CV_PI / 180), -sin(-0.15 * CV_PI / 180), 0.000000,
+				0, sin(-0.15 * CV_PI / 180), cos(-0.15 * CV_PI / 180), 0.000000,
 				0, 0, 0, 1;
 
 			rotation = rotation3 * rotation1;
 
-			pcl::transformPointCloud(*cloud, *cloud_standard, rotation1);
-			pcl::transformPointCloud(*cloud, *cloud, rotation);
+			float* lidar_buffer = (float*)malloc(cloud_cv.size() * 3 * sizeof(float));
+			float* cloud = (float*) malloc(cloud_cv.size() * 3 * sizeof(float));
+			float* cloud_standard = (float*) malloc(cloud_cv.size() * 3 * sizeof(float));
+			float rotation1_3[9] = { 0.999829f, 0.000000f, -0.012079f, 0.010205f, 0.999944f, -0.000053f, 0.012079f, -0.000053f, 0.999935f };
+			float rotation_3[9] = {(float)rotation(0,0),(float)rotation(0,1),(float)rotation(0,2),(float)rotation(1,0),(float)rotation(1,1),(float)rotation(1,2),
+				(float)rotation(2,0),(float)rotation(2,1),(float)rotation(2,2)};
+			
+			for (int i = 0; i < cloud_cv.size(); i++) {
+				lidar_buffer[i] = cloud_cv[i].x;
+				lidar_buffer[i+cloud_cv.size()] = cloud_cv[i].y;
+				lidar_buffer[i+2*cloud_cv.size()] = cloud_cv[i].z;
+			}
+
+			float *g_rotation1_3, *g_rotation_3,*g_lidar_buffer, *g_cloud,*g_cloud_standard;
+			cudaMalloc((void **)&g_rotation1_3, sizeof(float) * 9);
+			cudaMalloc((void **)&g_rotation_3, sizeof(float) * 9);
+			cudaMalloc((void **)&g_lidar_buffer, sizeof(float) * cloud_cv.size()*3);
+			cudaMalloc((void **)&g_cloud, sizeof(float) * cloud_cv.size()*3);
+			cudaMalloc((void **)&g_cloud_standard, sizeof(float) * cloud_cv.size()*3);
+
+			// initialize CUBLAS context
+			cublasHandle_t handle;
+			cublasCreate(&handle);
+
+			cudaMemcpy(g_rotation1_3,&rotation1_3,9*sizeof(float),cudaMemcpyHostToDevice);
+			cudaMemcpy(g_rotation_3,&rotation_3,9*sizeof(float),cudaMemcpyHostToDevice);
+       		cudaMemcpy(g_lidar_buffer,lidar_buffer,3*cloud_cv.size()*sizeof(float),cudaMemcpyHostToDevice);
+        	cudaMemset(g_cloud,0,3*cloud_cv.size()*sizeof(float));
+			cudaMemset(g_cloud_standard,0,3*cloud_cv.size()*sizeof(float));
+
+			float al = 1.0f;
+			float bet = 0.0f;
+			
+			cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, 
+				cloud_cv.size(),3 , 3, &al, g_lidar_buffer, 
+				cloud_cv.size(), g_rotation_3, 3, &bet, g_cloud, cloud_cv.size());
+
+			cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, 
+				cloud_cv.size(),3 , 3, &al, g_lidar_buffer, 
+				cloud_cv.size(), g_rotation1_3, 3, &bet, g_cloud_standard, cloud_cv.size());      //g_rotation_3
+
+			cudaMemcpy(cloud,g_cloud,3*cloud_cv.size()*sizeof(float),cudaMemcpyDeviceToHost);
+			cudaMemcpy(cloud_standard,g_cloud_standard,3*cloud_cv.size()*sizeof(float),cudaMemcpyDeviceToHost);
 
 			int left_num = invasion.coeff_left.size();
 			int right_num = invasion.coeff_right.size();
 
 			std::vector<float> points_z;
 			std::vector<pcl::PointXYZ> mat_need_points;
-			bool isShort = false;   //ͼ���й���ָ����Զ�����Ƿ������������ֵ
+			bool isShort = false;   //ͼ���й���ָ����Զ�����Ƿ�������������?
 			float z_limit = DIVIDE_DIS + 20.0f;
 			if (z_limit > distance_limit) {
 
 				z_limit = distance_limit;
 				isShort = true;
 			}
-			for (int i = 0;i < cloud->points.size();++i) {
 
-				pcl::PointXYZ pt = cloud->points[i];
+			cloud_change->points.reserve(cloud_cv.size());
+			cloud_change_standard->points.reserve(cloud_cv.size());
+			points_z.reserve(cloud_cv.size());
+			mat_need_points.reserve(cloud_cv.size());
+			for (int i = 0;i < cloud_cv.size();++i) {
 
-				if (pt.z >= z_limit || pt.y <= -4.0f || pt.y >= 4.0f)    //��Сת��뾶150m
+				pcl::PointXYZ pt;
+				pt.x = cloud_standard[i];
+				pt.y = cloud_standard[i + cloud_cv.size()];
+				pt.z = cloud_standard[i + 2*cloud_cv.size()];
+
+				if (pt.z >= DIVIDE_DIS + 18.0f && pt.z <= DETECT_DISTANCE) {    //50
+
+					pcl::PointXYZ pt_change;
+					pt_change.x = cloud[i];
+					pt_change.y = cloud[i + cloud_cv.size()];
+					pt_change.y = cloud[i + 2*cloud_cv.size()];
+					cloud_change->points.push_back({ pt_change.y, -pt_change.x, pt_change.z + 0.1f });
+					cloud_change_standard->points.push_back(pt);
+				}
+
+				if (pt.z >= z_limit) 
+					continue;
+				//float y_limit = 1.0f/15.0f * pt.z + 2.0f; //0,2  ----->30,4
+				if( pt.y <= -4.0f || pt.y >= 4.0f)    //最小转�?���?150m
 					continue;
 				points_z.push_back(pt.z);
 				mat_need_points.push_back(pt);
 			}
 
 			if (points_z.size() == 0){
+				free(lidar_buffer);
+				free(cloud);
+				free(cloud_standard);
+				cudaFree(g_rotation1_3);
+				cudaFree(g_rotation_3);
+				cudaFree(g_lidar_buffer);
+				cudaFree(g_cloud);
+				cudaFree(g_cloud_standard);
 				return output;
 			}
 
@@ -210,7 +280,6 @@ namespace watrix {
 			left_result = m_combine * left_coeff;
 			right_result = m_combine * right_coeff;
 
-
 			for (int i = 0;i < mat_need_points.size();++i) {
 
 				pcl::PointXYZ pt = mat_need_points[i];
@@ -220,9 +289,6 @@ namespace watrix {
 				float r_limit = right_result.at<float>(i, 0);
 
 				double virtual_mid;
-
-				/*if (pt.y >= l_limit - 0.3f && pt.y <= r_limit + 0.3f)
-					output->points.push_back(cloud_standard->points[i]);*/
 
 				if (r_limit - l_limit > 1.435f) {
 					virtual_mid = (l_limit + r_limit) / 2.0f;
@@ -239,43 +305,58 @@ namespace watrix {
 			}
 
 			if (isShort)
+			{
+				free(lidar_buffer);
+				free(cloud);
+				free(cloud_standard);
+				cudaFree(g_rotation1_3);
+				cudaFree(g_rotation_3);
+				cudaFree(g_lidar_buffer);
+				cudaFree(g_cloud);
+				cudaFree(g_cloud_standard);
 				return output;
 
+			}
+				
 			std::vector<cv::Point2d> projectedPoints;
 			std::vector<cv::Point3d> point_need;
-			for (int i = 0; i < cloud->points.size(); ++i) {
-				pcl::PointXYZ pt = cloud->points[i];
-				if (pt.z >= DIVIDE_DIS + 18.0f && pt.z <= 45.0f) {    //50
-
-					cloud_change->points.push_back({ pt.y, -pt.x, pt.z + 0.2f });
-					cloud_change_standard->points.push_back(cloud_standard->points[i]);
-				}
-
-			}
 
 			Eigen::Matrix4d rotation_cv;
 
-			rotation_cv << 0.9999960856928221, 0.0003353891285046393, -0.002777789258835963, 0,
-				-0.0003158570188030314, 0.9999752464831646, 0.007028986788848552, 0,
-				0.002780077944536163, -0.007028081891000952, 0.9999714382078898, 0,
+			rotation_cv << 0.9999994138848853, -0.0007077764296917184, -0.0008193182600682035, 0,
+				0.000688561989143834, 0.9997301624711764, -0.02321913279479644, 0,
+				0.0008355311321636263, 0.02321855503430087, 0.9997300638621639, 0,
 				0.000000, 0.000000, 0.000000, 1.000000;
 
 			pcl::transformPointCloud(*cloud_change, *cloud_change, rotation_cv);
 
+			//将点云压缩到同一高度(地面高度)，再映射到图像上
 			for (int i = 0; i < cloud_change->points.size(); ++i) {
 				pcl::PointXYZ pt = cloud_change->points[i];
 				point_need.push_back(cv::Point3d(pt.x, -GROUND_HEIGHT, pt.z));
 			}
 
-			if (point_need.size() == 0)
+			if (point_need.size() == 0){
+
+				free(lidar_buffer);
+				free(cloud);
+				free(cloud_standard);
+				cudaFree(g_rotation1_3);
+				cudaFree(g_rotation_3);
+				cudaFree(g_lidar_buffer);
+				cudaFree(g_cloud);
+				cudaFree(g_cloud_standard);
 				return output;
+			}
+				
+
 			cv::projectPoints(point_need, rvec, tvec, cameraMatrix, distCoeff, projectedPoints);
 
 			for (int i = 0; i < projectedPoints.size(); i++)
 			{
 				cv::Point2i p = projectedPoints[i];
-				p.x += 7;
-				p.y += 5;
+				p.x += 0;
+				p.y += 0;
 
 				if (p.y < min_y)
 					continue;
@@ -290,10 +371,19 @@ namespace watrix {
 				}
 			}
 
+			free(lidar_buffer);
+			free(cloud);
+			free(cloud_standard);
+			cudaFree(g_rotation1_3);
+			cudaFree(g_rotation_3);
+			cudaFree(g_lidar_buffer);
+			cudaFree(g_cloud);
+			cudaFree(g_cloud_standard);
+		
 			return output;
 		}
 
-		float LOD::calHeightVar(std::vector<Point3> object) {  //����һ��Ŀ��ĸ߶ȷ��Ϊ���ж����Ƿ���һ��ƽ�棬�����˳�
+		float LOD::calHeightVar(std::vector<Point3> object) {  //����һ��Ŀ��ĸ߶ȷ���??����ж����Ƿ���һ��ƽ��?������˳�?
 
 			float total_x = 0.0f;
 			for (int j = 0; j < object.size(); ++j) {
@@ -586,7 +676,7 @@ namespace watrix {
 
 				track_lines.push_back(pt);
 			}
-			//���ܳ��ֵ������������������
+			//���ܳ��ֵ������������������?
 			if (track_lines.size() < 3)
 				return;
 			FitLineData track_line_data = fitNextPoint(track_lines, row_radio);
@@ -605,7 +695,7 @@ namespace watrix {
 
 			}
 
-			//���ж��ڳ����ڡ�����֮���пӵ�����£�ִ�����¹���
+			//���ж��ڳ����ڡ�����֮���пӵ�����£�ִ�����¹���?
 			if (isHole) {
 				for (int i = GROUND_JUDGE;i < trackdata.trackBottomFit.size();++i)
 					trackdata.trackBottomFit[i] = trackdata.trackBottomFit[GROUND_JUDGE - 1];
@@ -616,7 +706,7 @@ namespace watrix {
 				return;
 			}
 
-			//���ݹ���½�����ѡȡȫ����ϵ�
+			//���ݹ���½�����ѡȡ�?�����ϵ�
 			std::vector<cv::Point2d> whole_line;
 			float whole_diff = trackdata.trackBottomFit[5];
 			float slope_limit_k = -SLOPE_LIMIT / 100.0f;
@@ -638,7 +728,7 @@ namespace watrix {
 
 			FitLineData whole_line_data = fitNextPoint(whole_line, row_radio);
 
-			//�������GROUND_JUDGE����ĵ����߶�
+			//�������GROUND_JUDGE����ĵ����߶�?
 			for (int i = GROUND_JUDGE; i < trackdata.trackBottomFit.size(); ++i) {
 
 				std::vector<cv::Point2d> lines_data;
@@ -771,14 +861,14 @@ namespace watrix {
 						visited[i][j] = true;
 						continue;
 					}
-					//����С��30m���������30cm�ߵĵ���Ϊ�ϰ����
+					//����С��30m���������?30cm�ߵĵ���Ϊ�ϰ����?
 					if (grid[i][j].min_z > DIVIDE_DIS && grid[i][j].max_z < 30.0f &&
 						grid[i][j].max_x - trackdata.trackBottom[i] < 0.15f) {    //0.3
 
 						visited[i][j] = true;
 						continue;
 					}
-					//�������30m���������10cm�ߵĵ���Ϊ�������ϰ����
+					//�������?30m���������?10cm�ߵĵ���Ϊ�������ϰ����?
 					if (grid[i][j].max_z >= 30.0f && grid[i][j].max_x - trackdata.trackBottom[i] < 0.1f) {
 
 						visited[i][j] = true;
@@ -844,7 +934,7 @@ namespace watrix {
 								if (ob_size.max_z < 25.0f && ob_size.max_y - ob_size.min_y <= 0.12f)
 									continue;
 
-								//��⵽������10m���ڣ���߶ȵı�׼�����С��3cm�����䰴��촦��
+								//��⵽������?10m���ڣ���߶ȵı�׼�����С��3cm�����䰴��촦��?
 								if (ob_size.min_z < DIVIDE_DIS) {
 									std::vector<Point3> object;
 									for (int grid_index = 0; grid_index < obstacle_grid_group.gridIndex.size(); ++grid_index) {
@@ -1000,7 +1090,7 @@ namespace watrix {
 			std::vector<float> distCoeff;
 			cv::Mat rvec(3, 3, CV_64F), tvec(3, 1, CV_64F);
 
-			//11�¶̽��������
+			//11�¶̽��������?
 			distCoeff.push_back(-0.2283);
 			distCoeff.push_back(0.1710);
 			distCoeff.push_back(-0.0013);
@@ -1211,7 +1301,7 @@ namespace watrix {
 					++i;
 			}
 
-			//�����������������Ŀ��(�������µ�)
+			//�����������������Ŀ��?(�������µ�)
 			for (int i = 0;i < obstacle_grid.size();) {
 
 				float lowest_height = obstacle_grid[i].ob_size.loss_min_x;
@@ -1230,7 +1320,7 @@ namespace watrix {
 							lowest_height = obstacle_grid[i].ob_size.min_x;
 						else
 							lowest_height = trackBottomAvr;
-						if (highest_height - lowest_height < 0.33f) {   //Ŀ��߶���ֵ�����ڸ���ֵ�˳�
+						if (highest_height - lowest_height < 0.33f) {   //Ŀ��߶���ֵ�����ڸ���ֵ�˳�?
 
 							obstacle_grid.erase(obstacle_grid.begin() + i);
 							continue;
@@ -1245,7 +1335,7 @@ namespace watrix {
 				//�ж�Ŀ��߶��Ƿ�ﵽ30cm
 				if (lowest_height == 100.0f) {
 					lowest_height = obstacle_grid[i].ob_size.min_x;
-					if (highest_height - obstacle_grid[i].ob_size.min_x <= 0.33f) {  //Ŀ��߶���ֵ�����ڸ���ֵ�˳�
+					if (highest_height - obstacle_grid[i].ob_size.min_x <= 0.33f) {  //Ŀ��߶���ֵ�����ڸ���ֵ�˳�?
 
 						obstacle_grid.erase(obstacle_grid.begin() + i);
 						continue;
@@ -1253,7 +1343,7 @@ namespace watrix {
 
 				}
 				else {
-					if (highest_height - lowest_height <= 0.33f) {   //Ŀ��߶���ֵ�����ڸ���ֵ�˳�
+					if (highest_height - lowest_height <= 0.33f) {   //Ŀ��߶���ֵ�����ڸ���ֵ�˳�?
 
 						obstacle_grid.erase(obstacle_grid.begin() + i);
 						continue;
@@ -1364,7 +1454,7 @@ namespace watrix {
 
 				obstacle_box.push_back(obstacle_temp);
 			}
-			//�޽����⵼�»��޷����
+			//�޽����⵼�»��޷����?
 			/*if (isTrain)
 				obstacle_box[idx_train].distance_z = modifyDis;*/
 
@@ -1415,15 +1505,15 @@ namespace watrix {
 			std::vector<float> distCoeff;
 			cv::Mat rvec(3, 3, CV_64F), tvec(3, 1, CV_64F);
 
-			//11�¶̽��������
-			distCoeff.push_back(-0.2283);
-			distCoeff.push_back(0.1710);
-			distCoeff.push_back(-0.0013);
-			distCoeff.push_back(-8.2250e-06);
-			distCoeff.push_back(0);
+			//11�¶̽��������?
+			distCoeff.push_back(-0.2759f);
+			distCoeff.push_back(0.4355f);
+			distCoeff.push_back(0.0010f);
+			distCoeff.push_back(-1.2753e-04f);
+			distCoeff.push_back(0.0f);
 
 			//11�¶̽��ڲβ���
-			float tempMatrix[3][3] = { { 2.1334e+03, 0, 931.1503 }, { 0, 2.1322e+03, 580.8112 }, { 0, 0, 1.0 } };
+			float tempMatrix[3][3] = { { 2.1159e+03f, 0.0f, 974.2096f }, { 0.0f, 2.1175e+03f, 619.7170f }, { 0.0f, 0.0f, 1.0f } };
 
 			for (int i = 0; i < 3; ++i) {
 				for (int j = 0; j < 3; ++j) {
@@ -1440,7 +1530,7 @@ namespace watrix {
 					rvec.at<double>(i, j) = tempRvec[i][j];
 			cv::Rodrigues(rvec, rvec);
 
-			double tempTvec[3] = { 0.0,0.80,0.177 };
+			double tempTvec[3] = { 0.0,0.92,0.137 };
 
 			for (int i = 0; i < 3; ++i)
 				tvec.at<double>(i, 0) = tempTvec[i];
@@ -1462,8 +1552,8 @@ namespace watrix {
 
 			Eigen::Matrix4d rotation, rotation_cv;
 			rotation << 1, 0, 0, 0,
-				0, cos(0.15 * CV_PI / 180), -sin(0.15 * CV_PI / 180), 0.000000,
-				0, sin(0.15 * CV_PI / 180), cos(0.15 * CV_PI / 180), 0.000000,
+				0, cos(-0.15 * CV_PI / 180), -sin(-0.15 * CV_PI / 180), 0.000000,
+				0, sin(-0.15 * CV_PI / 180), cos(-0.15 * CV_PI / 180), 0.000000,
 				0, 0, 0, 1;
 
 			pcl::transformPointCloud(*cloud_box, *cloud_box, rotation);
@@ -1474,16 +1564,16 @@ namespace watrix {
 				float temp = pt.x;
 				pt.x = pt.y;
 				pt.y = -temp;
-				pt.z = pt.z + 0.2f;
+				pt.z = pt.z + 0.1f;
 				cloud_box->points[i].x = pt.x;
 				cloud_box->points[i].y = pt.y;
 				cloud_box->points[i].z = pt.z;
 
 			}
 
-			rotation_cv << 0.9999960856928221, 0.0003353891285046393, -0.002777789258835963, 0,
-				-0.0003158570188030314, 0.9999752464831646, 0.007028986788848552, 0,
-				0.002780077944536163, -0.007028081891000952, 0.9999714382078898, 0,
+			rotation_cv << 0.9999994138848853, -0.0007077764296917184, -0.0008193182600682035, 0,
+				0.000688561989143834, 0.9997301624711764, -0.02321913279479644, 0,
+				0.0008355311321636263, 0.02321855503430087, 0.9997300638621639, 0,
 				0.000000, 0.000000, 0.000000, 1.000000;
 
 			pcl::transformPointCloud(*cloud_box, *cloud_box, rotation_cv);
@@ -1522,10 +1612,10 @@ namespace watrix {
 					if (projectedPoints[idx].y <=  y_min) y_min = projectedPoints[idx].y;
 					if (projectedPoints[idx].y >=  y_max) y_max = projectedPoints[idx].y;
 				}
-				x_min += 7;
-				x_max += 7;
-				y_min += 5;
-				y_max += 5;
+				x_min += 0;
+				x_max += 0;
+				y_min += 0;
+				y_max += 0;
 
 				lidar_invasion_cvbox cvbox;
 				cvbox.xmin = x_min;

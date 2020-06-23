@@ -18,7 +18,7 @@
 #include <QMenu>
 #include <QTimerEvent>
 #include <QTime>
-#include <QtMultimedia>
+// #include <QtMultimedia>
 #include <QMouseEvent>
 #include <QPoint>
 #include <QAtomicInt>
@@ -127,7 +127,7 @@ private:
     int warning_time_ = 0;
     int timer_id_;
     cv::Mat ConvertTo3Channels(const cv::Mat &binImg);
-    void YoloResaultDisplay(const std::shared_ptr<watrix::projects::adas::proto::SendResult> &sync_result,const string &channel_name);
+    void YoloResultDisplay(const std::shared_ptr<watrix::projects::adas::proto::SendResult> &sync_result,const string &channel_name);
 
     void RecordDisplay(const std::shared_ptr<apollo::drivers::Image> &record,const string & channel_name);
 

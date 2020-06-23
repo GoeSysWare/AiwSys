@@ -6,8 +6,8 @@
   ################
   #仿真文件所在的目录
   ################ 
-    simulator_files_dir:"/media/remote_pc"
+    simulator_files_dir:"/media/Server_184"
   ################
   #仿真配置文件
   ################ 
-    config_file:"cam1_cam0_pcd.txt"
+    config_file:"cam1_cam0_pcd_yes.txt"  

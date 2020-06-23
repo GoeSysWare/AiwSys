@@ -170,7 +170,10 @@ namespace watrix {
 			std::vector<int>& lidar_invasion_status,
 			lane_safe_area_corner_t& lane_safe_area_corner,
 			bool& is_open_long_camera, // 是否开远焦
-			std::vector<lidar_invasion_cvbox>& cv_obstacle_box // lidar invasion object cv box
+			std::vector<lidar_invasion_cvbox>& cv_obstacle_box, // lidar invasion object cv box
+			cvpoint_t& touch_point, // 侵界障碍物和轨道的接触点
+			cvpoints_t& left_fitted_lane_cvpoints, // 拟合后的左轨道图像坐标点列
+			cvpoints_t& right_fitted_lane_cvpoints // 拟合后的右轨道图像坐标点列
 		)
 		{
 			std::vector<cvpoints_t> trains_cvpoints;
@@ -193,7 +196,10 @@ namespace watrix {
 				lidar_invasion_status,
 				lane_safe_area_corner,
 				is_open_long_camera,
-				cv_obstacle_box
+				cv_obstacle_box,
+				touch_point,
+				left_fitted_lane_cvpoints,
+				right_fitted_lane_cvpoints
 			);
 		}
 

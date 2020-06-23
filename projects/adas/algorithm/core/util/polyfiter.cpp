@@ -65,6 +65,34 @@ namespace watrix {
 			}
 		}
 
+		Polyfiter::Polyfiter(
+			const std::vector<dpoint_t>& src_d_points_, 
+			int n_,
+			bool reverse_xy_,
+			int x_range_min_,
+			int x_range_max_,
+			int y_range_min_,
+			int y_range_max_
+		):  n(n_), 
+			reverse_xy(reverse_xy_),
+			auto_x_range_min(0),
+			auto_x_range_max(0),
+			auto_y_range_min(0),
+			auto_y_range_max(0),
+			user_x_range_min(x_range_min_),
+			user_x_range_max(x_range_max_),
+			user_y_range_min(y_range_min_),
+			user_y_range_max(y_range_max_),
+			is_valid_input(false)
+		{
+			// n=1,2 points; n=2, 3 points
+			is_valid_input = src_d_points_.size()>n;
+			//is_valid_input = true; 
+			if (!is_valid_input){
+				std::cout << "Not Enough Points to fit." << std::endl;
+			}
+		}
+
 		void Polyfiter::_reverse_points_xy(){
 			if(reverse_xy){
 				for(auto& point: src_points){
@@ -211,63 +239,79 @@ namespace watrix {
 			}
 
 			fitted_dpoints.clear();
+
+			// std::cout << "vy:" << vy[0] << " " << vy[vy.size()-1] << std::endl;
+			// ��ʱvy �Ӵ�С max->min
+
+			for(int i=vy.size()-1; i >=0; --i){
+				double t_y = vy[i];
+				double t_x = _predict(t_y);
+				fitted_dpoints.push_back({t_x, t_y});
+			}
 		
-			// get range xy
-			double x_range_min,x_range_max;
-			double y_range_min,y_range_max;
-			if (use_auto_range){
-				x_range_min = MINV(vx);
-				x_range_max = MAXV(vx);
-				y_range_min = MINV(vy);
-				y_range_max = MAXV(vy);
-				// // CAMERA_TYPE::CAMERA_LONG  1 
-				// if (table_type == 1){
-				// 	x_range_min = (MINV(vx) < -9) ? MINV(vx) : -9;
-				// 	x_range_max = MAXV(vx);
-				// 	y_range_min = (MINV(vy) < 31) ? MINV(vy) : 31;
-				// 	y_range_max = MAXV(vy);
-				// }
-				// // CAMERA_TYPE::CAMERA_SHORT
-				// else {
-				// 	x_range_min = (MINV(vx) < -19) ? MINV(vx) : -19;
-				// 	x_range_max = MAXV(vx);
-				// 	y_range_min = (MINV(vy) < 1) ? MINV(vy) : 1;
-				// 	y_range_max = MAXV(vy);
-				// }
-			} else {
-				x_range_min = user_x_range_min;
-				x_range_max = user_x_range_max;
-				y_range_min = user_y_range_min;
-				y_range_max = user_y_range_max;
-			}
+// 			// get range xy
+// 			double x_range_min,x_range_max;
+// 			double y_range_min,y_range_max;
 
-			// reverse range xy
-			if(reverse_xy){
-				std::swap(x_range_min, y_range_min);
-				std::swap(x_range_max, y_range_max);
-			}
+// 			x_range_min = MINV(vx);
+// 			x_range_max = MAXV(vx);
+// 			y_range_min = MINV(vy);
+// 			y_range_max = MAXV(vy);
 
-#ifdef DEBUG_INFO 
-			printf("[FIT] x_range_min = %d, x_range_max = %d \n", x_range_min, x_range_max); 
-			printf("[FIT] y_range_min = %d, y_range_max = %d \n", y_range_min, y_range_max); 
-#endif
-			std::cout << x_range_min << "," << x_range_max << std::endl;
-			double x = x_range_min;
-			while (x <= x_range_max){
-				double y = _predict(x);
-				// std::cout << x << "," << y << "," << y_range_min << "," << y_range_max << std::endl;
-				// if (y>=y_range_min && y<=y_range_max){
-				dpoint_t ipt;
-				ipt.push_back(double(x));
-				ipt.push_back(double(y));
-				if(reverse_xy){
-					std::swap(ipt[0], ipt[1]);
-				}
-				fitted_dpoints.push_back(ipt);
-				// }
-				x += 0.1;
-				// x += 0.05;
-			}
+
+// 			if (use_auto_range){
+// 				x_range_min = MINV(vx);
+// 				x_range_max = MAXV(vx);
+// 				y_range_min = MINV(vy);
+// 				y_range_max = MAXV(vy);
+// 				// // CAMERA_TYPE::CAMERA_LONG  1 
+// 				// if (table_type == 1){
+// 				// 	x_range_min = (MINV(vx) < -9) ? MINV(vx) : -9;
+// 				// 	x_range_max = MAXV(vx);
+// 				// 	y_range_min = (MINV(vy) < 31) ? MINV(vy) : 31;
+// 				// 	y_range_max = MAXV(vy);
+// 				// }
+// 				// // CAMERA_TYPE::CAMERA_SHORT
+// 				// else {
+// 				// 	x_range_min = (MINV(vx) < -19) ? MINV(vx) : -19;
+// 				// 	x_range_max = MAXV(vx);
+// 				// 	y_range_min = (MINV(vy) < 1) ? MINV(vy) : 1;
+// 				// 	y_range_max = MAXV(vy);
+// 				// }
+// 			} else {
+// 				x_range_min = user_x_range_min;
+// 				x_range_max = user_x_range_max;
+// 				y_range_min = user_y_range_min;
+// 				y_range_max = user_y_range_max;
+// 			}
+
+// 			// reverse range xy
+// 			if(reverse_xy){
+// 				std::swap(x_range_min, y_range_min);
+// 				std::swap(x_range_max, y_range_max);
+// 			}
+
+// #ifdef DEBUG_INFO 
+// 			printf("[FIT] x_range_min = %d, x_range_max = %d \n", x_range_min, x_range_max); 
+// 			printf("[FIT] y_range_min = %d, y_range_max = %d \n", y_range_min, y_range_max); 
+// #endif
+// 			std::cout << x_range_min << "," << x_range_max << std::endl;
+// 			double x = x_range_min;
+// 			while (x <= x_range_max){
+// 				double y = _predict(x);
+// 				// std::cout << x << "," << y << "," << y_range_min << "," << y_range_max << std::endl;
+// 				// if (y>=y_range_min && y<=y_range_max){
+// 				dpoint_t ipt;
+// 				ipt.push_back(double(x));
+// 				ipt.push_back(double(y));
+// 				if(reverse_xy){
+// 					std::swap(ipt[0], ipt[1]);
+// 				}
+// 				fitted_dpoints.push_back(ipt);
+// 				// }
+// 				x += 0.1;
+// 				// x += 0.05;
+// 			}
 			// std::cout << "fitted_dpoints size:" << fitted_dpoints.size() << std::endl;
 			// std::cout << "fitted_dpoints[0] size:" << fitted_dpoints[0].size() << std::endl;
 			return fitted_dpoints;

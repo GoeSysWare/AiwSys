@@ -21,6 +21,6 @@ cc_library(
             "@pcl",      
             "@vtk",             
             "@eigen",   
-              "@cuda",             
+            "@cuda",             
     ],
 )

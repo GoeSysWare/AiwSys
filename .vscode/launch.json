@@ -27,7 +27,7 @@
             "name": "Debug Test",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bazel-bin/modules/test/test_cc/test_async",
+            "program": "${workspaceFolder}/bazel-bin/modules/test/test_cc/test_move",
             "args": ["",],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -46,7 +46,7 @@
             "name": "Debug Cyber",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bazel-bin/cyber/python/examples/py_service",
+            "program": "${workspaceFolder}/bazel-bin/cyber/examples/talker",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -65,8 +65,8 @@
                 },
                 {
                     "name": "CYBER_IP",
-                    //"value":"192.168.0.227"
-                    "value": "127.0.0.1"
+                    "value":"192.168.0.107"
+                    // "value": "127.0.0.1"
                 },
             ],
             "externalConsole": false,

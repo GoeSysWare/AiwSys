@@ -339,18 +339,20 @@ namespace watrix
       {
         // this->v_image_ = perception_->images_;
         
-        perception_->camera_mutex_.lock();
-        // for (auto i = 0; i < perception_->images_.size(); i++)
-        //   this->v_image_[i] = perception_->images_[i].clone();
-        this->v_image_ = perception_->images_;
+        //  perception_->camera_mutex_.lock();
+  
+        this->v_image_.resize(perception_->images_.size());
+         for (auto i = 0; i < perception_->images_.size(); i++)
+           this->v_image_[i] = std::move(perception_->images_[i]);
+        // this->v_image_ = std::move(perception_->images_);
         this->v_image_lane_front_result_ = perception_->v_image_lane_front_result_;
-        perception_->camera_mutex_.unlock();
+        //  perception_->camera_mutex_.unlock();
 
-       perception_->lidar_mutex_.lock();
-        this->lidar_cloud_buf_ = perception_->lidar_cloud_buf_;
-        this->lidar_safe_area_ = perception_->lidar_safe_area_;
-        this->lidar2image_paint_ = perception_->lidar2image_paint_;
-        perception_->lidar_mutex_.unlock();
+      //  perception_->lidar_mutex_.lock();
+        this->lidar_cloud_buf_ = std::move(perception_->lidar_cloud_buf_);
+        this->lidar_safe_area_ = std::move(perception_->lidar_safe_area_);
+        this->lidar2image_paint_ = std::move(perception_->lidar2image_paint_);
+        // perception_->lidar_mutex_.unlock();
 
 
 
@@ -420,8 +422,8 @@ namespace watrix
 
         if (v_image_lane_front_result_.size() == 0)
         {
-          cv::Mat image_0 = cv::Mat::zeros(272, 480, CV_32FC(5));
-          for (int h = 0; h < 272; h++)
+          cv::Mat image_0 = cv::Mat::zeros(160, 480, CV_32FC(5));
+          for (int h = 0; h < 160; h++)
           {
             for (int w = 0; w < 480; w++)
             {
@@ -560,12 +562,18 @@ namespace watrix
             {
               //一直都允许存
               dection_is_save = true;
-              here_draw_detection_boxs(v_image_[camera_index], yolo_detection_boxs0_, 5, image_with_boxs);
+              here_draw_detection_boxs(v_image_[camera_index], 
+              camera_index==0? yolo_detection_boxs0_:yolo_detection_boxs1_, 
+              5, 
+              image_with_boxs);
             }
             else
             {
               //看过滤效果存
-              dection_is_save = here_draw_detection_boxs_ey(v_image_[camera_index], camera_index,yolo_detection_boxs0_, 5, image_with_boxs);
+              dection_is_save = here_draw_detection_boxs_ey(v_image_[camera_index], 
+              camera_index,camera_index==0? yolo_detection_boxs0_:yolo_detection_boxs1_,
+               5, 
+               image_with_boxs);
             }
 
             if (dection_is_save)
@@ -648,12 +656,12 @@ namespace watrix
             {
               //一直都允许存
               dection_is_save = true;
-              here_draw_detection_boxs(v_image_[camera_index], yolo_detection_boxs0_, 5, image_with_boxs);
+              here_draw_detection_boxs(v_image_[camera_index], camera_index==0 ? yolo_detection_boxs0_:yolo_detection_boxs1_, 5, image_with_boxs);
             }
             else
             {
               //看过滤效果存
-              dection_is_save = here_draw_detection_boxs_ey(v_image_[camera_index], camera_index,yolo_detection_boxs0_, 5, image_with_boxs);
+              dection_is_save = here_draw_detection_boxs_ey(v_image_[camera_index], camera_index,camera_index==0 ? yolo_detection_boxs0_:yolo_detection_boxs1_, 5, image_with_boxs);
             }
 
             if (dection_is_save)
@@ -688,6 +696,17 @@ namespace watrix
         std::vector<lane_safe_area_corner_t> v_lane_safe_area_corner(2); // 4 cornet point
         std::vector<int> lidar_invasion_status0;                         // status:  -1 UNKNOW, 0 NOT Invasion, 1 Yes Invasion
         std::vector<int> lidar_invasion_status1;
+
+        //安全线
+				watrix::algorithm::cvpoint_t touch_point_0;
+        //左轨道点
+				watrix::algorithm::cvpoints_t left_fitted_lane_cvpoints_0;
+        //右轨道点
+				watrix::algorithm::cvpoints_t right_fitted_lane_cvpoints_0;
+
+				watrix::algorithm::cvpoint_t touch_point_1;
+				watrix::algorithm::cvpoints_t left_fitted_lane_cvpoints_1;
+				watrix::algorithm::cvpoints_t right_fitted_lane_cvpoints_1;
 
         cvpoints_t lidar_cvpoints;
         cvpoints_t train_cvpoints;
@@ -749,7 +768,10 @@ namespace watrix
                 lidar_invasion_status0,
                 v_lane_safe_area_corner[v],
                 short_camera_open_status,
-                short_cv_obstacle_box);
+                short_cv_obstacle_box,
+                touch_point_0,
+                left_fitted_lane_cvpoints_0,
+                right_fitted_lane_cvpoints_0);
           }
           else
           {
@@ -782,7 +804,10 @@ namespace watrix
                 lidar_invasion_status1,
                 v_lane_safe_area_corner[v],
                 long_camera_open_status,
-                long_cv_obstacle_box);
+                long_cv_obstacle_box,
+                touch_point_1,
+                left_fitted_lane_cvpoints_1,
+                right_fitted_lane_cvpoints_1);
           }
         }
 
@@ -900,7 +925,7 @@ namespace watrix
         //     //cout<<"----"<<pos_x<<"  "<<pos_y<<endl;
         //     //PainPoint2Image(short_mat, pos_x, pos_y, GREEN_POINT);
 
-        //     if (lidar_point_status[j] == 1)
+        //     if (lidar_point_status[j] == 1)long_cv_obstacle_box
         //     {
         //       //从3D-2D再从新计算一边x,y
         //       PainPoint2Image(short_mat, pos_x, pos_y, RED_POINT);
@@ -1002,7 +1027,7 @@ namespace watrix
             log_fstream.flush();
           }
         }
-
+        //存档
         if (perception_->adas_perception_param_.if_save_image_result())
         {
 
@@ -1017,31 +1042,20 @@ namespace watrix
           cv::Point2i origin(900, 50);
           std::string display_text;
           int if_combine = 0;
-          if (v_image_with_color_mask[0].empty())
-          {
-            std::cout << "cam1 is null" << std::endl;
-          }
-          else
-          {
-            display_text = "short safe distance" + std::to_string(short_safe_y);
-            here_draw_detection_boxs_ex(v_image_with_color_mask[0], yolo_detection_boxs0_, v_box_invasion_results[0], 5, s_image_boxs);
-            cv::putText(s_image_boxs, display_text, origin, cv::FONT_HERSHEY_SIMPLEX, 0.7, COLOR_YELLOW, 2);
-            if_combine++;
-          }
+     
+          display_text = "short safe distance" + std::to_string(short_safe_y);
+          here_draw_detection_boxs_ex(v_image_[0], yolo_detection_boxs0_, v_box_invasion_results[0], 5, s_image_boxs);
+          cv::putText(s_image_boxs, display_text, origin, cv::FONT_HERSHEY_SIMPLEX, 0.7, COLOR_YELLOW, 2);
+          if_combine++;
+        
 
           cv::Mat l_image_boxs;
-          if (v_image_with_color_mask[1].empty())
-          {
-            std::cout << "cam2 is null" << std::endl;
-          }
-          else
-          {
-            here_draw_detection_boxs_ex(v_image_with_color_mask[1], yolo_detection_boxs1_, v_box_invasion_results[1], 5, l_image_boxs);
-            display_text = "long safe distance" + std::to_string(long_safe_y);
-            cv::putText(l_image_boxs, display_text, origin, cv::FONT_HERSHEY_SIMPLEX, 0.7, COLOR_YELLOW, 2);
-            if_combine++;
-          }
-
+      
+          here_draw_detection_boxs_ex(v_image_[1], yolo_detection_boxs1_, v_box_invasion_results[1], 5, l_image_boxs);
+          display_text = "long safe distance" + std::to_string(long_safe_y);
+          cv::putText(l_image_boxs, display_text, origin, cv::FONT_HERSHEY_SIMPLEX, 0.7, COLOR_YELLOW, 2);
+          if_combine++;
+  
           if (if_combine == 2)
           {
             std::string image_filename = boost::filesystem::path(sim_image_files_[0]).stem().string();
@@ -1052,7 +1066,7 @@ namespace watrix
           }
         }
 
-        //   //打包成SendResult
+        //打包成SendResult
         auto sendData_0 = std::make_shared<watrix::projects::adas::proto::SendResult>();
         auto sendData_1 = std::make_shared<watrix::projects::adas::proto::SendResult>();
 
@@ -1061,29 +1075,65 @@ namespace watrix
         apollo::drivers::Image *source_image_0 = sendData_0->mutable_source_image();
         watrix::projects::adas::proto::DetectionBoxs *pb_mutable_detection_boxs_0 = sendData_0->mutable_detection_boxs();
         watrix::projects::adas::proto::MaxSafeDistance *max_safe_distance_0 = sendData_0->mutable_max_safe_distance();
+        //向protobuf填入轨道和安全线
+        watrix::projects::adas::proto::PerceptionResult *perception_result_0= sendData_0->mutable_perception_result();
+        perception_result_0->mutable_touch_point()->set_x(double(touch_point_0.x));
+        perception_result_0->mutable_touch_point()->set_y(double(touch_point_0.y));
+
+        //短焦的左轨道线
+        for(auto &point : left_fitted_lane_cvpoints_0  )
+        {
+          apollo::common::Point2D *pb_point_left = perception_result_0->add_left_fitted_lane_cvpoints();
+          pb_point_left->set_x(double(point.x));
+          pb_point_left->set_y(double(point.y));
+        }
+        //短焦的右轨道线
+        for(auto &point : right_fitted_lane_cvpoints_0  )
+        {
+          apollo::common::Point2D *pb_point_right = perception_result_0->add_right_fitted_lane_cvpoints();
+          pb_point_right->set_x(double(point.x));
+          pb_point_right->set_y(double(point.y));
+        }
+
 
         apollo::drivers::Image *source_image_1 = sendData_1->mutable_source_image();
         watrix::projects::adas::proto::DetectionBoxs *pb_mutable_detection_boxs_1 = sendData_1->mutable_detection_boxs();
         watrix::projects::adas::proto::MaxSafeDistance *max_safe_distance_1 = sendData_1->mutable_max_safe_distance();
-        //resize to hdmi need screen
-        // cv::Mat out_mat_0;
-        // cv::Mat out_mat_1;
+        watrix::projects::adas::proto::PerceptionResult *perception_result_1= sendData_1->mutable_perception_result();
+        perception_result_1->mutable_touch_point()->set_x(double(touch_point_1.x));
+        perception_result_1->mutable_touch_point()->set_y(double(touch_point_1.y));
 
-        FillDetectBox(v_image_with_color_mask[0], yolo_detection_boxs0_, v_box_invasion_results[0], pb_mutable_detection_boxs_0);
+        //长焦的左轨道线
+        for(auto &point : left_fitted_lane_cvpoints_1  )
+        {
+          apollo::common::Point2D *pb_point_left = perception_result_1->add_left_fitted_lane_cvpoints();
+          pb_point_left->set_x(double(point.x));
+          pb_point_left->set_y(double(point.y));
+        }
+        //长焦的右轨道线
+        for(auto &point : right_fitted_lane_cvpoints_1  )
+        {
+          apollo::common::Point2D *pb_point_right = perception_result_1->add_right_fitted_lane_cvpoints();
+          pb_point_right->set_x(double(point.x));
+          pb_point_right->set_y(double(point.y));
+        }
+
+        //把检测框放在image上
+        FillDetectBox(v_image_[0], yolo_detection_boxs0_, v_box_invasion_results[0], pb_mutable_detection_boxs_0);
         max_safe_distance_0->set_image_distance(short_safe_y);
         // cv::resize(v_image_with_color_mask[0], out_mat_0, cv::Size(1280, 800));
 
         //mat image
-        FillDetectBox(v_image_with_color_mask[1], yolo_detection_boxs1_, v_box_invasion_results[1], pb_mutable_detection_boxs_1);
+        FillDetectBox(v_image_[1], yolo_detection_boxs1_, v_box_invasion_results[1], pb_mutable_detection_boxs_1);
         max_safe_distance_1->set_image_distance(long_safe_y);
         //tmp_mat = v_image_with_color_mask[select_cam];
         // cv::resize(v_image_with_color_mask[1], out_mat_1, cv::Size(1280, 800));
 
         //准备发送给客户端
-        MakeCvImageToProtoMsg(v_image_with_color_mask[0], source_image_0);
+        MakeCvImageToProtoMsg(v_image_[0], source_image_0);
         perception_->camera_out_writers_[perception_->camera_names_[0]]->Write(sendData_0);
 
-        MakeCvImageToProtoMsg(v_image_with_color_mask[1], source_image_1);
+        MakeCvImageToProtoMsg(v_image_[1], source_image_1);
         perception_->camera_out_writers_[perception_->camera_names_[1]]->Write(sendData_1);
       }
 

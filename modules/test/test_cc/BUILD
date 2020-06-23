@@ -3,6 +3,18 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
+    name = "test_atomic",
+    srcs = [
+        "test_atomic.cpp",
+    ],
+    linkopts = [
+        "-lpthread",
+    ],
+    deps = [
+    ],
+)
+
+cc_binary(
     name = "test_usb_cam",
     srcs = ["test_cam.cpp"],
     deps = [

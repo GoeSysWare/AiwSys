@@ -17,7 +17,7 @@
 #include <QMenu>
 #include <QTimerEvent>
 #include <QTime>
-#include <QtMultimedia>
+#include <QSignalMapper>
 #include <QMouseEvent>
 #include <QPoint>
 #include <QPushButton>

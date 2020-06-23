@@ -12,7 +12,8 @@ export  ADAS_WORK_BIN=${ROOT_DIR}/bazel-bin
 
 #CYBER配置目录
 export  CYBER_PATH=${ADAS_WORK_PATH}/cyber
-
+#CYBER_IP  配置這個IP可以启用RTPS， 实现局域网通信
+export  CYBER_IP=192.168.0.107
 #ADAS 配置目录
 export ADAS_CONFIG_PATH=${ADAS_WORK_PATH}/projects/adas
 

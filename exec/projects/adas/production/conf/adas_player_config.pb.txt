@@ -2,4 +2,4 @@
   #ADAS播放录像的配置
   # 注: 所有的路径支持相对路径和绝对路径，如果是相对路径，则在环境变量${ADAS_PATH}下
    ############################################################
-records_save_dir:"/home/watrix18/workspace/adas_data/records"
+records_save_dir:"/media/watrix/1b573151-65ca-4760-96f7-b360e64c6586/adas_data/records"

@@ -38,22 +38,20 @@ namespace watrix {
 	namespace algorithm {
 		namespace internal {
 
-
-
 			cv::Size lanesegutil::ORIGIN_SIZE(1920,1080);
 			// cv::Size lanesegutil::UPPER_SIZE(1920,568);
 			// cv::Size lanesegutil::CLIP_SIZE(1920,512);
 			cv::Size lanesegutil::UPPER_SIZE(1920,440);
 			cv::Size lanesegutil::CLIP_SIZE(1920,640);
 			cv::Size lanesegutil::CAFFE_INPUT_SIZE(1024,256);
-			// // pt_simple v2 v3 v4 resize 480 160
-			// cv::Size lanesegutil::PT_SIMPLE_INPUT_SIZE(480,160);
+			// // pt_simple v2 v3 v4 resize 480 160 v8_sequence
+			cv::Size lanesegutil::PT_SIMPLE_INPUT_SIZE(480,160);
 
 			// pt_simple v5 resize 480 240
 			// cv::Size lanesegutil::PT_SIMPLE_INPUT_SIZE(480,240);
 
 			// pt_simple v7 sequence resize 480 272
-			cv::Size lanesegutil::PT_SIMPLE_INPUT_SIZE(480,272);
+			// cv::Size lanesegutil::PT_SIMPLE_INPUT_SIZE(480,272);
 
 
 #pragma region get_lane_full_binary_mask
@@ -332,14 +330,15 @@ namespace watrix {
 					unsigned int X = int(points[i][0]);
 					unsigned int Y = int(points[i][1]);
 
+
 					float x,y;
 					bool success = MonocularDistanceApi::get_distance(table_type, Y,X, x, y);
-					// std::cout << success << "," << X << "," << Y << "," << x << "," << y << std::endl;
 					//  (X,z1,Y) (3,n)
 					if (success){
 						// CAMERA_TYPE::CAMERA_LONG  1 
 						if (table_type == 1){
 							if (round(x) > -10 && round(x) < 10 && round(y) > 30 && round(y) < 350){
+								// std::cout << success << "," << X << "," << Y << "," << x << "," << y << std::endl;
 								//std::cout << success << ",long " << points[i][0] << "," << points[i][1] << "," << X << "," << Y << "," << x << "," << y << std::endl;
 								coord_trans[0].push_back(x);
 								coord_trans[1].push_back(0);
@@ -580,7 +579,6 @@ namespace watrix {
 				*/
 				//printf(" coord_trans[2] Y.size = %d \n", coord_trans[2].size());
 				std::vector<int> y_idx = NumpyUtil::np_argwhere_eq(lane_coord_trans[2], y);
-				// std::cout << "y_idx size:" << y_idx.size() << " " << y_idx[0] << std::endl;
 				std::vector<double> x_coords;
 				for(auto& index: y_idx){
 					x_coords.push_back(lane_coord_trans[0][index]);
@@ -649,13 +647,13 @@ namespace watrix {
 			{
 				// (256,1024) ===(512,1920)===>(1080,1920) 
 
-				// // pt_simple v2 v3 v4 use CLIP_SIZE
-				// float h_rad = CLIP_SIZE.height/(input_size.height*1.f);
-				// float w_rad = CLIP_SIZE.width/(input_size.width*1.f);
+				// // pt_simple v2 v3 v4 v8_sequence use CLIP_SIZE
+				float h_rad = CLIP_SIZE.height/(input_size.height*1.f);
+				float w_rad = CLIP_SIZE.width/(input_size.width*1.f);
 
-				// pt_simple v5 use ORIGIN_SIZE
-				float h_rad = ORIGIN_SIZE.height/(input_size.height*1.f);
-				float w_rad = ORIGIN_SIZE.width/(input_size.width*1.f);
+				// pt_simple v5 v7_sequence use ORIGIN_SIZE
+				// float h_rad = ORIGIN_SIZE.height/(input_size.height*1.f);
+				// float w_rad = ORIGIN_SIZE.width/(input_size.width*1.f);
 
 				//printf("h_rad %f, w_rad = %f \n", h_rad, w_rad); // h_rad 2.0, w_rad = 1.875 
 
@@ -665,12 +663,12 @@ namespace watrix {
 					// (256,1024) ===(512,1920)===>(1080,1920) 
 					for(auto& pointxy: one_lane_points)
 					{
-						// // pt_simple v2 v3 v4 use CLIP_SIZE use UPPER_SIZE.height
-						// pointxy[0] = round(pointxy[0] * w_rad);
-						// pointxy[1] = round(pointxy[1] * h_rad + UPPER_SIZE.height);
-						// pt_simple v5 
+						// pt_simple v2 v3 v4 v8_sequence use CLIP_SIZE use UPPER_SIZE.height
 						pointxy[0] = round(pointxy[0] * w_rad);
-						pointxy[1] = round(pointxy[1] * h_rad);
+						pointxy[1] = round(pointxy[1] * h_rad + UPPER_SIZE.height);
+						// pt_simple v5 v7_sequence
+						// pointxy[0] = round(pointxy[0] * w_rad);
+						// pointxy[1] = round(pointxy[1] * h_rad);
 					}
 				}
 			}
@@ -733,8 +731,33 @@ namespace watrix {
 					dpoints_t auto_range_lane_dpoints;
 					
 					if (one_lane_points.size() >= (config.polyfit_order+1)){
-						cvpoints_t cvpoints = dpoints_to_cvpoints(one_lane_points);
-						Polyfiter fiter(cvpoints, 
+						// cvpoints_t cvpoints = dpoints_to_cvpoints(one_lane_points);
+						// Polyfiter fiter(cvpoints, 
+						// 	config.polyfit_order, 
+						// 	config.reverse_xy,
+						// 	config.x_range_min,
+						// 	config.x_range_max,
+						// 	config.y_range_min,
+						// 	config.y_range_max
+						// ); 
+
+						// Polyfiter fiter;
+				
+						TABLE_TYPE table_type = TABLE_LONG_A;
+						if (camera_type == CAMERA_SHORT){
+							table_type = TABLE_SHORT_A;
+						}
+						// CAMERA_TYPE::CAMERA_LONG  1 
+						double thresh = 0.0;
+						if (table_type == 1){
+							thresh = 0.05;
+						}
+						
+						int thresh_num = int(one_lane_points.size() * thresh);
+						int size_num = one_lane_points.size() - thresh_num;
+						std::vector<dpoint_t> one_lane_points_new(one_lane_points.begin()+thresh_num, one_lane_points.end());
+
+						Polyfiter fiter(one_lane_points_new, 
 							config.polyfit_order, 
 							config.reverse_xy,
 							config.x_range_min,
@@ -742,16 +765,7 @@ namespace watrix {
 							config.y_range_min,
 							config.y_range_max
 						); 
-				
-						// CAMERA_TYPE::CAMERA_LONG  1 
-						double thresh = 0.0;
-						// if (camera_type != CAMERA_SHORT){
-						// 	thresh = 0.05;
-						// }
-						
-						int thresh_num = int(one_lane_points.size() * thresh);
-						int size_num = one_lane_points.size() - thresh_num;
-						std::vector<dpoint_t> one_lane_points_new(one_lane_points.begin()+thresh_num, one_lane_points.end());
+
 						// std::copy(one_lane_points.begin()+thresh_num, one_lane_points.begin()+size_num, one_lane_points_new);
 						// std::cout << "one_lane_points size:" << one_lane_points.size() << " one_lane_points_new size:" << one_lane_points_new.size() << std::endl;
 						cv::Mat mat_k = fiter.cal_mat_add_points(one_lane_points_new);
@@ -867,131 +881,6 @@ namespace watrix {
 				x_left = -1000;
 				x_right = 1000; 
 				lane_count = v_auto_range_lane_points.size();
-
-				// (1) find left/right lane id by auto range 
-// 				for(int lane_id=0; lane_id< v_auto_range_lane_points.size(); lane_id++)
-// 				{
-// 					const dpoints_t& one_lane_points = v_auto_range_lane_points[lane_id]; // (1080,1920)
-// 					int n = one_lane_points.size();
-// 					// for lane point: image coord 1080,1920  ===> distance coord  x=[-5,5] y=[15,60]
-// 					dpoints_t lane_trans = image_points_to_distance_points(camera_type, config, one_lane_points); // 3*n
-// 					// X= lane_trans[0,:], Y= lane_trans[2,:]
-// 					// top keypoint
-// 					double top_lane_x = lane_trans[0][0]; 
-// 					double top_lane_z1 = lane_trans[1][0];
-// 					double top_lane_y = lane_trans[2][0];
-
-// 					dpoint_t top_point_trans{top_lane_x, top_lane_z1, top_lane_y};
-// 					cvpoint_t top_lane_cvpoint = dist_point_to_image_point(camera_type, config, top_point_trans);
-
-// 					// bottom keypoint (find left/right lane based on lane x)
-// 					double lane_x = lane_trans[0][n-1];
-// 					double lane_z1 = lane_trans[1][n-1];
-// 					double lane_y = lane_trans[2][n-1];
-					
-// 					dpoint_t bottom_point_trans{lane_x, lane_z1, lane_y};
-// 					cvpoint_t bottom_lane_cvpoint = dist_point_to_image_point(camera_type, config, bottom_point_trans);
-// 					bound_cvpoint(bottom_lane_cvpoint, ORIGIN_SIZE, 15); // for better display lane point
-
-// 					// lane keypoints
-// 					LaneKeypoint lane_keypoint;
-// 					lane_keypoint.top = top_lane_cvpoint;
-// 					lane_keypoint.bottom = bottom_lane_cvpoint;
-// 					v_lane_keypoint.push_back(lane_keypoint);
-
-// #ifdef DEBUG_INFO
-// 					printf("land_id = %d, N= %d, lane_x = %f, lane_point = (%d,%d) \n", 
-// 						lane_id, n, lane_x, bottom_lane_cvpoint.x,bottom_lane_cvpoint.y
-// 					); 
-// #endif
-
-// 					if (lane_count == 2){ // only 2 lane
-// 						if (lane_id == 0){ // lane 0
-// 							id_left = lane_id;
-// 							x_left = lane_x;
-// 							coord_left = lane_trans;
-// 						} else { // lane 1
-// 							id_right = lane_id;
-// 							x_right = lane_x;
-// 							coord_right = lane_trans;
-// 						}
-
-// 						if (lane_id == 1){
-// 							//printf("[HIT] lane 2 \n"); 
-// 							if (x_left > x_right) { // swap left and right
-// 								std::swap(id_left,id_right);
-// 								std::swap(x_left,x_right);
-// 								std::swap(coord_left,coord_right);
-// 							}
-// 						}
-// 					} else {
-// 						// other case
-// 						if (lane_x >=0 && lane_x < x_right){
-// 							id_right = lane_id;
-// 							x_right = lane_x;
-// 							coord_right = lane_trans;
-// 						}	
-// 						if (lane_x < 0 && lane_x > x_left){
-// 							id_left = lane_id;
-// 							x_left = lane_x;
-// 							coord_left = lane_trans;
-// 						}
-// 					}					
-// 				}
-
-				// (2) based on left/right lane, find yrange: y_min,y_max  and re-polyfit left/right lane
-// 				int y_min = UPPER_SIZE.height;// NEED TO UPDATED BY LANE y_min  568; ===> 440
-// 				int y_max = ORIGIN_SIZE.height; // image height 1080
-
-// 				cvpoints_t left_user_range_lane_cvpoints;
-// 				cvpoints_t right_user_range_lane_cvpoints;
-
-// 				if (id_left>=0 && id_right>=0){
-// 					int left_y_min = v_lane_keypoint[id_left].top.y;
-// 					int right_y_min = v_lane_keypoint[id_right].top.y;
-// 					y_min = std::min(left_y_min, right_y_min); // update y_min by min value of left/right y_min
-
-// #ifdef DEBUG_INFO
-// 					printf("[re-polyfit] left_y_min = %d, right_y_min= %d, y_min = %d\n", 
-// 						left_y_min, right_y_min, y_min
-// 					); 
-// #endif
-
-// 					// (3) re-polyfit by yrange
-// 					// (3.1) left
-// 					cvpoints_t left_cvpoints = dpoints_to_cvpoints(v_auto_range_lane_points[id_left]);
-// 					Polyfiter fiter(left_cvpoints, 
-// 						config.polyfit_order, 
-// 						config.reverse_xy,
-// 						config.x_range_min,
-// 						config.x_range_max,
-// 						y_min,
-// 						y_max
-// 					); 
-				
-// 					// change mat
-// 					cv::Mat mat_k = fiter.cal_mat_add_points(v_auto_range_lane_points[id_left]);
-// 					fiter.set_mat_k(mat_k);
-// 					// left_user_range_lane_cvpoints = fiter.fit(false);
-// 					dpoints_t left_user_range_lane_dpoints = fiter.fit_dpoint(v_auto_range_lane_points[id_left], false);
-
-// 					// (3.2) right
-// 					cvpoints_t right_cvpoints = dpoints_to_cvpoints(v_auto_range_lane_points[id_right]);
-// 					Polyfiter fiter2(right_cvpoints, 
-// 						config.polyfit_order, 
-// 						config.reverse_xy,
-// 						config.x_range_min,
-// 						config.x_range_max,
-// 						y_min,
-// 						y_max
-// 					); 
-// 					// change mat
-// 					cv::Mat mat_k_2 = fiter2.cal_mat_add_points(v_auto_range_lane_points[id_right]);
-// 					fiter2.set_mat_k(mat_k_2);
-// 					// right_user_range_lane_cvpoints = fiter2.fit(false);
-// 					dpoints_t right_user_range_lane_dpoints = fiter2.fit_dpoint(v_auto_range_lane_points[id_right], false);
-					
-// 				}
 				
 				// fwc
 				// std::cout << "id_left:" << id_left << "," << "id_right:" << id_right << std::endl;
@@ -1004,11 +893,11 @@ namespace watrix {
 				id_right = -1;
 				// printf("%s %d  v_auto_range_lane_points %d \n",__FUNCTION__,__LINE__, v_auto_range_lane_points.size());
 				// printf("%s %d  0= %d   1=%d \n",__FUNCTION__,__LINE__, v_auto_range_lane_points[0].size(), v_auto_range_lane_points[1].size());
-				if (v_auto_range_lane_points[0].size() >= 2){
+				if (v_auto_range_lane_points[0][0].size() >= 2){
 					id_left = 0;
 					left_user_range_lane_dpoints = v_auto_range_lane_points[id_left];
 				}
-				if (v_auto_range_lane_points[1].size() >= 2){
+				if (v_auto_range_lane_points[1][0].size() >= 2){
 					id_right = 1;
 					right_user_range_lane_dpoints = v_auto_range_lane_points[id_right];
 				}
@@ -1022,30 +911,30 @@ namespace watrix {
 					} else if(lane_id == id_right){
 						// v_merged_lane_points.push_back(cvpoints_to_dpoints(right_user_range_lane_cvpoints));
 						v_merged_lane_points.push_back(right_user_range_lane_dpoints);
-					} else {
-						v_merged_lane_points.push_back(v_auto_range_lane_points[lane_id]);
 					}
 				}
-printf("%s %d \n",__FUNCTION__,__LINE__);
+				// printf("%s %d \n",__FUNCTION__,__LINE__);
 				// (5) force left/right lane coords by merge range
 				coord_left.resize(3);
 				coord_right.resize(3);
 				if (id_left>=0){
-					coord_left = image_points_to_distance_points(camera_type, config, v_merged_lane_points[id_left]); 
+					// coord_left = image_points_to_distance_points(camera_type, config, v_merged_lane_points[id_left]); 
+					coord_left = v_merged_lane_points[id_left]; 
 				}
 				if (id_right>=0){
-					coord_right = image_points_to_distance_points(camera_type, config, v_merged_lane_points[id_right]); 
+					// coord_right = image_points_to_distance_points(camera_type, config, v_merged_lane_points[id_right]); 
+					coord_right = v_merged_lane_points[id_right];
 				}
 
-				if(coord_left[0].size()<=0){
-					id_left = -1;
-				}
+				// if(coord_left[0].size()<=0){
+				// 	id_left = -1;
+				// }
 
-				if(coord_right[0].size()<=0){
-					id_right = -1;
-				}
+				// if(coord_right[0].size()<=0){
+				// 	id_right = -1;
+				// }
 
-printf("%s %d \n",__FUNCTION__,__LINE__);
+				// printf("%s %d \n",__FUNCTION__,__LINE__);
 #ifdef DEBUG_INFO
 				printf("lane_count = %d \n",lane_count);
 				printf("id_left = %d \n",id_left);
@@ -1264,7 +1153,7 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 				box_invasion_result.invasion_distance = 0;	
 
 				// classname == train
-				if (detection_box.class_index == 3){
+				if (detection_box.class_name == "train"){
 					// std::cout << "train" << std::endl;
 					// classname == train
 					if (box_trans[0].size() > 0){
@@ -1341,7 +1230,7 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 					}
 				}
 				// classname == traffic light
-				else if (detection_box.class_index == 2){
+				else if (detection_box.class_name == "traffic light"){
 					box_invasion_result.invasion_status = INVASION_STATUS::NO_INVASION;
 				}
 				else{
@@ -1360,7 +1249,9 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 						(coord_expand_right[2][coord_expand_right[2].size()-1] < coord_expand_left[2][coord_expand_left[2].size()-1])?coord_expand_right[2][coord_expand_right[2].size()-1]:coord_expand_left[2][coord_expand_left[2].size()-1];
 						double dist_train_box = box_trans[2][0];
 
-						if (y1 <= dist_lane){
+						// std::cout << "fwc:" << y1 << " " << dist_lane << std::endl;
+						// if (y1 <= dist_lane){
+						if (y1 <= 250){
 							box_invasion_result = __do_box_invasion_detect(
 								config, coord_expand_left, coord_expand_right, x1, y1, x2, y2
 							);
@@ -1395,8 +1286,6 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 					const detection_box_t& detection_box = detection_boxs[i];
 
 					box_invasion_result_t box_invasion_result; 
-
-					// case1 box：目标物成像离镜头近，且挡住了轨道；由于轨道被遮挡，所以判断是否侵入轨道时，会判断为未侵界；
 					// if (is_case1_box(detection_box, config.case1_x_threshold, config.case1_y_threshold)){
 					// 	box_invasion_result = do_case1_box_invasion_detect(
 					// 		detection_box
@@ -1511,9 +1400,9 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 #pragma region lidar pointcloud small objects invasion detect
 			void lanesegutil::lidar_pointcloud_smallobj_invasion_detect(
 				// pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, 
-				std::vector<cv::Point3f> cloud,
+				const std::vector<cv::Point3f>& cloud,
 				InvasionData  invasion,
-				float distance_limit, 
+				float distance_limit,
 				cvpoints_t& input_l,
 				cvpoints_t& input_r,
 				std::vector<LidarBox>& obstacle_box,
@@ -1541,18 +1430,19 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 				// 	input_r_f.push_back(t_p);
 				// }
 
-				pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_pcl(new pcl::PointCloud<pcl::PointXYZ>);
-				for(int index=0;index<cloud.size();++index){
+				// pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_pcl(new pcl::PointCloud<pcl::PointXYZ>);
+				// for(int index=0;index<cloud.size();++index){
 
-					pcl::PointXYZ pt;
-					pt.x = cloud[index].x;
-					pt.y = cloud[index].y;
-					pt.z = cloud[index].z;
-					cloud_pcl->points.push_back(pt);
-				}
-				points = LOD::getPointFrom2DAnd3D(cloud_pcl, LOD::getInvasionMap(input_l, input_r, top_y), top_y, invasion, rotation, distance_limit);
+				// 	pcl::PointXYZ pt;
+				// 	pt.x = cloud[index].x;
+				// 	pt.y = cloud[index].y;
+				// 	pt.z = cloud[index].z;
+				// 	cloud_pcl->points.push_back(pt);
+				// }
+
+				points = LOD::getPointFrom2DAnd3D(cloud, LOD::getInvasionMap(input_l, input_r, top_y), top_y, invasion, rotation, distance_limit);
 #ifdef SHOW_PCD
-				// pcl::io::savePCDFileBinary("output.pcd", *points);
+				pcl::io::savePCDFileBinary("output.pcd", *points);
 				pcl::visualization::CloudViewer viewer("Show");
 				viewer.showCloud(points);
 				// system("pause");
@@ -1583,13 +1473,14 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 #pragma region draw lane with mask
 			cvpoint_t lanesegutil::get_nearest_invasion_box_point(
 				const detection_boxs_t& detection_boxs,
+				const std::vector<lidar_invasion_cvbox>& cv_obstacle_box, // lidar invasion object cv box
 				const box_invasion_results_t& box_invasion_results
 				)
 			{
 					cvpoint_t nearest_point;
-					for(int i=0;i<detection_boxs.size();i++){
+					for(int i=0; i<detection_boxs.size(); i++){
 						// train 不计算nearest point
-						if (detection_boxs[i].class_index != 3){
+						if (detection_boxs[i].class_name != "train"){
 							if (box_invasion_results[i].invasion_status == INVASION_STATUS::YES_INVASION){
 								const detection_box_t& box = detection_boxs[i];
 								int cx = (box.xmin + box.xmax)/2;
@@ -1599,6 +1490,15 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 									nearest_point.x = cx; 
 								}
 							}
+						}
+					}
+					for(int i=0; i<cv_obstacle_box.size(); i++){
+						const lidar_invasion_cvbox& lidar_cvbox = cv_obstacle_box[i];
+						int cx = (lidar_cvbox.xmin + lidar_cvbox.xmax)/2;
+						int cy = lidar_cvbox.ymax;
+						if (nearest_point.y<cy){ // find max y
+							nearest_point.y = cy; 
+							nearest_point.x = cx; 
 						}
 					}
 					return nearest_point;
@@ -1806,7 +1706,8 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 
 
 				// (2.1) left/right lane
-				if (config.b_draw_left_right_lane)
+				// if (config.b_draw_left_right_lane)
+				if (true)
 				{
 					if (id_left>=0 && id_right>=0){
 						cvpoints_t clipped_left_lane_cvpoints = clip_lane_by_nearest_box_point(
@@ -1832,7 +1733,8 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 				}
 				
 				// (3.1) draw left/right fitted lane
-				if (config.b_draw_left_right_fitted_lane){
+				// if (config.b_draw_left_right_fitted_lane){
+				if(false){
 					if (id_left>=0 && id_right>=0){
 						cvpoints_t clipped_left_fitted_lane_cvpoints = clip_lane_by_nearest_box_point(
 							v_fitted_lane_points[id_left], near_x, near_y
@@ -1883,8 +1785,6 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 				}
 				
 				// (6) draw left-right lane safe area  and corners
-				lane_safe_area_corner.valid = false;
-
 				if (config.b_draw_safe_area && id_left>=0 && id_right>=0){
 					cvpoints_t clipped_left_lane_cvpoints = clip_lane_by_nearest_box_point(
 						left_expand_lane_cvpoints, near_x, near_y
@@ -1919,7 +1819,6 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 					NumpyUtil::cv_add_weighted(safe_area_1, out, config.safe_area_alpha);
 
 				}
-
 				// (7) draw train cvpoints
 				if (config.b_draw_train_cvpoints){
 				 	for(int i=0; i<trains_cvpoints.size();i++){
@@ -1956,7 +1855,7 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 				const std::vector<cvpoints_t>& trains_cvpoints,
 				const cvpoints_t& lidar_cvpoints,
 				// const pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, // lidar pointscloud
-				const std::vector<cv::Point3f> cloud, // lidar pointscloud
+				const std::vector<cv::Point3f>& cloud, // lidar pointscloud
 				const LaneInvasionConfig& config_,
 				cv::Mat& image_with_color_mask,
 				int& lane_count,
@@ -1965,8 +1864,11 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 				box_invasion_results_t& box_invasion_results,
 				std::vector<int>& lidar_invasion_status,
 				lane_safe_area_corner_t& lane_safe_area_corner,
-				bool& is_open_long_camera, // 是否开远焦
-				std::vector<lidar_invasion_cvbox>& cv_obstacle_box // lidar invasion object cv box
+				bool& is_open_long_camera,
+				std::vector<lidar_invasion_cvbox>& cv_obstacle_box, // lidar invasion object cv box
+				cvpoint_t& touch_point, // 侵界障碍物和轨道的接触点
+				cvpoints_t& left_fitted_lane_cvpoints, // 拟合后的左轨道图像坐标点列
+				cvpoints_t& right_fitted_lane_cvpoints // 拟合后的右轨道图像坐标点列
 			)
 			{
 				//std::cout<<"lanesegutil::lane_invasion_detect for lane_model_type = "<<lane_model_type << std::endl;
@@ -2038,7 +1940,11 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 				// point2 = [995, 955]
 				*/
 				static int m_counter = 0;
-				
+
+#ifdef DEBUG_INFO_TIME
+				boost::posix_time::ptime pt1 = boost::posix_time::microsec_clock::local_time();
+#endif
+
 				// (1) get clustered lane points (256,1024)
 				std::vector<dpoints_t> v_src_lane_points;
 				x_get_clustered_lane_points(
@@ -2049,18 +1955,34 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 					v_src_lane_points
 				);
 
-				std::cout << "v_src_lane_points size:" << v_src_lane_points.size() << std::endl;
+#ifdef DEBUG_INFO_TIME
+				boost::posix_time::ptime pt2 = boost::posix_time::microsec_clock::local_time();
+				int64_t cost = (pt2 - pt1).total_milliseconds();
+				std::cout<<"[x_get_clustered_lane_points_cost] = "<< cost << std::endl;
+#endif
+
+				// std::cout << "v_src_lane_points size:" << v_src_lane_points.size() << std::endl;
 				// std::cout << "v_src_lane_points[0] size:" << v_src_lane_points[0].size() << std::endl;
 				// std::cout << "v_src_lane_points[1] size:" << v_src_lane_points[1].size() << std::endl;
 
 				// (2) transform lane points from binary image to origin image 
 				// (256,1024)===>(1080,1920) 
+
+#ifdef DEBUG_INFO_TIME
+				pt1 = boost::posix_time::microsec_clock::local_time();
+#endif
+
 				x_transform_binary_lanes_to_origin_lanes(
 					lane_model_type, 
 					v_src_lane_points
 				);
 
-				std::cout << "v_src_lane_points size:" << v_src_lane_points.size() << std::endl;
+#ifdef DEBUG_INFO_TIME
+				pt2 = boost::posix_time::microsec_clock::local_time();
+				cost = (pt2 - pt1).total_milliseconds();
+				std::cout<<"[x_transform_binary_lanes_to_origin_lanes_cost] = "<< cost << std::endl;
+#endif
+				// std::cout << "v_src_lane_points size:" << v_src_lane_points.size() << std::endl;
 				// std::cout << "v_src_lane_points[0] size:" << v_src_lane_points[0].size() << std::endl;
 				// std::cout << "v_src_lane_points[1] size:" << v_src_lane_points[1].size() << std::endl;
 				// std::cout << "cvpoints -> distance_points end" << std::endl;
@@ -2117,6 +2039,10 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 				// 	v_user_range_lane_points
 				// );
 
+#ifdef DEBUG_INFO_TIME
+				pt1 = boost::posix_time::microsec_clock::local_time();
+#endif
+
 				// (3) polyfit lanes
 				std::vector<dpoints_t> v_auto_range_dist_lane_points;
 				std::vector<dpoints_t> v_user_range_dist_lane_points;
@@ -2139,8 +2065,18 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 					v_src_dist_lane_points.push_back(tmp_ps);
 				}
 
-				std::cout << "v_src_dist_lane_points size:" << v_src_dist_lane_points.size() << std::endl;
+#ifdef DEBUG_INFO_TIME
+				pt2 = boost::posix_time::microsec_clock::local_time();
+				cost = (pt2 - pt1).total_milliseconds();
+				std::cout<<"[change_points_cost] = "<< cost << std::endl;
+#endif
+
+				// std::cout << "v_src_dist_lane_points size:" << v_src_dist_lane_points.size() << std::endl;
 				// std::cout << "v_src_dist_lane_points[0] size:" << v_src_dist_lane_points[0].size() << std::endl;
+
+#ifdef DEBUG_INFO_TIME
+				pt1 = boost::posix_time::microsec_clock::local_time();
+#endif
 
 				std::vector<cv::Mat> v_left_right_polyfit_matk; // add left right lane polyfit matk
 				// in distance_points polyfit
@@ -2155,10 +2091,19 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 					v_left_right_polyfit_matk
 				);
 
+#ifdef DEBUG_INFO_TIME
+				pt2 = boost::posix_time::microsec_clock::local_time();
+				cost = (pt2 - pt1).total_milliseconds();
+				std::cout<<"[lane_polyfit_cost] = "<< cost << std::endl;
+#endif
+
 				// std::cout << "polyfit end" << std::endl;
-				std::cout << "v_auto_range_dist_lane_points size:" << v_auto_range_dist_lane_points.size() << std::endl;
+				// std::cout << "v_auto_range_dist_lane_points size:" << v_auto_range_dist_lane_points.size() << std::endl;
 				// std::cout << "point num:" << v_auto_range_dist_lane_points[0].size() << std::endl;
 
+#ifdef DEBUG_INFO_TIME
+				pt1 = boost::posix_time::microsec_clock::local_time();
+#endif
 
 				// v_auto_range_dist_lane_points is distance_points, -> cvpoints
 				std::vector<dpoints_t> v_auto_range_lane_points;
@@ -2180,22 +2125,20 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 					v_auto_range_dist_lane_points_new.push_back(tmp_ps);
 				}
 
-				// dpoints_t t_left = v_auto_range_dist_lane_points_new[0], t_right = v_auto_range_dist_lane_points_new[1];
-				// float t_dist = (t_left[2][t_left[2].size()-1] < t_right[2][t_right[2].size()-1]) ? \
-				// 					t_left[2][t_left[2].size()-1] : t_right[2][t_right[2].size()-1];
-					
-				// std::cout << "distance limit 0:" << t_dist << std::endl;
-				// std::cout << "left:" << t_left[2][t_left[2].size()-1] << " right:" << t_right[2][t_right[2].size()-1] << std::endl;
+				// std::vector<cvpoints_t> v_left_right_expand_cvpoints;
+				// for(int lane_id=0; lane_id < v_auto_range_dist_lane_points_new.size(); lane_id++){
+				// 	const dpoints_t& one_lane_points = v_auto_range_dist_lane_points_new[lane_id]; 
+				// 	cvpoints_t lane_trans = distance_points_to_image_points(camera_type, config, one_lane_points); // 3*n
+				// 	dpoints_t lane_trans_d = cvpoints_to_dpoints(lane_trans);
+				// 	v_left_right_expand_cvpoints.push_back(lane_trans);
+				// 	v_auto_range_lane_points.push_back(lane_trans_d);
+				// }
 
-				std::vector<cvpoints_t> v_left_right_expand_cvpoints;
-				for(int lane_id=0; lane_id < v_auto_range_dist_lane_points_new.size(); lane_id++){
-					const dpoints_t& one_lane_points = v_auto_range_dist_lane_points_new[lane_id]; 
-					cvpoints_t lane_trans = distance_points_to_image_points(camera_type, config, one_lane_points); // 3*n
-					dpoints_t lane_trans_d = cvpoints_to_dpoints(lane_trans);
-					v_left_right_expand_cvpoints.push_back(lane_trans);
-					v_auto_range_lane_points.push_back(lane_trans_d);
-				}
-
+#ifdef DEBUG_INFO_TIME
+				pt2 = boost::posix_time::microsec_clock::local_time();
+				cost = (pt2 - pt1).total_milliseconds();
+				std::cout<<"[change_points_cost] = "<< cost << std::endl;
+#endif
 
 				// for(int lane_id=0; lane_id < v_auto_range_dist_lane_points_new.size(); lane_id++){
 				// 	const dpoints_t& one_lane_points = v_auto_range_dist_lane_points_new[lane_id]; 
@@ -2220,7 +2163,9 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 				}
 #endif
 
-
+#ifdef DEBUG_INFO_TIME
+				pt1 = boost::posix_time::microsec_clock::local_time();
+#endif
 
 				// (4) get left right main lane (auto range)
 				std::vector<dpoints_t> v_merged_lane_points;
@@ -2235,8 +2180,8 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 				get_left_right_lane(
 					camera_type,
 					config, 
-					v_auto_range_lane_points, 
-					v_user_range_lane_points,
+					v_auto_range_dist_lane_points_new, 
+					v_user_range_dist_lane_points,
 					v_merged_lane_points,
 					v_lane_keypoint,
 					lane_count,
@@ -2252,8 +2197,8 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 
 				// (5) expand left and right lane X by 0.7825
 				// X= lane_trans[0,:], Y= lane_trans[2,:]
-				dpoints_t coord_expand_left = coord_left;
-				dpoints_t coord_expand_right = coord_right;
+				dpoints_t coord_expand_left = coord_left; // 3*n
+				dpoints_t coord_expand_right = coord_right; // 3*n
 
 				// if (coord_expand_left.size()>0){
 				// 	for(auto& x: coord_expand_left[0]){
@@ -2271,21 +2216,43 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 
 
 				// (6) get left and right expand image points in origin image
-				// cvpoints_t left_expand_lane_cvpoints  = distance_points_to_image_points(
-				// 	camera_type,
-				// 	config, 
-				// 	coord_expand_left
-				// );
-				// cvpoints_t right_expand_lane_cvpoints = distance_points_to_image_points(
-				// 	camera_type,
-				// 	config, 
-				// 	coord_expand_right
-				// );
-				cvpoints_t left_expand_lane_cvpoints, right_expand_lane_cvpoints;
-				if (v_left_right_expand_cvpoints.size() == 2){
-					left_expand_lane_cvpoints = v_left_right_expand_cvpoints[0];
-					right_expand_lane_cvpoints = v_left_right_expand_cvpoints[1];
-				}
+				cvpoints_t left_expand_lane_cvpoints  = distance_points_to_image_points(
+					camera_type,
+					config, 
+					coord_expand_left
+				);
+				cvpoints_t right_expand_lane_cvpoints = distance_points_to_image_points(
+					camera_type,
+					config, 
+					coord_expand_right
+				);
+
+				cvpoints_t left_lane_cvpoints  = distance_points_to_image_points(
+					camera_type,
+					config, 
+					coord_left
+				);
+				cvpoints_t right_lane_cvpoints = distance_points_to_image_points(
+					camera_type,
+					config, 
+					coord_right
+				);
+
+				dpoints_t left_lane_dpoints = cvpoints_to_dpoints(left_lane_cvpoints);
+				dpoints_t right_lane_dpoints = cvpoints_to_dpoints(right_lane_cvpoints);
+				std::vector<dpoints_t> v_fitted_lane_points = {left_lane_dpoints, right_lane_dpoints};
+
+				// cvpoints_t left_expand_lane_cvpoints, right_expand_lane_cvpoints;
+				// if (v_left_right_expand_cvpoints.size() == 2){
+				// 	left_expand_lane_cvpoints = v_left_right_expand_cvpoints[0];
+				// 	right_expand_lane_cvpoints = v_left_right_expand_cvpoints[1];
+				// }
+
+#ifdef DEBUG_INFO_TIME
+				pt2 = boost::posix_time::microsec_clock::local_time();
+				cost = (pt2 - pt1).total_milliseconds();
+				std::cout<<"[get_left_right_lane_cost] = "<< cost << std::endl;
+#endif
 
 #ifdef DEBUG_INFO_FWC
 				std::vector<cvpoints_t> v_expand_lane_cvpoints;
@@ -2306,6 +2273,10 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 				}
 #endif
 
+#ifdef DEBUG_INFO_TIME
+				pt1 = boost::posix_time::microsec_clock::local_time();
+#endif
+
 				if (box_count<1){
 					printf("[WARNING-1] no detecton boxs. \n");
 				}
@@ -2316,6 +2287,12 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 				} 
 
 				cvpoint_t nearest_point; // nearest invasion box point
+
+				// fwc test
+				TABLE_TYPE table_type = TABLE_LONG_A;
+				if (camera_type == CAMERA_SHORT){
+					table_type = TABLE_SHORT_A;
+				}
 
 				std::vector<LidarBox> obstacle_box; // lidar invasion object 3d box
 				// std::vector<lidar_invasion_cvbox> cv_obstacle_box; // lidar invasion object cv box
@@ -2349,12 +2326,9 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 					float distance_limit;
 					distance_limit = (coord_expand_left[2][coord_expand_left[2].size()-1] < coord_expand_right[2][coord_expand_right[2].size()-1]) ? \
 									coord_expand_left[2][coord_expand_left[2].size()-1] : coord_expand_right[2][coord_expand_right[2].size()-1];
-					
-					std::cout << "distance limit:" << distance_limit << std::endl;
-					std::cout << "left:" << coord_expand_left[2][coord_expand_left[2].size()-1] << " right:" << coord_expand_right[2][coord_expand_right[2].size()-1] << std::endl;
 
 					// CAMERA_TYPE::CAMERA_LONG  1 
-					if (camera_type == CAMERA_SHORT){
+					if (table_type != 1){
 						if (config.use_lidar_pointcloud_smallobj_invasion_detect){
 							lidar_pointcloud_smallobj_invasion_detect(
 								cloud, invasion, distance_limit, left_expand_lane_cvpoints, right_expand_lane_cvpoints,
@@ -2382,10 +2356,26 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 					// (9) get nearest invasion box point
 					nearest_point = get_nearest_invasion_box_point(
 						detection_boxs, 
+						cv_obstacle_box, 
 						box_invasion_results
 					);
 				}
-				
+
+				touch_point = nearest_point; // 侵界障碍物和轨道的接触点
+				left_fitted_lane_cvpoints = left_expand_lane_cvpoints; // 拟合后的左轨道图像坐标点列
+				right_fitted_lane_cvpoints = right_expand_lane_cvpoints; // 拟合后的右轨道图像坐标点列
+
+#ifdef DEBUG_INFO_TIME				
+				pt2 = boost::posix_time::microsec_clock::local_time();
+				cost = (pt2 - pt1).total_milliseconds();
+				std::cout<<"[function_cost] = "<< cost << std::endl;
+#endif				
+
+
+/*
+#ifdef DEBUG_INFO_TIME			
+				pt1 = boost::posix_time::microsec_clock::local_time();
+#endif
 
 
 				// (10) draw image with lane mask, safe area
@@ -2396,7 +2386,7 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 					binary_mask,
 					instance_mask,
 					v_src_lane_points, 
-					v_merged_lane_points,
+					v_fitted_lane_points,
 					v_lane_keypoint,
 					id_left, 
 					id_right, 
@@ -2429,7 +2419,7 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 				}
 
 				// CAMERA_TYPE::CAMERA_LONG  1 
-				if (camera_type == CAMERA_SHORT){
+				if (table_type != 1){
 					// bool is_show_lidarbox = true;
 					if (config.use_lidar_pointcloud_smallobj_invasion_detect){
 						for (size_t i = 0; i < cv_obstacle_box.size(); i++)
@@ -2533,6 +2523,14 @@ printf("%s %d \n",__FUNCTION__,__LINE__);
 						}
 					}
 				}// end if table type
+
+#ifdef DEBUG_INFO_TIME				
+				pt2 = boost::posix_time::microsec_clock::local_time();
+				cost = (pt2 - pt1).total_milliseconds();
+				std::cout<<"[draw_cost] = "<< cost << std::endl;
+#endif
+*/
+
 				m_counter++;
 
 				return true;

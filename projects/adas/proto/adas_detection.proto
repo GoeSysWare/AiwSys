@@ -22,6 +22,8 @@ message DetectionBox {
 }
 
 
+
+
 // for 1 image, we get 1 DetectionBoxs (N DetectionBox)
 message DetectionBoxs {
   repeated DetectionBox boxs = 1; 
@@ -45,6 +47,12 @@ message LidarImageResult {
   optional apollo.drivers.Image  lidar_image = 1; 
   optional uint64 timestamp_msec = 2;  
 }
+// 感知后的结果,包含安全线,左右轨道线
+message PerceptionResult {
+  optional apollo.common.Point2D   touch_point =1;
+  repeated apollo.common.Point2D   left_fitted_lane_cvpoints =2;
+  repeated apollo.common.Point2D   right_fitted_lane_cvpoints =3;
+}
 
 
 message MaxSafeDistance {
@@ -57,5 +65,8 @@ message SendResult {
   optional apollo.drivers.Image seg_binary_mask = 2;
   optional DetectionBoxs detection_boxs = 3;
   optional MaxSafeDistance max_safe_distance = 4; 
+  optional PerceptionResult perception_result = 5; 
+
+
 }
 

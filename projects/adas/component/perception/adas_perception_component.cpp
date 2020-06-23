@@ -733,12 +733,15 @@ namespace watrix
             cv::cvtColor(tmp, tmp, CV_RGB2BGR); //将RGB图像转换为BGR
 
             //填充本地cv::Mat
-            images_[i] = tmp;
+            //images_[i] = tmp;
+            images_[i] = std::move(tmp);
+            // assert(images_[i].data == tmp.data);
+            
           }
         }
         //暂时只有一路相机出发计算线程
-        if (camera_names_[0] == camera_name)
-          return apollo::cyber::SUCC;
+        // if (camera_names_[0] == camera_name)
+        //   return apollo::cyber::SUCC;
         //序列号
         this->sequence_num_ = in_message->header().sequence_num();
 
@@ -753,11 +756,15 @@ namespace watrix
         std::shared_ptr<AdasPerceptionComponent> share_this =
             std::dynamic_pointer_cast<AdasPerceptionComponent>(shared_from_this());
         //新建PerceptionTask 任务
-
-
+        for(auto & img : share_this->images_)
+        {
+          if(img.empty())
+          return;
+        }
         YoloDarknetApi* darknet_ptr = static_cast<YoloDarknetApi*>(this->task_processor_->ptr_map_[std::this_thread::get_id()]);
 
       
+
         std::shared_ptr<PerceptionTask> task = make_shared<PerceptionTask>(share_this,darknet_ptr);
 
         task->Excute();
